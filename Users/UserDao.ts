@@ -1,7 +1,6 @@
 import User from "./User";
 import UserModel from "./UserModel";
 import UserDaoInterface from "./UserDaoInterface";
-import UserInterface from "./UserInterface";
 
 export default class UserDao implements UserDaoInterface {
     async createUser(user: User): Promise<User> {

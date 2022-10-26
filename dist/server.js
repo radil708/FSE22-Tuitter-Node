@@ -28,7 +28,7 @@ function defaultPage(req, res) {
 }
 app.get('/', defaultPage);
 const userDaoInstance = new UserDao_1.default();
-const userConstroller = new UserController_1.default(app, userDaoInstance);
+const userController = new UserController_1.default(app, userDaoInstance);
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 //# sourceMappingURL=server.js.map

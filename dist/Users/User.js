@@ -7,7 +7,7 @@ const MaritalStatus_1 = require("./UserEnums/MaritalStatus");
  * A user has a username, password, firstName, lastName, email, accountType
  * maritalStatus, and location at minimum.
  * A User also has optional attributes like profilePhoto and headerImage.
- * By default a user's accountType is Personal and maritalStatus is Single.
+ * By default, a user's accountType is Personal and maritalStatus is Single.
  */
 class User {
     /**

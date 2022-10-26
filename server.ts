@@ -41,7 +41,7 @@ function defaultPage (req: Request, res: Response) {
 app.get('/',defaultPage)
 
 const userDaoInstance = new UserDao();
-const userConstroller = new UserController(app,userDaoInstance);
+const userController = new UserController(app,userDaoInstance);
 
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
