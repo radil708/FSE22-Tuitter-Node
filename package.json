@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "build" : "tsc --project ./",
+    "compileTs" : "node dist/server.js",
+    "build" : "tsc && npm run compileTs",
     "local" : "node build/server.js"
   },
   "scriptsComments": {
