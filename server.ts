@@ -1,8 +1,7 @@
 /**
  * @file Implements an Express Node HTTP server.
  */
-import * as express from 'express';
-import {Request, Response} from 'express';
+import express, {Request, Response} from 'express';
 import mongoose from "mongoose";
 
 
@@ -28,4 +27,3 @@ app.get('/hello', sayHello);
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 
-module.exports = app
