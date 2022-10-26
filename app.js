@@ -1,3 +1,10 @@
+import express, {Request, Response} from 'express';
+import mongoose from "mongoose";
+/*---------- my custom imports above -------------*/
+
+const cors = require('cors')
+var app = express();
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -7,7 +14,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -37,5 +44,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+/*######################## DEFAULT CODE ABOVE ##############*/
 
 module.exports = app;
