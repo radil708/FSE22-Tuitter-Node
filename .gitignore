@@ -1,6 +1,7 @@
 node_modules
 .idea
 build
+personal-readme
 
 
 # Elastic Beanstalk Files
