@@ -5,6 +5,8 @@ const UserController_1 = require("./Users/UserController");
 const UserDao_1 = require("./Users/UserDao");
 const app = express();
 const mongoose = require('mongoose');
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 /*************    Connect To Remote MongoDB Database    *****************/
 /*IMPORTANT** Make sure environment variable set up before running
 i.e. for aws elastic beanstalk deployment:

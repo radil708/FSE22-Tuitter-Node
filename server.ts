@@ -7,6 +7,8 @@ import UserDao from "./Users/UserDao";
 const app = express();
 const mongoose = require('mongoose');
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 /*************    Connect To Remote MongoDB Database    *****************/
 
