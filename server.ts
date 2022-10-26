@@ -1,6 +1,9 @@
 import * as express from 'express';
 import {Request, Response} from "express";
 
+import UserController from "./Users/UserController";
+import UserDao from "./Users/UserDao";
+
 const app = express();
 const mongoose = require('mongoose');
 
@@ -36,6 +39,9 @@ function defaultPage (req: Request, res: Response) {
 }
 
 app.get('/',defaultPage)
+
+const userDaoInstance = new UserDao();
+const userConstroller = new UserController(app,userDaoInstance);
 
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
