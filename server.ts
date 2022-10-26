@@ -27,3 +27,5 @@ app.get('/hello', sayHello);
  */
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
+
+module.exports = app
