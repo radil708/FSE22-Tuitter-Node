@@ -8,8 +8,10 @@ const mongoose = require('mongoose');
 /*************    Connect To Remote MongoDB Database    *****************/
 
 /*IMPORTANT** Make sure environment variable set up before running
-i.e. for aws elastic beanstalk deployment: eb setenv DB_CLUSTER_USERNAME=<username>
-on ubuntu use cmd: export DB_CLUSTER_USERNAME=<username>
+i.e. for aws elastic beanstalk deployment:
+    eb setenv DB_CLUSTER_USERNAME=<username>
+on local ubuntu use cmd:
+    export DB_CLUSTER_USERNAME=<username>
  */
 const DB_USERNAME = process.env.DB_CLUSTER_USERNAME;
 const DB_PASSWORD = process.env.DB_CLUSTER_PASSWORD;

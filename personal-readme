@@ -1,0 +1,20 @@
+Pre-requesites for developers
+1.) node installed
+2.) typescript installed
+3.) npm install mongoose
+4.) npm install express
+5.) eb (elastic beanstalk) installed
+
+6.) eb env variables for username and password to MongoAtlas DB have been set
+ie..
+eb setenv DB_CLUSTER_USERNAME=<username to MongoDB Atlas Cloud cluster specific username>
+eb setenv DB_CLUSTER_PASSWORD=<password to MongoDB Atlas Cloud cluster specific password>
+NOTE** make sure to wait until command is finished running before calling another command
+
+if wanting to run local copy, I use linux and you can set env variables by
+export DB_CLUSTER_USERNAME=<username to MongoDB Atlas Cloud cluster specific username>
+DB_CLUSTER_PASSWORD=<password to MongoDB Atlas Cloud cluster specific password>
+
+you can recall this info in the server.ts or any .ts file using:
+process.env.DB_CLUSTER_USERNAME
+process.env.DB_CLUSTER_PASSWORD
