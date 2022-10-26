@@ -1,7 +1,8 @@
 /**
  * @file Implements an Express Node HTTP server.
  */
-import express, {Request, Response} from 'express';
+import * as express from 'express';
+import {Request, Response} from 'express';
 import mongoose from "mongoose";
 const cors = require('cors')
 
