@@ -4,10 +4,10 @@
 import * as express from 'express';
 import {Request, Response} from 'express';
 import mongoose from "mongoose";
-const cors = require('cors')
+
 
 const app = express();
-app.use(cors()); //Allows servers and clients to talk safely
+
 app.use(express.json()); // Allows server to parse data coming from clients
 
 function sayHello (req: Request, res: Response) {
