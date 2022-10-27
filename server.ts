@@ -5,6 +5,8 @@ import UserController from "./Users/UserController";
 import UserDao from "./Users/UserDao";
 import TuitDao from "./Tuits/TuitDao";
 import TuitController from "./Tuits/TuitController";
+import LikeController from "./Likes/LikeController";
+import LikeDao from "./Likes/LikeDao";
 
 const app = express();
 const cors = require('cors');
@@ -50,6 +52,7 @@ const userDao = new UserDao();
 const userController = new UserController(app, userDao);
 const tuitDao = new TuitDao();
 const tuitController = new TuitController(app,tuitDao,userDao);
+const likeController = new LikeController(app, new LikeDao());
 
 
 const PORT = 4000;

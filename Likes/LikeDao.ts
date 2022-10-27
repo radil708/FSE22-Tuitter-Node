@@ -3,17 +3,18 @@ import Like from "./Like";
 import LikeModel from "./LikeModel";
 import User from "../Users/User";
 import Tuit from "../Tuits/Tuit";
-import jsonToTuit from "./jsonToTuit";
-import jsonToUser from "./jsonToUser";
-
+import TuitModel from "../Tuits/TuitModel";
+import likeModel from "./LikeModel";
 
 export default class LikeDao implements LikeDaoInterface{
-    createLike(tuitLiked: Tuit, likedBy: User): Promise<Like> {
-        return Promise.resolve(undefined);
+
+    async createLike(tuitLikedId: string, userLikedId: string): Promise<Like> {
+        const createdLike = await LikeModel.create({likedTuit: tuitLikedId, likedBy: userLikedId})
+        return new Like(createdLike._id.toString(),null,null)
     }
 
-    deleteLike(likedId: string): Promise<number> {
-        return Promise.resolve(0);
+    async deleteLike(likedId: string): Promise<any> {
+        return await LikeModel.deleteOne({_id: likedId})
     }
 
     async findAllLikes(): Promise<Like[]> {
@@ -23,15 +24,53 @@ export default class LikeDao implements LikeDaoInterface{
         const likedArr = [];
 
         for (const eachLike of allLikesJson) {
-            likedArr.push(new Like(eachLike._id.toString(),jsonToTuit(eachLike.likedTuit),jsonToUser(eachLike.likedBy)));
+            let targetTuit = eachLike.likedTuit
+            let userTarget = eachLike.likedBy
+
+            let tUser = new User(
+                userTarget._id.toString() || '',
+                userTarget['username'] || '',
+                userTarget['firstName'] || '',
+                userTarget['lastName'] || '',
+                userTarget['password'] || '',
+                userTarget['email'] || '');
+
+            let tTuit = new Tuit(
+                targetTuit._id.toString(),
+                userTarget._id.toString(),
+                targetTuit['tuit'],
+                targetTuit['postedOn'])
+
+            tTuit.setUser(tUser);
+
+            likedArr.push(new Like(eachLike._id.toString(),tTuit, tUser));
         }
 
         return likedArr;
 
     }
 
-    findLikeById(id: string): Promise<Like> {
-        return Promise.resolve(undefined);
+    async findLikeById(id: string): Promise<Like> {
+        const likeFromDb = await LikeModel.findById(id);
+        const targetTuit = likeFromDb.likedTuit
+        const userTarget = likeFromDb.likedBy
+
+        const tUser = new User(
+            userTarget._id.toString() || '',
+            userTarget['username'] || '',
+            userTarget['firstName'] || '',
+            userTarget['lastName'] || '',
+            userTarget['password'] || '',
+            userTarget['email'] || '');
+
+        const tTuit = new Tuit(
+            targetTuit._id.toString(),
+            userTarget._id.toString(),
+            targetTuit['tuit'],
+            targetTuit['postedOn'])
+
+        return new Like(likeFromDb._id.toString(), tTuit,tUser)
+
     }
 
 }

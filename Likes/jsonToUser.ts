@@ -1,13 +1,15 @@
 import Tuit from "../Tuits/Tuit";
 import User from "../Users/User";
+import mongoose from "mongoose";
 
-function jsonToUser(jsonIn) {
-    return new User(jsonIn._id.toString(),
-        jsonIn.username,
-        jsonIn.firstName,
-        jsonIn.lastName,
-        '',
-        jsonIn.email);
+function jsonToUser(userFromDb) {
+    return new User(
+        userFromDb._id.toString() || '',
+        userFromDb['username'] || '',
+        userFromDb['firstName'] || '',
+        userFromDb['lastName'] || '',
+        userFromDb['password'] || '',
+        userFromDb['email'] || '')
 }
 
 export default jsonToUser;

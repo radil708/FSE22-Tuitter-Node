@@ -19,17 +19,9 @@ class TuitDao {
     }
     findAllTuits() {
         return __awaiter(this, void 0, void 0, function* () {
-            const allTuitsJSON = yield TuitModel_1.default.find().populate("postedBy").exec();
-            // const allTuitsArray = allTuitsJSON.map(eachTuit => new Tuit(
-            //     eachTuit._id.toString(),
-            //     eachTuit.postedBy._id.toString(),
-            //     eachTuit['tuit'],
-            //     eachTuit['postedOn']
-            //     )
-            // );
-            //
-            // return allTuitsArray;
-            return allTuitsJSON;
+            const allTuitsJSON = yield TuitModel_1.default.find();
+            const allTuitsArray = allTuitsJSON.map(eachTuit => new Tuit_1.default(eachTuit._id.toString(), eachTuit.postedBy._id.toString(), eachTuit['tuit'], eachTuit['postedOn']));
+            return allTuitsArray;
         });
     }
     createTuit(tuitIn) {

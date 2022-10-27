@@ -4,7 +4,7 @@ import User from "../Users/User";
 
 export default interface LikeDaoInterface {
     findAllLikes(): Promise<Like[]>
-    createLike(tuitLiked: Tuit, likedBy: User): Promise<Like>
-    deleteLike(likedId: string): Promise<number>
+    createLike(tuitLikedId: string, userLikedId: string): Promise<Like>
+    deleteLike(likedId: string): Promise<any>
     findLikeById(id: string): Promise<Like>
 }

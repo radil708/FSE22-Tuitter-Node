@@ -5,6 +5,8 @@ const UserController_1 = require("./Users/UserController");
 const UserDao_1 = require("./Users/UserDao");
 const TuitDao_1 = require("./Tuits/TuitDao");
 const TuitController_1 = require("./Tuits/TuitController");
+const LikeController_1 = require("./Likes/LikeController");
+const LikeDao_1 = require("./Likes/LikeDao");
 const app = express();
 const cors = require('cors');
 app.use(cors());
@@ -37,6 +39,7 @@ const userDao = new UserDao_1.default();
 const userController = new UserController_1.default(app, userDao);
 const tuitDao = new TuitDao_1.default();
 const tuitController = new TuitController_1.default(app, tuitDao, userDao);
+const likeController = new LikeController_1.default(app, new LikeDao_1.default());
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 //# sourceMappingURL=server.js.map
