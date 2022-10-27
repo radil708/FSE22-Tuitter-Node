@@ -9,11 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MongoToClassConverter = void 0;
 const User_1 = require("./Users/User");
 const UserDao_1 = require("./Users/UserDao");
+const Tuit_1 = require("./Tuits/Tuit");
 class MongoToClassConverter {
     constructor() {
-        this.userDao = UserDao_1.default.getInstance();
+        // TODO ask, why can't I set more than one attr??
+        this.convUserDao = UserDao_1.default.getInstance();
+    }
+    setTuitDao(tuitDaoIn) {
+        this.tuitDao = tuitDaoIn;
     }
     convertToUser(mongoRes, showPassword = false, showNames = true) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,6 +37,15 @@ class MongoToClassConverter {
             return new User_1.default(jScriptObj["_id"], jScriptObj["username"], firstName, lastName, pwd, jScriptObj["email"]);
         });
     }
+    convertToTuit(mongoRes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tid = mongoRes["_id"].toString();
+            const uid = mongoRes["postedBy"]._id.toString();
+            const tuitedBy = yield this.convUserDao.findUserById(uid);
+            const retTuit = new Tuit_1.default(tid, uid, mongoRes["tuit"], mongoRes["postedOn"], tuitedBy);
+            return retTuit;
+        });
+    }
 }
-exports.default = MongoToClassConverter;
+exports.MongoToClassConverter = MongoToClassConverter;
 //# sourceMappingURL=MongoToClassConverter.js.map

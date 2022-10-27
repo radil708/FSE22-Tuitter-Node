@@ -1,12 +1,19 @@
 import User from "./Users/User";
 import UserDao from "./Users/UserDao";
+import TuitDao from "./Tuits/TuitDao";
+import Tuit from "./Tuits/Tuit";
 
 
-export default class MongoToClassConverter {
-    private userDao;
+export class MongoToClassConverter {
+    // TODO ask, why can't I set more than one attr??
+    private convUserDao = UserDao.getInstance();
+    private tuitDao;
 
-    constructor() {
-        this.userDao = UserDao.getInstance();
+
+    constructor() {}
+
+    public setTuitDao(tuitDaoIn: TuitDao) {
+        this.tuitDao = tuitDaoIn;
     }
 
     async convertToUser(mongoRes, showPassword = false, showNames= true): Promise<User> {
@@ -33,6 +40,24 @@ export default class MongoToClassConverter {
             lastName,
             pwd,
             jScriptObj["email"])
+
+    }
+
+    async convertToTuit(mongoRes): Promise<Tuit> {
+        const tid = mongoRes["_id"].toString()
+
+        const uid = mongoRes["postedBy"]._id.toString()
+
+        const tuitedBy = await this.convUserDao.findUserById(uid)
+
+        const retTuit =  new Tuit(
+            tid,
+            uid,
+            mongoRes["tuit"],
+            mongoRes["postedOn"],
+            tuitedBy)
+
+        return retTuit
 
     }
 

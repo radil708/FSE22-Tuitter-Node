@@ -1,13 +1,12 @@
 import User from "./User";
 import UserModel from "./UserModel";
 import UserDaoInterface from "./UserDaoInterface";
-import MongoToClassConverter from "../MongoToClassConverter";
+import {MongoToClassConverter} from "../MongoToClassConverter";
 
 export default class UserDao implements UserDaoInterface {
-    private converter: MongoToClassConverter = new MongoToClassConverter()
-
     // Singleton Architecture
     private static userDao: UserDao = new UserDao();
+    private converter: MongoToClassConverter = new MongoToClassConverter();
 
     public static getInstance() {
         return this.userDao;
@@ -25,14 +24,7 @@ export default class UserDao implements UserDaoInterface {
         // add to database
         const userModelObj = await UserModel.create(user);
 
-        // get created userId
-        const createdUserId = userModelObj._id.toString()
-
-        // use findByUserId method to get a Promise<User>
-        const newUserJSON = await UserModel.findById(createdUserId).lean();
-
-        // Return a User type object
-        return this.converter.convertToUser(newUserJSON,true);
+        return user;
 
     }
 

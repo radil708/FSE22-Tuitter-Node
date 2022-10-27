@@ -9,74 +9,66 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Tuit_1 = require("./Tuit");
-const TuitModel_1 = require("./TuitModel");
-const User_1 = require("../Users/User");
-const UserModel_1 = require("../Users/UserModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
-const staticDaos_1 = require("../staticDaos");
+const TuitModel_1 = require("./TuitModel");
 class TuitDao {
     constructor() {
-        this.oid = require('mongodb').ObjectId;
-        this.converter = MongoToClassConverter_1.default.getInstance();
+        this.converter = new MongoToClassConverter_1.MongoToClassConverter();
+        this.converter.setTuitDao(TuitDao.getInstance());
     }
-    findAllTuits() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const allTuitsJSON = yield TuitModel_1.default.find().lean();
-            const allTuitsArray = [];
-            for (const each of allTuitsJSON) {
-                // need to make this await so call back when conversion completelie
-                allTuitsArray.push(yield this.converter.convertToTuit(each));
-            }
-            return allTuitsArray;
-        });
+    static getInstance() {
+        return this.tSingletonDao;
     }
     createTuit(tuitIn) {
         return __awaiter(this, void 0, void 0, function* () {
-            //can remove
-            const userFromDb = yield UserModel_1.default.findById(tuitIn.getUserID());
-            const tuitJSON = yield TuitModel_1.default.create({ tuit: tuitIn.getContent(),
-                postedOn: tuitIn.getDate(), postedBy: tuitIn.getUserID() });
-            const tuitResponse = new Tuit_1.default(tuitJSON._id.toString(), userFromDb._id.toString(), tuitJSON.tuit, tuitJSON.postedOn);
-            // can remove
-            const userT = new User_1.default(userFromDb._id.toString() || '', userFromDb['username'] || '', userFromDb['firstName'] || '', userFromDb['lastName'] || '', userFromDb['password'] || '', userFromDb['email'] || '');
-            tuitResponse.setUser(userT);
-            return tuitResponse;
+            // this will populate postedBy property with user from db
+            const tuitJSON = yield TuitModel_1.default.create({
+                tuit: tuitIn.getContent(),
+                postedOn: tuitIn.getDate(),
+                postedBy: tuitIn.getUserID()
+            });
+            const newTuitId = tuitJSON._id.toString();
+            // get user after being made, this returns a User type obj
+            return yield this.findTuitById(newTuitId);
         });
     }
     deleteTuit(tuitId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield TuitModel_1.default.deleteOne({ _id: tuitId });
+            console.log("in TuitDao", tuitId);
+            const dbResp = yield TuitModel_1.default.deleteOne({ _id: tuitId });
+            console.log("after model deletes", dbResp.deletedCount);
+            return dbResp.deletedCount;
         });
     }
-    // async updateTuit(tuitId: string, tuit : Tuit) : Promise<number> {
-    //     const retTuit =  await TuitModel.updateOne(
-    //         {_id: tuitId},
-    //         {$set: tuit}
-    // );
-    //     return retTuit.matchedCount;
-    // }
+    findAllTuits() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const allTuitsJSON = yield TuitModel_1.default.find().lean();
+            const allTuitArr = [];
+            for (const eachTuit of allTuitsJSON) {
+                allTuitArr.push(yield this.converter.convertToTuit(eachTuit));
+            }
+            return allTuitArr;
+        });
+    }
     findTuitById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tuitFromDb = yield TuitModel_1.default.findById(id).lean();
-            const userid = tuitFromDb.postedBy._id.toString();
-            // a User type object
-            const userT = yield staticDaos_1.default.getInstance().getUserDao().findUserById(userid);
-            const tuitResponse = yield MongoToClassConverter_1.default.getInstance().convertToTuit(tuitFromDb);
-            tuitResponse.setUser(userT);
-            return tuitResponse;
+            const tartgetT = yield TuitModel_1.default.findById(id).lean();
+            const t = yield this.converter.convertToTuit(tartgetT);
+            return t;
         });
     }
     findTuitsByUser(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            // get target user, hopefully they exist
-            const userTarget = yield UserModel_1.default.findById(userId);
-            const allTuitsByUser = yield TuitModel_1.default.find({ postedBy: userTarget._id });
-            const allTuitsArray = allTuitsByUser.map(eachTuit => new Tuit_1.default(eachTuit._id.toString(), eachTuit.postedBy._id.toString(), eachTuit['tuit'], eachTuit['postedOn']));
-            allTuitsArray.forEach(indivTuit => indivTuit.setUser(new User_1.default(userTarget._id.toString() || '', userTarget['username'] || '', userTarget['firstName'] || '', userTarget['lastName'] || '', userTarget['password'] || '', userTarget['email'] || '')));
-            return allTuitsArray;
+            const dbTuits = yield TuitModel_1.default.find({ postedBy: userId });
+            const allTuitsArr = [];
+            for (const eachTuit of dbTuits) {
+                allTuitsArr.push(yield this.converter.convertToTuit(eachTuit));
+            }
+            return allTuitsArr;
         });
     }
 }
 exports.default = TuitDao;
+//Singleton Architecture
+TuitDao.tSingletonDao = new TuitDao();
 //# sourceMappingURL=TuitDao.js.map

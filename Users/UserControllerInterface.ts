@@ -2,6 +2,7 @@ import {Request, Response} from "express";
 import User from "./User";
 
 
+
 /**
  * This controller interface declares all the methods required for any UserController
  * type object. It uses Request and Response type object from

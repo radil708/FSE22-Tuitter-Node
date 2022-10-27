@@ -5,7 +5,7 @@ const User_1 = require("../Users/User");
 this class represent a tuit/tweet. It uses the User class as an attribute.
  */
 class Tuit {
-    constructor(tuitIdIn, userIdIn, contentIn, postedOnIn) {
+    constructor(tuitIdIn, userIdIn, contentIn, postedOnIn, userIn = null) {
         this.tuitID = '';
         this.userId = '';
         this.tuitContent = '';
@@ -14,7 +14,7 @@ class Tuit {
         this.userId = userIdIn;
         this.tuitContent = contentIn;
         this.postedOn = postedOnIn;
-        this.postedBy = null;
+        this.postedBy = userIn;
     }
     getTuitId() {
         return this.tuitID;

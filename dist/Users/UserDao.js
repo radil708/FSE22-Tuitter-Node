@@ -13,7 +13,7 @@ const UserModel_1 = require("./UserModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
 class UserDao {
     constructor() {
-        this.converter = new MongoToClassConverter_1.default();
+        this.converter = new MongoToClassConverter_1.MongoToClassConverter();
     }
     static getInstance() {
         return this.userDao;
@@ -26,12 +26,7 @@ class UserDao {
         return __awaiter(this, void 0, void 0, function* () {
             // add to database
             const userModelObj = yield UserModel_1.default.create(user);
-            // get created userId
-            const createdUserId = userModelObj._id.toString();
-            // use findByUserId method to get a Promise<User>
-            const newUserJSON = yield UserModel_1.default.findById(createdUserId).lean();
-            // Return a User type object
-            return this.converter.convertToUser(newUserJSON, true);
+            return user;
         });
     }
     deleteUser(uid) {

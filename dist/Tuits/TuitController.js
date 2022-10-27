@@ -9,59 +9,61 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const TuitDao_1 = require("./TuitDao");
 const Tuit_1 = require("./Tuit");
-const staticDaos_1 = require("../staticDaos");
+//IMPORTANT LEARNIN NOTE, MAKE THESE FUNCTIONS ASYNC BECAUSE
+// THEY RELY ON ASYNC METHODS, OTHERWISE WILL SEND BACK BLANK
 class TuitController {
     constructor(appIn) {
-        this.tuitDao = staticDaos_1.default.getInstance().getTuitDao();
-        this.userDao = staticDaos_1.default.getInstance().getUserDao();
-        this.createTuit = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const userId = req.params.uid;
-            //TODO what if user does not exist?
-            const clientTuit = new Tuit_1.default('', userId.toString(), req.body.tuit, req.body.postedOn);
-            //pass in userId as well
-            const tuitFromDb = yield this.tuitDao.createTuit(clientTuit);
-            res.send(tuitFromDb);
-        });
-        this.deleteTuit = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const tuitIdTarget = req.params.tid;
-            const count = yield this.tuitDao.deleteTuit(tuitIdTarget);
-            res.send(count);
-        });
-        this.findAllTuits = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const allTuits = yield this.tuitDao.findAllTuits();
-            res.json(allTuits);
-        });
-        this.findTuitById = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const tuitIdTarget = req.params.tid;
-            const targetTuit = yield this.tuitDao.findTuitById(tuitIdTarget);
-            res.json(targetTuit);
-        });
-        // updateTuit = async (req: Request, res: Response) => {
-        //     const tuitIdTarget = req.params.tid;
-        //
-        //     const tuitToUpdate = await this.tuitDao.findTuitById(tuitIdTarget);
-        //
-        //     const req_content = req.body.tuit;
-        //
-        //     // update the content of the tuit
-        //     tuitToUpdate.setContent(req_content);
-        //
-        //     const updateResp = await this.tuitDao.updateTuit(tuitIdTarget, tuitToUpdate)
-        //
-        //     res.send(updateResp);
-        // }
-        this.findTuitsByUser = (req, res) => {
-            this.tuitDao.findTuitsByUser(req.params.uid)
-                .then(tuits => res.json(tuits));
-        };
         this.app = appIn;
+        // TODO ask why setting attribute doesn't actually set attribute
+        this.tuitDao = TuitDao_1.default.getInstance();
         this.app.get('/tuits', this.findAllTuits);
         this.app.get('/tuits/:tid', this.findTuitById);
-        this.app.get('/users/:uid/tuits', this.findTuitsByUser);
-        this.app.post('/users/:uid/tuits', this.createTuit);
         this.app.delete('/tuits/:tid', this.deleteTuit);
-        //this.app.put('/tuits/:tid', this.updateTuit)
+        this.app.post('/users/:uid/tuits', this.createTuit);
+        this.app.get('/users/:uid/tuits', this.findTuitsByUser);
+    }
+    createTuit(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Get all info needed to make a Tuit object
+            const tuitedById = req.params.uid;
+            const tuitContent = req.body.tuit;
+            const tuitPostedDate = req.body.postedOn;
+            const clientTuit = new Tuit_1.default('', tuitedById, tuitContent, tuitPostedDate);
+            const dbResp = yield TuitDao_1.default.getInstance().createTuit(clientTuit);
+            res.send(dbResp);
+        });
+    }
+    deleteTuit(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tdao = TuitDao_1.default.getInstance();
+            const targetTid = req.params.tid;
+            const numDeleted = yield tdao.deleteTuit(targetTid);
+            const stringResp = "Number of users deleted: " + numDeleted.toString();
+            // send needs to be a string otherwise it will thinkg status code
+            res.send(stringResp);
+        });
+    }
+    findAllTuits(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            res.send(yield TuitDao_1.default.getInstance().findAllTuits());
+        });
+    }
+    findTuitById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tuitdao = TuitDao_1.default.getInstance();
+            const tidString = req.params.tid;
+            const targetTuit = yield tuitdao.findTuitById(tidString);
+            res.send(targetTuit);
+        });
+    }
+    findTuitsByUser(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tuitdao = TuitDao_1.default.getInstance();
+            const tuitsByUser = yield tuitdao.findTuitsByUser(req.params.uid);
+            res.send(tuitsByUser);
+        });
     }
 }
 exports.default = TuitController;

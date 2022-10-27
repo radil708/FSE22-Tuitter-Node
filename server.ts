@@ -3,6 +3,8 @@ import {Request, Response} from "express";
 
 import UserController from "./Users/UserController";
 import UserDao from "./Users/UserDao";
+import TuitController from "./Tuits/TuitController";
+
 
 const app = express();
 const cors = require('cors');
@@ -46,7 +48,9 @@ app.get('/',defaultPage)
 
 UserDao.getInstance();
 
+
 const userController = new UserController(app);
+const tuitConroller = new TuitController(app);
 
 
 const PORT = 4000;
