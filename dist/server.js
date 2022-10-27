@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const UserController_1 = require("./Users/UserController");
 const UserDao_1 = require("./Users/UserDao");
+const TuitDao_1 = require("./Tuits/TuitDao");
+const TuitController_1 = require("./Tuits/TuitController");
 const app = express();
 const cors = require('cors');
 app.use(cors());
@@ -31,7 +33,10 @@ function defaultPage(req, res) {
     res.send('Welcome to Ramzi\'s Fall2022 SoftEng Home Page');
 }
 app.get('/', defaultPage);
-const userController = new UserController_1.default(app, new UserDao_1.default());
+const userDao = new UserDao_1.default();
+const userController = new UserController_1.default(app, userDao);
+const tuitDao = new TuitDao_1.default();
+const tuitController = new TuitController_1.default(app, tuitDao, userDao);
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 //# sourceMappingURL=server.js.map

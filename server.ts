@@ -3,6 +3,8 @@ import {Request, Response} from "express";
 
 import UserController from "./Users/UserController";
 import UserDao from "./Users/UserDao";
+import TuitDao from "./Tuits/TuitDao";
+import TuitController from "./Tuits/TuitController";
 
 const app = express();
 const cors = require('cors');
@@ -44,7 +46,11 @@ function defaultPage (req: Request, res: Response) {
 
 app.get('/',defaultPage)
 
-const userController = new UserController(app, new UserDao())
+const userDao = new UserDao();
+const userController = new UserController(app, userDao);
+const tuitDao = new TuitDao();
+const tuitController = new TuitController(app,tuitDao,userDao);
+
 
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
