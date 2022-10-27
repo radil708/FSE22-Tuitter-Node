@@ -4,6 +4,7 @@ import {Request, Response} from "express";
 import UserController from "./Users/UserController";
 import UserDao from "./Users/UserDao";
 import TuitController from "./Tuits/TuitController";
+import LikeController from "./Likes/LikeController";
 
 
 const app = express();
@@ -51,6 +52,7 @@ UserDao.getInstance();
 
 const userController = new UserController(app);
 const tuitConroller = new TuitController(app);
+const likeControoler = new LikeController(app);
 
 
 const PORT = 4000;

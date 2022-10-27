@@ -9,26 +9,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const LikeDao_1 = require("./LikeDao");
 class LikeController {
-    constructor(appIn, likeDaoIn) {
-        this.findAllLikes = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            console.log("finding all likes");
-            const allLikes = yield this.likeDao.findAllLikes();
-            res.json(allLikes);
-        });
-        this.createLike = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            console.log("making a like");
+    constructor(app) {
+        this.app = app;
+        // TODO setting this attr does not seem to work, ask why
+        this.likeDao = LikeDao_1.default.getInstance();
+        this.app.post('/tuits/:tid/user/:uid/likes', this.createLike);
+        this.app.get('/likes', this.getAllLikes);
+    }
+    createLike(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
             const tuitId = req.params.tid;
-            const usid = req.params.uid;
-            console.log(tuitId);
-            console.log(usid);
-            const createdLike = yield this.likeDao.createLike(tuitId, usid);
-            res.json(createdLike);
+            const userId = req.params.uid;
+            const tLikeDao = LikeDao_1.default.getInstance();
+            const likeObj = yield tLikeDao.createLike(tuitId, userId);
+            res.send(likeObj);
         });
-        this.app = appIn;
-        this.likeDao = likeDaoIn;
-        this.app.get('/likes', this.findAllLikes);
-        this.app.post('/tuit/:tid/likedBy/:uid/likes', this.createLike);
+    }
+    getAllLikes(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tLikeDao = LikeDao_1.default.getInstance();
+            const allLikes = yield tLikeDao.getAllLikes();
+            res.send(allLikes);
+        });
     }
 }
 exports.default = LikeController;

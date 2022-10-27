@@ -8,7 +8,7 @@ import UserDao from "../Users/UserDao";
 
 //IMPORTANT LEARNIN NOTE, MAKE THESE FUNCTIONS ASYNC BECAUSE
 // THEY RELY ON ASYNC METHODS, OTHERWISE WILL SEND BACK BLANK
-export default class TuitController{
+export default class TuitController implements TuitControllerInterface {
     app: Express;
 
     // TODO ask why setting attribute doesn't actually set attribute

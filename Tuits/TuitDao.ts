@@ -3,8 +3,7 @@ import Tuit from "./Tuit";
 import {MongoToClassConverter} from "../MongoToClassConverter";
 import TuitModel from "./TuitModel";
 
-export default class TuitDao{
-    private converter: MongoToClassConverter = new MongoToClassConverter()
+export default class TuitDao implements TuitDaoInterface{
     //Singleton Architecture
     private static tSingletonDao: TuitDao = new TuitDao()
 
@@ -13,7 +12,6 @@ export default class TuitDao{
     }
 
     private constructor() {
-        this.converter.setTuitDao(TuitDao.getInstance())
     }
 
 
@@ -42,29 +40,32 @@ export default class TuitDao{
 
     async findAllTuits(): Promise<Tuit[]> {
         const allTuitsJSON = await TuitModel.find().lean();
+        const conv = new MongoToClassConverter();
 
         const allTuitArr = [];
 
         for (const eachTuit of allTuitsJSON) {
-            allTuitArr.push(await this.converter.convertToTuit(eachTuit))
+            allTuitArr.push(await conv.convertToTuit(eachTuit))
         }
 
         return allTuitArr
     }
 
     async findTuitById(id: string): Promise<Tuit> {
+        // I can't make this an attribute without an nmp error
+        const conv = new MongoToClassConverter();
         const tartgetT = await TuitModel.findById(id).lean();
-        const t = await this.converter.convertToTuit(tartgetT)
+        const t = await conv.convertToTuit(tartgetT)
         return t
     }
 
     async findTuitsByUser(userId: string): Promise<Tuit[]> {
         const dbTuits = await TuitModel.find({postedBy: userId})
-
+        const conv = new MongoToClassConverter();
         const allTuitsArr = []
 
         for (const eachTuit of dbTuits) {
-            allTuitsArr.push(await this.converter.convertToTuit(eachTuit))
+            allTuitsArr.push(await conv.convertToTuit(eachTuit))
         }
 
         return allTuitsArr;

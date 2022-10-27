@@ -13,8 +13,6 @@ const MongoToClassConverter_1 = require("../MongoToClassConverter");
 const TuitModel_1 = require("./TuitModel");
 class TuitDao {
     constructor() {
-        this.converter = new MongoToClassConverter_1.MongoToClassConverter();
-        this.converter.setTuitDao(TuitDao.getInstance());
     }
     static getInstance() {
         return this.tSingletonDao;
@@ -43,26 +41,30 @@ class TuitDao {
     findAllTuits() {
         return __awaiter(this, void 0, void 0, function* () {
             const allTuitsJSON = yield TuitModel_1.default.find().lean();
+            const conv = new MongoToClassConverter_1.MongoToClassConverter();
             const allTuitArr = [];
             for (const eachTuit of allTuitsJSON) {
-                allTuitArr.push(yield this.converter.convertToTuit(eachTuit));
+                allTuitArr.push(yield conv.convertToTuit(eachTuit));
             }
             return allTuitArr;
         });
     }
     findTuitById(id) {
         return __awaiter(this, void 0, void 0, function* () {
+            // I can't make this an attribute without an nmp error
+            const conv = new MongoToClassConverter_1.MongoToClassConverter();
             const tartgetT = yield TuitModel_1.default.findById(id).lean();
-            const t = yield this.converter.convertToTuit(tartgetT);
+            const t = yield conv.convertToTuit(tartgetT);
             return t;
         });
     }
     findTuitsByUser(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const dbTuits = yield TuitModel_1.default.find({ postedBy: userId });
+            const conv = new MongoToClassConverter_1.MongoToClassConverter();
             const allTuitsArr = [];
             for (const eachTuit of dbTuits) {
-                allTuitsArr.push(yield this.converter.convertToTuit(eachTuit));
+                allTuitsArr.push(yield conv.convertToTuit(eachTuit));
             }
             return allTuitsArr;
         });
