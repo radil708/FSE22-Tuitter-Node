@@ -5,9 +5,12 @@ import UserController from "./Users/UserController";
 import UserDao from "./Users/UserDao";
 
 const app = express();
+const cors = require('cors');
+app.use(cors());
 const mongoose = require('mongoose');
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 /*************    Connect To Remote MongoDB Database    *****************/
 

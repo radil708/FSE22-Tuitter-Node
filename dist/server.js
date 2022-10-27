@@ -3,8 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const UserController_1 = require("./Users/UserController");
 const app = express();
+const cors = require('cors');
+app.use(cors());
 const mongoose = require('mongoose');
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 /*************    Connect To Remote MongoDB Database    *****************/
 /*IMPORTANT** Make sure environment variable set up before running
 i.e. for aws elastic beanstalk deployment:

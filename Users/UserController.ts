@@ -14,7 +14,7 @@ export default class UserController {
             UserController.userContAttr = new UserController();
         }
 
-        app.get('/users', UserController.userContAttr.findAllUsers)
+        app.get('/api/users', UserController.userContAttr.findAllUsers)
 
         return UserController.userContAttr;
     }
