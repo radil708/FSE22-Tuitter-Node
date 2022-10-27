@@ -2,6 +2,7 @@ import * as express from 'express';
 import {Request, Response} from "express";
 
 import UserController from "./Users/UserController";
+import UserDao from "./Users/UserDao";
 
 const app = express();
 const cors = require('cors');
@@ -43,7 +44,7 @@ function defaultPage (req: Request, res: Response) {
 
 app.get('/',defaultPage)
 
-const userController = UserController.getInstance(app);
+const userController = new UserController(app, new UserDao())
 
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);

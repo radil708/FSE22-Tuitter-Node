@@ -3,12 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 /**
  * This is the UsersSchema. This will match the format of every entry
- * in the 'Users' collection from the database and has default values
+ * in the 'Tuits' collection from the database and has default values
  * set where necessary
  */
 const UserSchema = new mongoose_1.default.Schema({
-    username: { type: String, required: true, default: `testusername${Date.now()}` },
-    password: { type: String, required: true, default: `testpassword${Date.now()}` },
+    username: { type: String, required: true },
+    password: { type: String, required: true },
     firstName: String,
     lastName: String,
     email: String,
