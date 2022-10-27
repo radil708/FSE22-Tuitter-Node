@@ -2,11 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const UserController_1 = require("./Users/UserController");
-const UserDao_1 = require("./Users/UserDao");
 const app = express();
 const mongoose = require('mongoose');
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 /*************    Connect To Remote MongoDB Database    *****************/
 /*IMPORTANT** Make sure environment variable set up before running
 i.e. for aws elastic beanstalk deployment:
@@ -29,8 +27,7 @@ function defaultPage(req, res) {
     res.send('Welcome to Ramzi\'s Fall2022 SoftEng Home Page');
 }
 app.get('/', defaultPage);
-const userDaoInstance = new UserDao_1.default();
-const userController = new UserController_1.default(app, userDaoInstance);
+const userController = UserController_1.default.getInstance(app);
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 //# sourceMappingURL=server.js.map

@@ -8,7 +8,6 @@ const app = express();
 const mongoose = require('mongoose');
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 /*************    Connect To Remote MongoDB Database    *****************/
 
@@ -42,8 +41,7 @@ function defaultPage (req: Request, res: Response) {
 
 app.get('/',defaultPage)
 
-const userDaoInstance = new UserDao();
-const userController = new UserController(app,userDaoInstance);
+const userController = UserController.getInstance(app);
 
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);

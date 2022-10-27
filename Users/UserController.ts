@@ -1,20 +1,26 @@
 import {Request, Response, Express} from "express";
 import UserDao from "./UserDao";
+import User from "./User";
 
 export default class UserController {
     // attributes
-    app: Express;
-    userDao: UserDao;
+    private static userDaoContAttr: UserDao = UserDao.getInstance();
+    private static userContAttr: UserController | null = null;
 
-    constructor(app: Express, userDao: UserDao) {
-        this.app = app;
-        this.userDao = userDao;
-        // Set attributes of app attribute
-        this.app.get('/users', this.findAllUsers);
+    private constructor() {
+    }
+    public static getInstance(app:Express): UserController {
+        if (UserController.userContAttr == null) {
+            UserController.userContAttr = new UserController();
+        }
+
+        app.get('/users', UserController.userContAttr.findAllUsers)
+
+        return UserController.userContAttr;
     }
 
     findAllUsers = async (req: Request, res: Response) => {
-        const allUsers = await this.userDao.findAllUsers();
+        const allUsers = await UserController.userDaoContAttr.findAllUsers();
         // send response JSON
         res.json(allUsers)
     }

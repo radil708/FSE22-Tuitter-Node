@@ -9,18 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const User_1 = require("./User");
 const UserModel_1 = require("./UserModel");
 class UserDao {
-    findAllUsers() {
-        return __awaiter(this, void 0, void 0, function* () {
-            // find wihtout a user passed in will return all documents form user table
-            // gets an array of user models
-            const allUserJsons = yield UserModel_1.default.find();
-            // for each user model in array allUserJsons
-            return allUserJsons.map(eachUserJSON => new User_1.default(eachUserJSON._id.toString(), eachUserJSON['username'], eachUserJSON['firstName'], eachUserJSON['lastName'], eachUserJSON['password'], eachUserJSON['email']));
-        });
+    constructor() {
+        this.findAllUsers = () => __awaiter(this, void 0, void 0, function* () { return UserModel_1.default.find(); });
+    }
+    static getInstance() {
+        if (UserDao.userDaoAttr == null) {
+            UserDao.userDaoAttr = new UserDao();
+        }
+        return UserDao.userDaoAttr;
     }
 }
 exports.default = UserDao;
+UserDao.userDaoAttr = null;
 //# sourceMappingURL=UserDao.js.map

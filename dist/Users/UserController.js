@@ -9,18 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const UserDao_1 = require("./UserDao");
 class UserController {
-    constructor(app, userDao) {
+    constructor() {
         this.findAllUsers = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const allUsers = yield this.userDao.findAllUsers();
+            const allUsers = yield UserController.userDaoContAttr.findAllUsers();
             // send response JSON
             res.json(allUsers);
         });
-        this.app = app;
-        this.userDao = userDao;
-        // Set attributes of app attribute
-        this.app.get('/users', this.findAllUsers);
+    }
+    static getInstance(app) {
+        if (UserController.userContAttr == null) {
+            UserController.userContAttr = new UserController();
+        }
+        app.get('/users', UserController.userContAttr.findAllUsers);
+        return UserController.userContAttr;
     }
 }
 exports.default = UserController;
+// attributes
+UserController.userDaoContAttr = UserDao_1.default.getInstance();
+UserController.userContAttr = null;
 //# sourceMappingURL=UserController.js.map
