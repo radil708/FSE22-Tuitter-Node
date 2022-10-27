@@ -46,6 +46,12 @@ class FollowDao {
             return allFollowsArr;
         });
     }
+    deleteFollow(followId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dbResp = yield FollowModel_1.default.deleteOne({ _id: followId });
+            return dbResp.deletedCount;
+        });
+    }
 }
 exports.default = FollowDao;
 FollowDao.fSingletonDao = new FollowDao();

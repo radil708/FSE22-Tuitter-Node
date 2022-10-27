@@ -41,6 +41,11 @@ export default class FollowDao {
         return allFollowsArr;
     }
 
+    async deleteFollow(followId: string): Promise<any> {
+        const dbResp = await FollowModel.deleteOne({_id: followId })
+        return dbResp.deletedCount;
+    }
+
 
 
 }

@@ -10,6 +10,7 @@ export default class FollowController {
         this.app.post('/follower/:rid/following/:gid/follows', this.createFollow)
         this.app.get('/follows', this.getAllFollows)
         this.app.get('/follows/:fid', this.getFollowById)
+        this.app.delete('/follows/:fid', this.unfollow)
     }
 
 
@@ -36,5 +37,12 @@ export default class FollowController {
         const followId = req.params.fid
         const followObj = await fDao.findById(followId);
         res.send(followObj)
+    }
+
+    async unfollow(req: Request, res: Response) {
+        const fDao = FollowDao.getInstance();
+        const targetFollow = req.params.fid
+        const numDeleted = await fDao.deleteFollow(targetFollow)
+        res.send("Number of Follows Deleted: " + numDeleted.toString())
     }
 }
