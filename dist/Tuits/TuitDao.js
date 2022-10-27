@@ -32,9 +32,7 @@ class TuitDao {
     }
     deleteTuit(tuitId) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("in TuitDao", tuitId);
             const dbResp = yield TuitModel_1.default.deleteOne({ _id: tuitId });
-            console.log("after model deletes", dbResp.deletedCount);
             return dbResp.deletedCount;
         });
     }

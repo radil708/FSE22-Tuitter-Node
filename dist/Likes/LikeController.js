@@ -19,6 +19,8 @@ class LikeController {
         this.app.get('/likes', this.getAllLikes);
         this.app.get('/likes/:lid', this.getLikeById);
         this.app.get('/users/:uid/likes', this.getAllTuitsLikedBy);
+        this.app.get('/tuits/:tid/likes', this.getAllUsersThatLikedThisTuit);
+        this.app.delete('/likes/:lid', this.unlike);
     }
     createLike(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -48,6 +50,21 @@ class LikeController {
             const tLikeDao = LikeDao_1.default.getInstance();
             const allTuitsLikedByUser = yield tLikeDao.getAllTuitsLikedBy(req.params.uid);
             res.send(allTuitsLikedByUser);
+        });
+    }
+    getAllUsersThatLikedThisTuit(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tLikeDao = LikeDao_1.default.getInstance();
+            const usersThatLiked = yield tLikeDao.getAllUsersThatLikesThisTuit(req.params.tid);
+            res.send(usersThatLiked);
+        });
+    }
+    unlike(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tLikeDao = LikeDao_1.default.getInstance();
+            const numDeleted = yield tLikeDao.deleteLike(req.params.lid);
+            const resp = "Likes Deleted = " + numDeleted.toString();
+            res.send(resp);
         });
     }
 }

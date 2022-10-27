@@ -14,6 +14,8 @@ export default class LikeController{
         this.app.get('/likes',this.getAllLikes)
         this.app.get('/likes/:lid', this.getLikeById)
         this.app.get('/users/:uid/likes', this.getAllTuitsLikedBy)
+        this.app.get('/tuits/:tid/likes', this.getAllUsersThatLikedThisTuit)
+        this.app.delete('/likes/:lid', this.unlike)
     }
 
     async createLike(req: Request, res: Response) {
@@ -42,6 +44,19 @@ export default class LikeController{
         const tLikeDao= LikeDao.getInstance();
         const allTuitsLikedByUser = await tLikeDao.getAllTuitsLikedBy(req.params.uid);
         res.send(allTuitsLikedByUser);
+    }
+
+    async getAllUsersThatLikedThisTuit (req: Request, res: Response) {
+        const tLikeDao= LikeDao.getInstance();
+        const usersThatLiked = await tLikeDao.getAllUsersThatLikesThisTuit(req.params.tid)
+        res.send(usersThatLiked);
+    }
+
+    async unlike(req: Request, res: Response) {
+        const tLikeDao= LikeDao.getInstance();
+        const numDeleted = await tLikeDao.deleteLike(req.params.lid)
+        const resp = "Likes Deleted = " + numDeleted.toString()
+        res.send(resp)
     }
 
 

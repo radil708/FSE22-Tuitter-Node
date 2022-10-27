@@ -32,9 +32,7 @@ export default class TuitDao implements TuitDaoInterface{
     }
 
     async deleteTuit(tuitId: string): Promise<any> {
-        console.log("in TuitDao", tuitId)
         const dbResp = await TuitModel.deleteOne({_id : tuitId});
-        console.log("after model deletes", dbResp.deletedCount);
         return dbResp.deletedCount;
     }
 

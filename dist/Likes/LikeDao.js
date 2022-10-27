@@ -13,6 +13,7 @@ const MongoToClassConverter_1 = require("../MongoToClassConverter");
 const TuitDao_1 = require("../Tuits/TuitDao");
 const LikeModel_1 = require("./LikeModel");
 const LikeModel_2 = require("./LikeModel");
+const UserDao_1 = require("../Users/UserDao");
 class LikeDao {
     constructor() {
         this.converter = new MongoToClassConverter_1.MongoToClassConverter();
@@ -60,6 +61,27 @@ class LikeDao {
                 allTuits.push(yield tDao.findTuitById(eachId));
             }
             return allTuits;
+        });
+    }
+    getAllUsersThatLikesThisTuit(tuitId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const allLikesFromDb = yield LikeModel_2.default.find({ likedTuit: tuitId });
+            const tUDao = yield UserDao_1.default.getInstance();
+            const allUserIds = [];
+            for (const eachLike of allLikesFromDb) {
+                allUserIds.push((yield eachLike).likedBy._id.toString());
+            }
+            const allUsers = [];
+            for (const eachUserId of allUserIds) {
+                allUsers.push(yield tUDao.findUserById(eachUserId));
+            }
+            return allUsers;
+        });
+    }
+    deleteLike(likeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dbResp = yield LikeModel_1.default.deleteOne({ _id: likeId });
+            return dbResp.deletedCount;
         });
     }
 }

@@ -4,6 +4,8 @@ import Like from "./Like";
 import LikeModel from "./LikeModel";
 import likeModel from "./LikeModel";
 import Tuit from "../Tuits/Tuit";
+import User from "../Users/User";
+import UserDao from "../Users/UserDao";
 
 
 export default class LikeDao {
@@ -66,6 +68,33 @@ export default class LikeDao {
 
         return allTuits;
 
+    }
+
+    async getAllUsersThatLikesThisTuit(tuitId: string): Promise<User[]> {
+        const allLikesFromDb = await likeModel.find({likedTuit: tuitId})
+        const tUDao = await UserDao.getInstance();
+
+        const allUserIds = []
+
+        for (const eachLike of allLikesFromDb) {
+            allUserIds.push((await eachLike).likedBy._id.toString())
+        }
+
+        const allUsers = []
+
+
+        for (const eachUserId of allUserIds) {
+            allUsers.push(await tUDao.findUserById(eachUserId))
+        }
+
+
+        return allUsers
+
+    }
+
+    async deleteLike(likeId: string): Promise<any> {
+        const dbResp = await LikeModel.deleteOne({_id: likeId})
+        return dbResp.deletedCount;
     }
 
 }
