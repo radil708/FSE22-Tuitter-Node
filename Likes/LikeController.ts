@@ -13,6 +13,7 @@ export default class LikeController{
         this.app.post('/tuits/:tid/user/:uid/likes', this.createLike)
         this.app.get('/likes',this.getAllLikes)
         this.app.get('/likes/:lid', this.getLikeById)
+        this.app.get('/users/:uid/likes', this.getAllTuitsLikedBy)
     }
 
     async createLike(req: Request, res: Response) {
@@ -35,6 +36,12 @@ export default class LikeController{
         const tLikeDao= LikeDao.getInstance();
         const targetedLike = await tLikeDao.getLikeById(req.params.lid)
         res.send(targetedLike)
+    }
+
+    async getAllTuitsLikedBy(req: Request, res: Response) {
+        const tLikeDao= LikeDao.getInstance();
+        const allTuitsLikedByUser = await tLikeDao.getAllTuitsLikedBy(req.params.uid);
+        res.send(allTuitsLikedByUser);
     }
 
 

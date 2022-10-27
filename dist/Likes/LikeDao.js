@@ -10,7 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
+const TuitDao_1 = require("../Tuits/TuitDao");
 const LikeModel_1 = require("./LikeModel");
+const LikeModel_2 = require("./LikeModel");
 class LikeDao {
     constructor() {
         this.converter = new MongoToClassConverter_1.MongoToClassConverter();
@@ -42,6 +44,22 @@ class LikeDao {
         return __awaiter(this, void 0, void 0, function* () {
             const likeFromDb = yield LikeModel_1.default.findById(likeId);
             return yield this.converter.convertToLike(likeFromDb);
+        });
+    }
+    getAllTuitsLikedBy(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const allLikesFromDb = yield LikeModel_2.default.find({ likedBy: userId });
+            const allTids = [];
+            // get all tids of the Tuits that were liked by this user
+            for (const eachLike of allLikesFromDb) {
+                allTids.push((yield eachLike).likedTuit._id.toString());
+            }
+            const allTuits = [];
+            const tDao = TuitDao_1.default.getInstance();
+            for (const eachId of allTids) {
+                allTuits.push(yield tDao.findTuitById(eachId));
+            }
+            return allTuits;
         });
     }
 }

@@ -18,6 +18,7 @@ class LikeController {
         this.app.post('/tuits/:tid/user/:uid/likes', this.createLike);
         this.app.get('/likes', this.getAllLikes);
         this.app.get('/likes/:lid', this.getLikeById);
+        this.app.get('/users/:uid/likes', this.getAllTuitsLikedBy);
     }
     createLike(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -40,6 +41,13 @@ class LikeController {
             const tLikeDao = LikeDao_1.default.getInstance();
             const targetedLike = yield tLikeDao.getLikeById(req.params.lid);
             res.send(targetedLike);
+        });
+    }
+    getAllTuitsLikedBy(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tLikeDao = LikeDao_1.default.getInstance();
+            const allTuitsLikedByUser = yield tLikeDao.getAllTuitsLikedBy(req.params.uid);
+            res.send(allTuitsLikedByUser);
         });
     }
 }

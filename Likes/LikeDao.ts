@@ -2,6 +2,8 @@ import {MongoToClassConverter} from "../MongoToClassConverter";
 import TuitDao from "../Tuits/TuitDao";
 import Like from "./Like";
 import LikeModel from "./LikeModel";
+import likeModel from "./LikeModel";
+import Tuit from "../Tuits/Tuit";
 
 
 export default class LikeDao {
@@ -43,6 +45,26 @@ export default class LikeDao {
     async getLikeById(likeId: string): Promise<Like> {
         const likeFromDb = await LikeModel.findById(likeId);
         return await this.converter.convertToLike(likeFromDb)
+    }
+
+    async getAllTuitsLikedBy(userId: string): Promise<Tuit[]> {
+        const allLikesFromDb = await likeModel.find({likedBy: userId})
+        const allTids = []
+
+        // get all tids of the Tuits that were liked by this user
+        for (const eachLike of allLikesFromDb) {
+            allTids.push((await eachLike).likedTuit._id.toString())
+        }
+
+        const allTuits = []
+
+        const tDao = TuitDao.getInstance();
+
+        for (const eachId of allTids) {
+            allTuits.push(await tDao.findTuitById(eachId))
+        }
+
+        return allTuits;
 
     }
 

@@ -52,7 +52,7 @@ class MongoToClassConverter {
             const likedById = mongoRes["likedBy"]._id.toString();
             const tuitedBy = yield UserDao_1.default.getInstance().findUserById(likedById);
             const likedTuit = yield TuitDao_1.default.getInstance().findTuitById(likedTuitid);
-            const retLike = new Like_1.default(likeId, likedById, likedById);
+            const retLike = new Like_1.default(likeId, likedTuit, tuitedBy);
             return retLike;
         });
     }

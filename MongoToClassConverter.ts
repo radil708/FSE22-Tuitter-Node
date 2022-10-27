@@ -68,8 +68,8 @@ export class MongoToClassConverter {
 
         const retLike = new Like(
             likeId,
-            likedById,
-            likedById
+            likedTuit,
+            tuitedBy
         )
 
         return retLike
