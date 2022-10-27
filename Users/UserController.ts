@@ -1,12 +1,12 @@
 import {Request, Response,Express} from "express";
 import UserDao from "./UserDao";
 import UserControllerInterface from "./UserControllerInterface";
-import staticDaos from "../staticDaos";
+
 
 export default class UserController implements UserControllerInterface {
     // attributes
     app: Express;
-    userDao: UserDao = staticDaos.getInstance().getUserDao();
+    userDao: UserDao = UserDao.getInstance();
 
     constructor(app: Express) {
         this.app = app;

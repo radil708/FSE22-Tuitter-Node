@@ -11,44 +11,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const User_1 = require("./Users/User");
 const UserDao_1 = require("./Users/UserDao");
-const Tuit_1 = require("./Tuits/Tuit");
 class MongoToClassConverter {
     constructor() {
-        MongoToClassConverter.userDao = new UserDao_1.default();
+        this.userDao = UserDao_1.default.getInstance();
     }
-    static getInstance() {
-        if (MongoToClassConverter.converter == null) {
-            MongoToClassConverter.converter = new MongoToClassConverter();
-        }
-        return MongoToClassConverter.converter;
-    }
-    convertToUser(mongoRes, showPassword = false) {
-        const jScriptObj = mongoRes;
-        let pwd;
-        if (showPassword == true) {
-            pwd = jScriptObj["password"];
-        }
-        else {
-            pwd = '';
-        }
-        const uRet = new User_1.default(jScriptObj["_id"], jScriptObj["username"], jScriptObj["firstName"], jScriptObj["lastName"], pwd, jScriptObj["email"]);
-        return uRet;
-    }
-    convertToTuit(mongoRes) {
+    convertToUser(mongoRes, showPassword = false, showNames = true) {
         return __awaiter(this, void 0, void 0, function* () {
             const jScriptObj = mongoRes;
-            //console.log(jScriptObj.postedBy._id.toString())
-            const userId = jScriptObj.postedBy._id.toString();
-            //userQuery returns a Promise<User>
-            const userQuery = yield MongoToClassConverter.userDao.findUserById(userId);
-            const tRet = new Tuit_1.default(jScriptObj["_id"], userId, jScriptObj["tuit"], jScriptObj["postedOn"]);
-            tRet.setUser(userQuery);
-            //console.log(userQuery)
-            //console.log('geeting tuit user',tRet.getUser())
-            return tRet;
+            let pwd = '';
+            let firstName = '';
+            let lastName = '';
+            if (showPassword == true) {
+                pwd = jScriptObj["password"];
+            }
+            if (showNames == true) {
+                firstName = jScriptObj["firstName"];
+                lastName = jScriptObj["lastName"];
+            }
+            return new User_1.default(jScriptObj["_id"], jScriptObj["username"], firstName, lastName, pwd, jScriptObj["email"]);
         });
     }
 }
 exports.default = MongoToClassConverter;
-MongoToClassConverter.converter = null;
 //# sourceMappingURL=MongoToClassConverter.js.map

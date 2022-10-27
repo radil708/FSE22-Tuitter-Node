@@ -14,6 +14,7 @@ const TuitModel_1 = require("./TuitModel");
 const User_1 = require("../Users/User");
 const UserModel_1 = require("../Users/UserModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
+const staticDaos_1 = require("../staticDaos");
 class TuitDao {
     constructor() {
         this.oid = require('mongodb').ObjectId;
@@ -24,8 +25,8 @@ class TuitDao {
             const allTuitsJSON = yield TuitModel_1.default.find().lean();
             const allTuitsArray = [];
             for (const each of allTuitsJSON) {
+                // need to make this await so call back when conversion completelie
                 allTuitsArray.push(yield this.converter.convertToTuit(each));
-                console.log("iteratir", this.converter.convertToTuit(each));
             }
             return allTuitsArray;
         });
@@ -57,10 +58,11 @@ class TuitDao {
     // }
     findTuitById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tuitFromDb = yield TuitModel_1.default.findById(id);
-            const userFromDb = yield UserModel_1.default.findById(tuitFromDb._id);
-            const userT = new User_1.default(userFromDb._id.toString() || '', userFromDb['username'] || '', userFromDb['firstName'] || '', userFromDb['lastName'] || '', userFromDb['password'] || '', userFromDb['email'] || '');
-            const tuitResponse = new Tuit_1.default(tuitFromDb._id.toString(), userFromDb._id.toString(), tuitFromDb.tuit, tuitFromDb.postedOn);
+            const tuitFromDb = yield TuitModel_1.default.findById(id).lean();
+            const userid = tuitFromDb.postedBy._id.toString();
+            // a User type object
+            const userT = yield staticDaos_1.default.getInstance().getUserDao().findUserById(userid);
+            const tuitResponse = yield MongoToClassConverter_1.default.getInstance().convertToTuit(tuitFromDb);
             tuitResponse.setUser(userT);
             return tuitResponse;
         });

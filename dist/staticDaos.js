@@ -4,7 +4,7 @@ const UserDao_1 = require("./Users/UserDao");
 const TuitDao_1 = require("./Tuits/TuitDao");
 class staticDaos {
     constructor() {
-        staticDaos.sUserDao = new UserDao_1.default();
+        staticDaos.sUserDao = UserDao_1.default.getInstance();
         staticDaos.sTuitDao = new TuitDao_1.default();
     }
     static getInstance() {

@@ -9,16 +9,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const User_1 = require("./User");
 const UserModel_1 = require("./UserModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
 class UserDao {
+    constructor() {
+        this.converter = new MongoToClassConverter_1.default();
+    }
+    static getInstance() {
+        return this.userDao;
+    }
+    /**
+     * Creates a User in the database
+     * @param user {User} The user that will be created in the database
+     */
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
+            // add to database
             const userModelObj = yield UserModel_1.default.create(user);
-            // useerModelObj is a dictionary
-            const newUser = new User_1.default(userModelObj._id.toString(), userModelObj['username'], userModelObj['firstName'], userModelObj['lastName'], userModelObj['password'], userModelObj['email']);
-            return newUser;
+            // get created userId
+            const createdUserId = userModelObj._id.toString();
+            // use findByUserId method to get a Promise<User>
+            const newUserJSON = yield UserModel_1.default.findById(createdUserId).lean();
+            // Return a User type object
+            return this.converter.convertToUser(newUserJSON, true);
         });
     }
     deleteUser(uid) {
@@ -27,31 +40,37 @@ class UserDao {
             return modelsAfterDeletion.deletedCount;
         });
     }
-    // declare that the function is asynchronous
+    /**
+     * Get all users from the database, password, first name and last names are omitted
+     */
     findAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
-            // find wihtout a user passed in will return all documents form user table
-            // gets an array of user models
-            const allUserJsons = yield UserModel_1.default.find();
-            // for each user model in array allUserJsons
-            return allUserJsons.map(eachUserJSON => new User_1.default(eachUserJSON._id.toString(), eachUserJSON['username'], eachUserJSON['firstName'], eachUserJSON['lastName'], eachUserJSON['password'], eachUserJSON['email']));
+            // Get all users as a Promise and convert to lean
+            const allUserJsons = yield UserModel_1.default.find().lean();
+            const allUsersArr = [];
+            for (const eachUserJSON of allUserJsons) {
+                allUsersArr.push(yield this.converter.convertToUser(eachUserJSON, false, false));
+            }
+            return allUsersArr;
         });
     }
     findUserById(uid) {
         return __awaiter(this, void 0, void 0, function* () {
             const userFromDb = yield UserModel_1.default.findById(uid).lean();
             // returns a user object
-            return MongoToClassConverter_1.default.getInstance().convertToUser(userFromDb);
+            return this.converter.convertToUser(userFromDb);
         });
     }
     // get user by filterbyName
     findUserbyUserName(userNameIn) {
         return __awaiter(this, void 0, void 0, function* () {
             // TODO gotta use findOne need to implement no same username
-            const userFromDb = yield UserModel_1.default.findOne({ username: userNameIn });
-            return new User_1.default(userFromDb._id.toString() || '', userFromDb['username'] || '', userFromDb['firstName'] || '', userFromDb['lastName'] || '', userFromDb['password'] || '', userFromDb['email'] || '');
+            const userFromDb = yield UserModel_1.default.findOne({ username: userNameIn }).lean();
+            return this.converter.convertToUser(userFromDb, false, true);
         });
     }
 }
 exports.default = UserDao;
+// Singleton Architecture
+UserDao.userDao = new UserDao();
 //# sourceMappingURL=UserDao.js.map

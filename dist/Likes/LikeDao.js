@@ -13,17 +13,20 @@ const Like_1 = require("./Like");
 const LikeModel_1 = require("./LikeModel");
 const User_1 = require("../Users/User");
 const Tuit_1 = require("../Tuits/Tuit");
+const staticDaos_1 = require("../staticDaos");
 class LikeDao {
     createLike(tuitLikedId, userLikedId) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdLike = yield LikeModel_1.default.create({ likedTuit: tuitLikedId, likedBy: userLikedId });
-            console.log(typeof createdLike);
-            console.log(JSON.stringify(createdLike));
-            const example = createdLike.toObject();
-            console.log(example["likedTuit"].toString());
-            console.log(example["_id"].toString());
-            console.log(example);
-            return new Like_1.default(createdLike._id.toString(), new Tuit_1.default('', '', '', new Date()), new User_1.default('', '', '', '', '', ''));
+            const userWhoLiked = yield staticDaos_1.default.getInstance().getUserDao().findUserById(userLikedId);
+            const likedTuit = yield staticDaos_1.default.getInstance().getTuitDao().findTuitById(tuitLikedId);
+            // console.log(typeof createdLike)
+            // console.log(JSON.stringify(createdLike))
+            // const example = createdLike.toObject()
+            // console.log(example["likedTuit"].toString())
+            // console.log(example["_id"].toString())
+            // console.log(example)
+            return new Like_1.default(createdLike._id.toString(), likedTuit, userWhoLiked);
         });
     }
     deleteLike(likedId) {
@@ -31,22 +34,28 @@ class LikeDao {
             return yield LikeModel_1.default.deleteOne({ _id: likedId });
         });
     }
-    findAllLikes() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const allLikesJson = yield LikeModel_1.default.find()
-                .populate("likedTuit").populate("likedBy").exec();
-            const likedArr = [];
-            for (const eachLike of allLikesJson) {
-                let targetTuit = eachLike.likedTuit;
-                let userTarget = eachLike.likedBy;
-                let tUser = new User_1.default(userTarget._id.toString() || '', userTarget['username'] || '', userTarget['firstName'] || '', userTarget['lastName'] || '', userTarget['password'] || '', userTarget['email'] || '');
-                let tTuit = new Tuit_1.default(targetTuit._id.toString(), userTarget._id.toString(), targetTuit['tuit'], targetTuit['postedOn']);
-                tTuit.setUser(tUser);
-                likedArr.push(new Like_1.default(eachLike._id.toString(), tTuit, tUser));
-            }
-            return likedArr;
-        });
-    }
+    // async findAllLikes(): Promise<Like[]> {
+    //     const allLikesJson = await LikeModel.find().lean()
+    //         .populate("likedTuit").populate("likedBy").exec();
+    //
+    //     const likedArr = [];
+    //
+    //     for (const eachLike of allLikesJson) {
+    //         let targetTuit = eachLike.likedTuit
+    //         let userTarget = eachLike.likedBy
+    //
+    //         let tUser = MongoToClassConverter.getInstance().convertToUser(userTarget)
+    //
+    //         let tTuit = await MongoToClassConverter.getInstance().convertToTuit(targetTuit)
+    //
+    //         tTuit.setUser(tUser);
+    //
+    //         likedArr.push(new Like(eachLike._id.toString(),tTuit, tUser));
+    //     }
+    //
+    //     return likedArr;
+    //
+    // }
     findLikeById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const likeFromDb = yield LikeModel_1.default.findById(id);

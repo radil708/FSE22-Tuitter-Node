@@ -3,10 +3,6 @@ import {Request, Response} from "express";
 
 import UserController from "./Users/UserController";
 import UserDao from "./Users/UserDao";
-import TuitDao from "./Tuits/TuitDao";
-import TuitController from "./Tuits/TuitController";
-import LikeController from "./Likes/LikeController";
-import LikeDao from "./Likes/LikeDao";
 
 const app = express();
 const cors = require('cors');
@@ -48,11 +44,9 @@ function defaultPage (req: Request, res: Response) {
 
 app.get('/',defaultPage)
 
+UserDao.getInstance();
+
 const userController = new UserController(app);
-const tuitDao = new TuitDao();
-const tuitController = new TuitController(app);
-const likeDao = new LikeDao()
-const likeController = new LikeController(app, likeDao);
 
 
 const PORT = 4000;
