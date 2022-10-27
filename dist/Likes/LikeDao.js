@@ -24,7 +24,8 @@ class LikeDao {
                 likedTuit: likedTuitId,
                 likedBy: likedByUserId
             });
-            return yield this.converter.convertToLike(newLike);
+            const newLikeId = newLike._id.toString();
+            return this.getLikeById(newLikeId);
         });
     }
     getAllLikes() {
@@ -35,6 +36,12 @@ class LikeDao {
                 allLikes.push(yield this.converter.convertToLike(eachLike));
             }
             return allLikes;
+        });
+    }
+    getLikeById(likeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const likeFromDb = yield LikeModel_1.default.findById(likeId);
+            return yield this.converter.convertToLike(likeFromDb);
         });
     }
 }

@@ -21,7 +21,9 @@ export default class LikeDao {
             likedBy: likedByUserId
         })
 
-        return await this.converter.convertToLike(newLike)
+        const newLikeId = newLike._id.toString()
+
+        return this.getLikeById(newLikeId);
 
     }
 
@@ -35,6 +37,12 @@ export default class LikeDao {
         }
 
         return allLikes;
+
+    }
+
+    async getLikeById(likeId: string): Promise<Like> {
+        const likeFromDb = await LikeModel.findById(likeId);
+        return await this.converter.convertToLike(likeFromDb)
 
     }
 
