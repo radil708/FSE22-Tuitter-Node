@@ -10,7 +10,9 @@ export default class LikeDao implements LikeDaoInterface{
 
     async createLike(tuitLikedId: string, userLikedId: string): Promise<Like> {
         const createdLike = await LikeModel.create({likedTuit: tuitLikedId, likedBy: userLikedId})
-        return new Like(createdLike._id.toString(),null,null)
+        return new Like(createdLike._id.toString(),
+            new Tuit('','','',new Date()),
+            new User('','','','','',''));
     }
 
     async deleteLike(likedId: string): Promise<any> {

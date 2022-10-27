@@ -39,7 +39,8 @@ const userDao = new UserDao_1.default();
 const userController = new UserController_1.default(app, userDao);
 const tuitDao = new TuitDao_1.default();
 const tuitController = new TuitController_1.default(app, tuitDao, userDao);
-const likeController = new LikeController_1.default(app, new LikeDao_1.default());
+const likeDao = new LikeDao_1.default();
+const likeController = new LikeController_1.default(app, likeDao);
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 //# sourceMappingURL=server.js.map

@@ -17,7 +17,7 @@ class LikeDao {
     createLike(tuitLikedId, userLikedId) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdLike = yield LikeModel_1.default.create({ likedTuit: tuitLikedId, likedBy: userLikedId });
-            return new Like_1.default(createdLike._id.toString(), null, null);
+            return new Like_1.default(createdLike._id.toString(), new Tuit_1.default('', '', '', new Date()), new User_1.default('', '', '', '', '', ''));
         });
     }
     deleteLike(likedId) {

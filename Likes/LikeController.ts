@@ -20,8 +20,9 @@ export default class LikeController {
     }
 
     createLike = async (req: Request, res: Response) => {
-
-        const createdLike = await this.likeDao.createLike(req.params.tid, req.params.uid);
+        const tuitId = req.params.tid
+        const usid = req.params.uid
+        const createdLike = await this.likeDao.createLike(tuitId, usid);
         res.json(createdLike)
     }
 

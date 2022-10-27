@@ -52,7 +52,8 @@ const userDao = new UserDao();
 const userController = new UserController(app, userDao);
 const tuitDao = new TuitDao();
 const tuitController = new TuitController(app,tuitDao,userDao);
-const likeController = new LikeController(app, new LikeDao());
+const likeDao = new LikeDao()
+const likeController = new LikeController(app, likeDao);
 
 
 const PORT = 4000;

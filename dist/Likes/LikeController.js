@@ -16,7 +16,9 @@ class LikeController {
             res.json(allLikes);
         });
         this.createLike = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const createdLike = yield this.likeDao.createLike(req.params.tid, req.params.uid);
+            const tuitId = req.params.tid;
+            const usid = req.params.uid;
+            const createdLike = yield this.likeDao.createLike(tuitId, usid);
             res.json(createdLike);
         });
         this.app = appIn;
