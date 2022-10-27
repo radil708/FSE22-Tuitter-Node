@@ -14,6 +14,8 @@ class FollowController {
     constructor(appIn) {
         this.app = appIn;
         this.app.post('/follower/:rid/following/:gid/follows', this.createFollow);
+        this.app.get('/follows', this.getAllFollows);
+        this.app.get('/follows/:fid', this.getFollowById);
     }
     createFollow(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -22,6 +24,21 @@ class FollowController {
             const followingId = req.params.gid;
             const createdFollow = yield fDao.createFollow(followerId, followingId);
             res.send(createdFollow);
+        });
+    }
+    getAllFollows(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fDao = FollowDao_1.default.getInstance();
+            const allFollows = yield fDao.getAllFollows();
+            res.send(allFollows);
+        });
+    }
+    getFollowById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fDao = FollowDao_1.default.getInstance();
+            const followId = req.params.fid;
+            const followObj = yield fDao.findById(followId);
+            res.send(followObj);
         });
     }
 }

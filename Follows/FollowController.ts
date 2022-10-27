@@ -8,6 +8,8 @@ export default class FollowController {
         this.app = appIn;
 
         this.app.post('/follower/:rid/following/:gid/follows', this.createFollow)
+        this.app.get('/follows', this.getAllFollows)
+        this.app.get('/follows/:fid', this.getFollowById)
     }
 
 
@@ -21,5 +23,18 @@ export default class FollowController {
         const createdFollow = await fDao.createFollow(followerId,followingId);
 
         res.send(createdFollow)
+    }
+
+    async getAllFollows(req: Request, res: Response) {
+        const fDao = FollowDao.getInstance();
+        const allFollows = await fDao.getAllFollows();
+        res.send(allFollows)
+    }
+
+    async getFollowById(req: Request, res: Response) {
+        const fDao = FollowDao.getInstance();
+        const followId = req.params.fid
+        const followObj = await fDao.findById(followId);
+        res.send(followObj)
     }
 }
