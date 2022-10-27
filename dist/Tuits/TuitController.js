@@ -10,8 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Tuit_1 = require("./Tuit");
+const staticDaos_1 = require("../staticDaos");
 class TuitController {
-    constructor(appIn, tuitDaoIn, userDaoIn) {
+    constructor(appIn) {
+        this.tuitDao = staticDaos_1.default.getInstance().getTuitDao();
+        this.userDao = staticDaos_1.default.getInstance().getUserDao();
         this.createTuit = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const userId = req.params.uid;
             //TODO what if user does not exist?
@@ -53,8 +56,6 @@ class TuitController {
                 .then(tuits => res.json(tuits));
         };
         this.app = appIn;
-        this.tuitDao = tuitDaoIn;
-        this.userDao = userDaoIn;
         this.app.get('/tuits', this.findAllTuits);
         this.app.get('/tuits/:tid', this.findTuitById);
         this.app.get('/users/:uid/tuits', this.findTuitsByUser);

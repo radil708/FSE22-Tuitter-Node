@@ -13,14 +13,20 @@ const Tuit_1 = require("./Tuit");
 const TuitModel_1 = require("./TuitModel");
 const User_1 = require("../Users/User");
 const UserModel_1 = require("../Users/UserModel");
+const MongoToClassConverter_1 = require("../MongoToClassConverter");
 class TuitDao {
     constructor() {
         this.oid = require('mongodb').ObjectId;
+        this.converter = MongoToClassConverter_1.default.getInstance();
     }
     findAllTuits() {
         return __awaiter(this, void 0, void 0, function* () {
-            const allTuitsJSON = yield TuitModel_1.default.find();
-            const allTuitsArray = allTuitsJSON.map(eachTuit => new Tuit_1.default(eachTuit._id.toString(), eachTuit.postedBy._id.toString(), eachTuit['tuit'], eachTuit['postedOn']));
+            const allTuitsJSON = yield TuitModel_1.default.find().lean();
+            const allTuitsArray = [];
+            for (const each of allTuitsJSON) {
+                allTuitsArray.push(yield this.converter.convertToTuit(each));
+                console.log("iteratir", this.converter.convertToTuit(each));
+            }
             return allTuitsArray;
         });
     }

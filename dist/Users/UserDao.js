@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const User_1 = require("./User");
 const UserModel_1 = require("./UserModel");
+const MongoToClassConverter_1 = require("../MongoToClassConverter");
 class UserDao {
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,10 +39,9 @@ class UserDao {
     }
     findUserById(uid) {
         return __awaiter(this, void 0, void 0, function* () {
-            const userFromDb = yield UserModel_1.default.findById(uid);
-            // TODO maybe obscure password here?
-            //TODO I can replace password with an empty string
-            return new User_1.default(userFromDb._id.toString(), userFromDb['username'], userFromDb['firstName'], userFromDb['lastName'], userFromDb['password'], userFromDb['email']);
+            const userFromDb = yield UserModel_1.default.findById(uid).lean();
+            // returns a user object
+            return MongoToClassConverter_1.default.getInstance().convertToUser(userFromDb);
         });
     }
     // get user by filterbyName

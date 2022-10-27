@@ -9,8 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const staticDaos_1 = require("../staticDaos");
 class UserController {
-    constructor(app, userDao) {
+    constructor(app) {
+        this.userDao = staticDaos_1.default.getInstance().getUserDao();
         this.createUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
             // assign variable to store POST JSON body from client
             const newUserJSON = req.body;
@@ -84,7 +86,6 @@ class UserController {
             res.json(targetedUser);
         });
         this.app = app;
-        this.userDao = userDao;
         // Set attributes of app attribute
         this.app.get('/users', this.findAllUsers);
         this.app.get('/users/:userid', this.findUserById);

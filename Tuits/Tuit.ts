@@ -8,7 +8,7 @@ export default class Tuit {
     private userId: string = '';
     private tuitContent: string = '';
     private postedOn: Date = new Date();
-    private postedBy: User | null;
+    public postedBy: User | null;
 
 
     constructor(tuitIdIn: string, userIdIn: string, contentIn : string, postedOnIn: Date) {

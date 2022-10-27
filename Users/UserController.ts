@@ -1,15 +1,15 @@
 import {Request, Response,Express} from "express";
 import UserDao from "./UserDao";
 import UserControllerInterface from "./UserControllerInterface";
+import staticDaos from "../staticDaos";
 
 export default class UserController implements UserControllerInterface {
     // attributes
     app: Express;
-    userDao: UserDao;
+    userDao: UserDao = staticDaos.getInstance().getUserDao();
 
-    constructor(app: Express, userDao: UserDao) {
+    constructor(app: Express) {
         this.app = app;
-        this.userDao = userDao;
         // Set attributes of app attribute
         this.app.get('/users', this.findAllUsers);
         this.app.get('/users/:userid', this.findUserById);

@@ -4,20 +4,21 @@ import TuitModel from "./TuitModel";
 import User from "../Users/User";
 import userModel from "../Users/UserModel";
 import TuitDaoInterface from "./TuitDaoInterface";
+import MongoToClassConverter from "../MongoToClassConverter";
 
 export default class TuitDao implements TuitDaoInterface {
     oid = require('mongodb').ObjectId;
+    converter = MongoToClassConverter.getInstance()
 
     async findAllTuits(): Promise<Tuit[]> {
-        const allTuitsJSON = await TuitModel.find();
+        const allTuitsJSON = await TuitModel.find().lean();
 
-        const allTuitsArray = allTuitsJSON.map(eachTuit => new Tuit(
-            eachTuit._id.toString(),
-            eachTuit.postedBy._id.toString(),
-            eachTuit['tuit'],
-            eachTuit['postedOn']
-            )
-        );
+        const allTuitsArray = []
+
+        for (const each of allTuitsJSON) {
+            // need to make this await so call back when conversion complete
+            allTuitsArray.push(await this.converter.convertToTuit(each))
+        }
 
         return allTuitsArray;
     }

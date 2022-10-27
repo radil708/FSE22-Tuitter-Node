@@ -4,17 +4,16 @@ import TuitDao from "./TuitDao";
 import UserDao from "../Users/UserDao";
 import User from "../Users/User";
 import Tuit from "./Tuit";
+import staticDaos from "../staticDaos";
 
 
 export default class TuitController implements TuitControllerInterface {
     app: Express;
-    tuitDao: TuitDao;
-    userDao: UserDao;
+    tuitDao: TuitDao = staticDaos.getInstance().getTuitDao();
+    userDao: UserDao = staticDaos.getInstance().getUserDao();
 
-    constructor(appIn: Express, tuitDaoIn: TuitDao, userDaoIn: UserDao ) {
+    constructor(appIn: Express ) {
         this.app = appIn;
-        this.tuitDao = tuitDaoIn;
-        this.userDao = userDaoIn;
 
         this.app.get('/tuits', this.findAllTuits);
         this.app.get('/tuits/:tid', this.findTuitById)

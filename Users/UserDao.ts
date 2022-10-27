@@ -1,6 +1,7 @@
 import User from "./User";
 import UserModel from "./UserModel";
 import UserDaoInterface from "./UserDaoInterface";
+import MongoToClassConverter from "../MongoToClassConverter";
 
 export default class UserDao implements UserDaoInterface {
     async createUser(user: User): Promise<User> {
@@ -35,18 +36,11 @@ export default class UserDao implements UserDaoInterface {
     }
 
     async findUserById(uid: string): Promise<User> {
-        const userFromDb = await UserModel.findById(uid);
+        const userFromDb = await UserModel.findById(uid).lean();
 
-        // TODO maybe obscure password here?
-        //TODO I can replace password with an empty string
-        return new User(
-            userFromDb._id.toString(),
-            userFromDb['username'],
-            userFromDb['firstName'],
-            userFromDb['lastName'],
-            userFromDb['password'],
-            userFromDb['email']
-        )
+
+        // returns a user object
+        return MongoToClassConverter.getInstance().convertToUser(userFromDb)
     }
 
     // get user by filterbyName

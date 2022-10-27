@@ -48,10 +48,9 @@ function defaultPage (req: Request, res: Response) {
 
 app.get('/',defaultPage)
 
-const userDao = new UserDao();
-const userController = new UserController(app, userDao);
+const userController = new UserController(app);
 const tuitDao = new TuitDao();
-const tuitController = new TuitController(app,tuitDao,userDao);
+const tuitController = new TuitController(app);
 const likeDao = new LikeDao()
 const likeController = new LikeController(app, likeDao);
 

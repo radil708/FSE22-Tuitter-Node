@@ -12,19 +12,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class LikeController {
     constructor(appIn, likeDaoIn) {
         this.findAllLikes = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            console.log("finding all likes");
             const allLikes = yield this.likeDao.findAllLikes();
             res.json(allLikes);
         });
         this.createLike = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            console.log("making a like");
             const tuitId = req.params.tid;
             const usid = req.params.uid;
+            console.log(tuitId);
+            console.log(usid);
             const createdLike = yield this.likeDao.createLike(tuitId, usid);
             res.json(createdLike);
         });
         this.app = appIn;
         this.likeDao = likeDaoIn;
         this.app.get('/likes', this.findAllLikes);
-        this.app.post('tuit/:tid/likedBy/:uid/likes', this.createLike);
+        this.app.post('/tuit/:tid/likedBy/:uid/likes', this.createLike);
     }
 }
 exports.default = LikeController;
