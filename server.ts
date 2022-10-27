@@ -2,7 +2,6 @@ import * as express from 'express';
 import {Request, Response} from "express";
 
 import UserController from "./Users/UserController";
-import UserDao from "./Users/UserDao";
 
 const app = express();
 const cors = require('cors');
