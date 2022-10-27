@@ -9,6 +9,6 @@ const FollowSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'UserModel'
     }
-})
+}, {collection: 'Follows'})
 
 export default FollowSchema

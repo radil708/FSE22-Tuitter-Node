@@ -3,6 +3,9 @@ import UserDao from "./Users/UserDao";
 import TuitDao from "./Tuits/TuitDao";
 import Tuit from "./Tuits/Tuit";
 import Like from "./Likes/Like";
+import FollowModel from "./Follows/FollowModel";
+import Follow from "./Follows/Follow";
+import FollowDao from "./Follows/FollowDao";
 
 
 export class MongoToClassConverter {
@@ -73,6 +76,19 @@ export class MongoToClassConverter {
         )
 
         return retLike
+    }
+
+    async convertToFollow(mongoRes): Promise<Follow> {
+        const followId = mongoRes["_id"].toString()
+        const userFollowedId = mongoRes.userFollowed._id.toString();
+        const userFollowingId = mongoRes.userFollowing._id.toString();
+
+        const uDao = UserDao.getInstance();
+        const userFollowed = await uDao.findUserById(userFollowedId)
+        const userFollowing = await uDao.findUserById(userFollowingId)
+
+        return new Follow(followId, userFollowed,userFollowing);
+
     }
 
 
