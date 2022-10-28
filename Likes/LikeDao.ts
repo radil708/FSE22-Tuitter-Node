@@ -6,19 +6,32 @@ import likeModel from "./LikeModel";
 import Tuit from "../Tuits/Tuit";
 import User from "../Users/User";
 import UserDao from "../Users/UserDao";
+import LikeDaoInterface from "./LikeDaoInterface";
 
 
-export default class LikeDao {
+export default class LikeDao implements LikeDaoInterface{
     private converter: MongoToClassConverter = new MongoToClassConverter()
     private static likeSingletonDao: LikeDao = new LikeDao()
 
+    /**
+     * Singleton Architecture
+     */
     public static getInstance() {
         return this.likeSingletonDao;
     }
 
+    /**
+     * Singleton Architecture
+     */
     private constructor() {
     }
 
+    /**
+     * Create a Like entry in the Likes database and return
+     * a Like object representing the entry
+     * @param likedTuitId
+     * @param likedByUserId
+     */
     async createLike(likedTuitId: string, likedByUserId: string): Promise<Like> {
         const newLike = await LikeModel.create({
             likedTuit: likedTuitId,
@@ -31,6 +44,10 @@ export default class LikeDao {
 
     }
 
+    /**
+     * Get every Like entry from the database and return them
+     * as Like objects
+     */
     async getAllLikes(): Promise<Like[]> {
         const allLikesFromDb = await LikeModel.find().lean();
 
@@ -44,11 +61,21 @@ export default class LikeDao {
 
     }
 
+    /**
+     * Get a specific Like entry from the database with a
+     * client defined userId and return it as a Like Object
+     * @param likeId
+     */
     async getLikeById(likeId: string): Promise<Like> {
         const likeFromDb = await LikeModel.findById(likeId);
         return await this.converter.convertToLike(likeFromDb)
     }
 
+    /**
+     * Get all Tuits that have been liked by a client defined
+     * userid and return them as Tuit objects
+     * @param userId
+     */
     async getAllTuitsLikedBy(userId: string): Promise<Tuit[]> {
         const allLikesFromDb = await likeModel.find({likedBy: userId})
         const allTids = []
@@ -70,6 +97,11 @@ export default class LikeDao {
 
     }
 
+    /**
+     * Get all users that have liked a Tuit with an id
+     * defined by the client and return them as User objects
+     * @param tuitId
+     */
     async getAllUsersThatLikesThisTuit(tuitId: string): Promise<User[]> {
         const allLikesFromDb = await likeModel.find({likedTuit: tuitId})
         const tUDao = await UserDao.getInstance();
@@ -92,6 +124,11 @@ export default class LikeDao {
 
     }
 
+    /**
+     * Represents unliking a tweet. Delete the Like entry
+     * with a client defined id.
+     * @param likeId
+     */
     async deleteLike(likeId: string): Promise<any> {
         const dbResp = await LikeModel.deleteOne({_id: likeId})
         return dbResp.deletedCount;

@@ -8,7 +8,10 @@ import Follow from "./Follows/Follow";
 import FollowDao from "./Follows/FollowDao";
 import Bookmark from "./Bookmarks/Bookmark";
 
-
+/**
+ * In the newer version of MongoDB you need to map the MongoQueries to the object itself, so I made
+ * this helper class to take care of that for me. It converts mongoResponses to actual class objects
+ */
 export class MongoToClassConverter {
     // TODO ask, why can't I set more than one wihtout TypeError: MongoToClassConverter_1.MongoToClassConverter is not a constructor
     //  attr??
