@@ -18,6 +18,7 @@ class FollowController {
         this.app.get('/follows/:fid', this.getFollowById);
         this.app.delete('/follows/:fid', this.unfollow);
         this.app.get('/follower/:uid', this.getUsersIAmFollowing);
+        this.app.get('/following/:uid', this.getUsersFollowingMe);
     }
     createFollow(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -57,6 +58,13 @@ class FollowController {
             const myUserId = req.params.uid;
             const usersIAmFollowing = yield fDao.getUsersIAmFollowing(myUserId);
             res.send(usersIAmFollowing);
+        });
+    }
+    getUsersFollowingMe(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fDao = FollowDao_1.default.getInstance();
+            const usersFollowingMeArr = yield fDao.getUsersFollowingMe(req.params.uid);
+            res.send(usersFollowingMeArr);
         });
     }
 }

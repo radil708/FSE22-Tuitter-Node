@@ -2,6 +2,7 @@ import FollowModel from "./FollowModel";
 import {MongoToClassConverter} from "../MongoToClassConverter";
 import Follow from "./Follow";
 import UserDao from "../Users/UserDao";
+import User from "../Users/User";
 
 export default class FollowDao {
     private static fSingletonDao: FollowDao = new FollowDao()
@@ -47,7 +48,7 @@ export default class FollowDao {
         return dbResp.deletedCount;
     }
 
-    async getUsersIAmFollowing(userIdFollower: string) {
+    async getUsersIAmFollowing(userIdFollower: string): Promise<User[]> {
         // client is the one following
         const allFollowsWhereUserIsFollower = await FollowModel.find({userFollowing: userIdFollower})
 
@@ -63,6 +64,28 @@ export default class FollowDao {
             allUsersBeingFollowedByMe.push(await uDao.findUserById(eachUserId))
         }
         return allUsersBeingFollowedByMe;
+    }
+
+    async getUsersFollowingMe(followingId: string): Promise<User[]> {
+        const followsDb = await FollowModel.find({userFollowed: followingId})
+
+        const userIds = []
+
+        // get user id's of everyone following me
+        for (const eachFollow of followsDb) {
+            userIds.push((await eachFollow).userFollowing._id.toString())
+        }
+
+        const uDao = UserDao.getInstance();
+
+        const usersFollowingMe = []
+
+        // use the userID's to get Users
+        for (const eachId of userIds) {
+            usersFollowingMe.push(await uDao.findUserById(eachId))
+        }
+
+        return usersFollowingMe;
     }
 
 

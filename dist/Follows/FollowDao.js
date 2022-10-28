@@ -69,6 +69,23 @@ class FollowDao {
             return allUsersBeingFollowedByMe;
         });
     }
+    getUsersFollowingMe(followingId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const followsDb = yield FollowModel_1.default.find({ userFollowed: followingId });
+            const userIds = [];
+            // get user id's of everyone following me
+            for (const eachFollow of followsDb) {
+                userIds.push((yield eachFollow).userFollowing._id.toString());
+            }
+            const uDao = UserDao_1.default.getInstance();
+            const usersFollowingMe = [];
+            // use the userID's to get Users
+            for (const eachId of userIds) {
+                usersFollowingMe.push(yield uDao.findUserById(eachId));
+            }
+            return usersFollowingMe;
+        });
+    }
 }
 exports.default = FollowDao;
 FollowDao.fSingletonDao = new FollowDao();

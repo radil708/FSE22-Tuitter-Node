@@ -12,6 +12,7 @@ export default class FollowController {
         this.app.get('/follows/:fid', this.getFollowById)
         this.app.delete('/follows/:fid', this.unfollow)
         this.app.get('/follower/:uid', this.getUsersIAmFollowing)
+        this.app.get('/following/:uid', this.getUsersFollowingMe)
     }
 
 
@@ -52,5 +53,11 @@ export default class FollowController {
         const myUserId = req.params.uid
         const usersIAmFollowing = await fDao.getUsersIAmFollowing(myUserId)
         res.send(usersIAmFollowing);
+    }
+
+    async getUsersFollowingMe(req: Request, res: Response) {
+        const fDao = FollowDao.getInstance();
+        const usersFollowingMeArr = await fDao.getUsersFollowingMe(req.params.uid)
+        res.send(usersFollowingMeArr)
     }
 }
