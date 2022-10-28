@@ -17,6 +17,7 @@ class FollowController {
         this.app.get('/follows', this.getAllFollows);
         this.app.get('/follows/:fid', this.getFollowById);
         this.app.delete('/follows/:fid', this.unfollow);
+        this.app.get('/follower/:uid', this.getUsersIAmFollowing);
     }
     createFollow(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -48,6 +49,14 @@ class FollowController {
             const targetFollow = req.params.fid;
             const numDeleted = yield fDao.deleteFollow(targetFollow);
             res.send("Number of Follows Deleted: " + numDeleted.toString());
+        });
+    }
+    getUsersIAmFollowing(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fDao = FollowDao_1.default.getInstance();
+            const myUserId = req.params.uid;
+            const usersIAmFollowing = yield fDao.getUsersIAmFollowing(myUserId);
+            res.send(usersIAmFollowing);
         });
     }
 }

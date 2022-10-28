@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const FollowModel_1 = require("./FollowModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
+const UserDao_1 = require("../Users/UserDao");
 class FollowDao {
     constructor() {
     }
@@ -50,6 +51,22 @@ class FollowDao {
         return __awaiter(this, void 0, void 0, function* () {
             const dbResp = yield FollowModel_1.default.deleteOne({ _id: followId });
             return dbResp.deletedCount;
+        });
+    }
+    getUsersIAmFollowing(userIdFollower) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // client is the one following
+            const allFollowsWhereUserIsFollower = yield FollowModel_1.default.find({ userFollowing: userIdFollower });
+            const allFollowingIdsArr = [];
+            for (const eachFollow of allFollowsWhereUserIsFollower) {
+                allFollowingIdsArr.push((yield eachFollow).userFollowed._id.toString());
+            }
+            const allUsersBeingFollowedByMe = [];
+            const uDao = UserDao_1.default.getInstance();
+            for (const eachUserId of allFollowingIdsArr) {
+                allUsersBeingFollowedByMe.push(yield uDao.findUserById(eachUserId));
+            }
+            return allUsersBeingFollowedByMe;
         });
     }
 }
