@@ -18,3 +18,6 @@ export DB_CLUSTER_PASSWORD=<password to MongoDB Atlas Cloud cluster specific pas
 you can recall this info in the server.ts or any .ts file using:
 process.env.DB_CLUSTER_USERNAME
 process.env.DB_CLUSTER_PASSWORD
+
+To use jsdoc:
+    jsdoc -r dist

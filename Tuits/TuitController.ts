@@ -32,7 +32,12 @@ export default class TuitController implements TuitControllerInterface {
         // Get all info needed to make a Tuit object
         const tuitedById = req.params.uid;
         const tuitContent = req.body.tuit;
-        const tuitPostedDate = req.body.postedOn
+        let tuitPostedDate = req.body.postedOn
+
+        // if date not added in body then make one for today
+        if (tuitPostedDate = '' || tuitPostedDate == null) {
+            tuitPostedDate = new Date();
+        }
 
         const clientTuit = new Tuit(
             '',
