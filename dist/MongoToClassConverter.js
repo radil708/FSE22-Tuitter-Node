@@ -16,6 +16,7 @@ const TuitDao_1 = require("./Tuits/TuitDao");
 const Tuit_1 = require("./Tuits/Tuit");
 const Like_1 = require("./Likes/Like");
 const Follow_1 = require("./Follows/Follow");
+const Bookmark_1 = require("./Bookmarks/Bookmark");
 class MongoToClassConverter {
     // TODO ask, why can't I set more than one wihtout TypeError: MongoToClassConverter_1.MongoToClassConverter is not a constructor
     //  attr??
@@ -66,6 +67,18 @@ class MongoToClassConverter {
             const userFollowed = yield uDao.findUserById(userFollowedId);
             const userFollowing = yield uDao.findUserById(userFollowingId);
             return new Follow_1.default(followId, userFollowed, userFollowing);
+        });
+    }
+    convertToBookmark(mongoRes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bId = mongoRes["_id"].toString();
+            const bookmarkedTuitId = mongoRes.bookmarkedTuit._id.toString();
+            const bookedBy = mongoRes.bookmarkedBy._id.toString();
+            const uDao = UserDao_1.default.getInstance();
+            const tDao = TuitDao_1.default.getInstance();
+            const userIn = yield uDao.findUserById(bookedBy);
+            const tuitIn = yield tDao.findTuitById(bookmarkedTuitId);
+            return new Bookmark_1.default(bId, tuitIn, userIn);
         });
     }
 }

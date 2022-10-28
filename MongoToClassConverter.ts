@@ -6,6 +6,7 @@ import Like from "./Likes/Like";
 import FollowModel from "./Follows/FollowModel";
 import Follow from "./Follows/Follow";
 import FollowDao from "./Follows/FollowDao";
+import Bookmark from "./Bookmarks/Bookmark";
 
 
 export class MongoToClassConverter {
@@ -89,6 +90,20 @@ export class MongoToClassConverter {
 
         return new Follow(followId, userFollowed,userFollowing);
 
+    }
+
+    async convertToBookmark(mongoRes): Promise<Bookmark> {
+        const bId = mongoRes["_id"].toString()
+        const bookmarkedTuitId = mongoRes.bookmarkedTuit._id.toString()
+        const bookedBy = mongoRes.bookmarkedBy._id.toString();
+
+        const uDao = UserDao.getInstance();
+        const tDao = TuitDao.getInstance()
+
+        const userIn = await uDao.findUserById(bookedBy)
+        const tuitIn = await tDao.findTuitById(bookmarkedTuitId)
+
+        return new Bookmark(bId, tuitIn,userIn)
     }
 
 
