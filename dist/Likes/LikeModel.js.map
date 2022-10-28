@@ -1,1 +1,1 @@
-{"version":3,"file":"LikeModel.js","sourceRoot":"","sources":["../../Likes/LikeModel.ts"],"names":[],"mappings":";;AAAA,uCAAgC;AAChC,6CAAsC;AAEtC,MAAM,SAAS,GAAG,kBAAQ,CAAC,KAAK,CAAC,WAAW,EAAE,oBAAU,CAAC,CAAC;AAE1D,kBAAe,SAAS,CAAC"}
+{"version":3,"file":"LikeModel.js","sourceRoot":"","sources":["../../Likes/LikeModel.ts"],"names":[],"mappings":";;AAAA,uCAAgC;AAChC,6CAAsC;AAEtC;;GAEG;AACH,MAAM,SAAS,GAAG,kBAAQ,CAAC,KAAK,CAAC,WAAW,EAAE,oBAAU,CAAC,CAAC;AAE1D,kBAAe,SAAS,CAAC"}

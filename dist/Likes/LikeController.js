@@ -10,6 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const LikeDao_1 = require("./LikeDao");
+/**
+ * This parses client requests and reads/writes data to/from the database
+ * using a dao.
+ */
 class LikeController {
     constructor(app) {
         this.app = app;
@@ -22,6 +26,12 @@ class LikeController {
         this.app.get('/tuits/:tid/likes', this.getAllUsersThatLikedThisTuit);
         this.app.delete('/likes/:lid', this.unlike);
     }
+    /**
+     * Creates a new Like entry based on the client provided
+     * userid and tuitId from the req.params
+     * @param req
+     * @param res
+     */
     createLike(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tuitId = req.params.tid;
@@ -31,6 +41,11 @@ class LikeController {
             res.send(likeObj);
         });
     }
+    /**
+     * Sends every Like entry to the client
+     * @param req
+     * @param res
+     */
     getAllLikes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
@@ -38,6 +53,12 @@ class LikeController {
             res.send(allLikes);
         });
     }
+    /**
+     * Send a specific like entrty from the db to
+     * the client with an id specified by the client
+     * @param req
+     * @param res
+     */
     getLikeById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
@@ -45,6 +66,12 @@ class LikeController {
             res.send(targetedLike);
         });
     }
+    /**
+     * Sends all Tuits that were liked by User
+     * with an id specified by the client in the req.params
+     * @param req
+     * @param res
+     */
     getAllTuitsLikedBy(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
@@ -52,6 +79,12 @@ class LikeController {
             res.send(allTuitsLikedByUser);
         });
     }
+    /**
+     * Sends all the Users that liked a Tuit with an id
+     * matching an id specified by the client in the req.params
+     * @param req
+     * @param res
+     */
     getAllUsersThatLikedThisTuit(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
@@ -59,6 +92,12 @@ class LikeController {
             res.send(usersThatLiked);
         });
     }
+    /**
+     * Deletes a like entry from the collection based
+     * on the likeid specified by the client
+     * @param req
+     * @param res
+     */
     unlike(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();

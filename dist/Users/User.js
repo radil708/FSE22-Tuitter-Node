@@ -1,12 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-// import classes that the User class is composed of
 const AccountType_1 = require("./UserEnums/AccountType");
 const MaritalStatus_1 = require("./UserEnums/MaritalStatus");
-/*
-The User class represents a user class on Tuiter. It uses the enums: AccountType and
-Marital status. It also uses a Location object as part of its attributes.
- */
 /**
  * This class represents any user on tuitter. A user has a username, password, firstName
  * lastname...etc

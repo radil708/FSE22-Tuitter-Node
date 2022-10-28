@@ -31,11 +31,13 @@ const DB_NAME = "fsd";
 const connectionString = DB_PROTOCOL + "://" + DB_USERNAME + ":" + DB_PASSWORD + "@" + HOST +
     "/" + DB_NAME + "?" + ENDING_QUERY;
 mongoose.connect(connectionString);
+/*************    Setup Default Page    *****************/
 function defaultPage(req, res) {
     res.send('Welcome to Ramzi\'s Fall2022 SoftEng Home Page');
 }
 app.get('/', defaultPage);
 UserDao_1.default.getInstance();
+/*************    Connect To app to custom api via controllers    *****************/
 const userController = new UserController_1.default(app);
 const tuitConroller = new TuitController_1.default(app);
 const likeControoler = new LikeController_1.default(app);

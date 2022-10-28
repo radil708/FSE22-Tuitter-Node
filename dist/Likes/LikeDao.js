@@ -15,12 +15,24 @@ const LikeModel_1 = require("./LikeModel");
 const LikeModel_2 = require("./LikeModel");
 const UserDao_1 = require("../Users/UserDao");
 class LikeDao {
+    /**
+     * Singleton Architecture
+     */
     constructor() {
         this.converter = new MongoToClassConverter_1.MongoToClassConverter();
     }
+    /**
+     * Singleton Architecture
+     */
     static getInstance() {
         return this.likeSingletonDao;
     }
+    /**
+     * Create a Like entry in the Likes database and return
+     * a Like object representing the entry
+     * @param likedTuitId
+     * @param likedByUserId
+     */
     createLike(likedTuitId, likedByUserId) {
         return __awaiter(this, void 0, void 0, function* () {
             const newLike = yield LikeModel_1.default.create({
@@ -31,6 +43,10 @@ class LikeDao {
             return this.getLikeById(newLikeId);
         });
     }
+    /**
+     * Get every Like entry from the database and return them
+     * as Like objects
+     */
     getAllLikes() {
         return __awaiter(this, void 0, void 0, function* () {
             const allLikesFromDb = yield LikeModel_1.default.find().lean();
@@ -41,12 +57,22 @@ class LikeDao {
             return allLikes;
         });
     }
+    /**
+     * Get a specific Like entry from the database with a
+     * client defined userId and return it as a Like Object
+     * @param likeId
+     */
     getLikeById(likeId) {
         return __awaiter(this, void 0, void 0, function* () {
             const likeFromDb = yield LikeModel_1.default.findById(likeId);
             return yield this.converter.convertToLike(likeFromDb);
         });
     }
+    /**
+     * Get all Tuits that have been liked by a client defined
+     * userid and return them as Tuit objects
+     * @param userId
+     */
     getAllTuitsLikedBy(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const allLikesFromDb = yield LikeModel_2.default.find({ likedBy: userId });
@@ -63,6 +89,11 @@ class LikeDao {
             return allTuits;
         });
     }
+    /**
+     * Get all users that have liked a Tuit with an id
+     * defined by the client and return them as User objects
+     * @param tuitId
+     */
     getAllUsersThatLikesThisTuit(tuitId) {
         return __awaiter(this, void 0, void 0, function* () {
             const allLikesFromDb = yield LikeModel_2.default.find({ likedTuit: tuitId });
@@ -78,6 +109,11 @@ class LikeDao {
             return allUsers;
         });
     }
+    /**
+     * Represents unliking a tweet. Delete the Like entry
+     * with a client defined id.
+     * @param likeId
+     */
     deleteLike(likeId) {
         return __awaiter(this, void 0, void 0, function* () {
             const dbResp = yield LikeModel_1.default.deleteOne({ _id: likeId });

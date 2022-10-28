@@ -11,10 +11,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const UserModel_1 = require("./UserModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
+/**
+ * This dao will interact with the database via the UserModel
+ */
 class UserDao {
+    /**
+     * Singleton Architecture
+     */
     constructor() {
         this.converter = new MongoToClassConverter_1.MongoToClassConverter();
     }
+    /**
+     * Singleton Architecture
+     */
     static getInstance() {
         return this.userDao;
     }
@@ -29,6 +38,10 @@ class UserDao {
             return user;
         });
     }
+    /**
+     * This will delete a user from the database
+     * @param uid {string} the user id of the user you want to delete
+     */
     deleteUser(uid) {
         return __awaiter(this, void 0, void 0, function* () {
             const modelsAfterDeletion = yield UserModel_1.default.deleteOne({ _id: uid });
@@ -36,7 +49,7 @@ class UserDao {
         });
     }
     /**
-     * Get all users from the database, password, first name and last names are omitted
+     * Returns an array of Users representing all Users in the database
      */
     findAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -49,6 +62,11 @@ class UserDao {
             return allUsersArr;
         });
     }
+    /**
+     * Returns a user from the database with an object id
+     * matching the uid param passed in the param
+     * @param uid {string} the user id of the user you want to find
+     */
     findUserById(uid) {
         return __awaiter(this, void 0, void 0, function* () {
             const userFromDb = yield UserModel_1.default.findById(uid).lean();
@@ -57,7 +75,10 @@ class UserDao {
             return this.converter.convertToUser(userFromDb);
         });
     }
-    // get user by filterbyName
+    /**
+     * Get user by username
+     * @param userNameIn
+     */
     findUserbyUserName(userNameIn) {
         return __awaiter(this, void 0, void 0, function* () {
             // TODO gotta use findOne need to implement no same username

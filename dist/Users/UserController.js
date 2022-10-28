@@ -10,9 +10,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const UserDao_1 = require("./UserDao");
+/**
+ * The controller will connect the get,post,delete request from clients
+ * to the database via the UserDao
+ */
 class UserController {
+    /**
+     * Singleton Architecture
+     */
     constructor(app) {
         this.userDao = UserDao_1.default.getInstance();
+        /**
+         * Creates a user in the database as defined by the client's req body.
+         * It will also send back the created user to the client as a JSON
+         * in the response body.
+         * @param req {Request} A Request object containing the client's request
+         * as an express.Request object. The response body should contain
+         * a JSON with the following properties:
+         *      username:
+         *      password:
+         *      firstName:
+         *      lastName:
+         *      email:
+         * @param res {Response} A Response object that will be used to
+         * send the created user to the client
+         */
         this.createUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
             // assign variable to store POST JSON body from client
             const newUserJSON = req.body;
@@ -21,6 +43,15 @@ class UserController {
             // add new user JSON info to response?
             res.send(newUserObject);
         });
+        /**
+         * Deletes a user from the database whose userid matches the user
+         * defined userid from the client's request.
+         * @param req {Request}  A Request object containing the client's request
+         * as an express.Request object. The req.params['userid'] needs
+         * to contain the client defined userid
+         * @param res {Response} A Response object that will send
+         * the amount of deleted users to the client
+         */
         this.deleteUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
             //TODO ask, by default params has a
             // userid comes from line18, i.e. the userid in the url
@@ -44,11 +75,28 @@ class UserController {
                 res.send("No users with _id: " + userIdToDelete + " found\n0 users deleted");
             }
         });
+        /**
+         * Gets all users from the database and sends them to the client
+         * @param req {Request} A Request object containing the client's request
+         * as an express.Request object
+         * @param res {Response} A Response object which will be used to send
+         * All users from the database in the format of a JSON array to the client
+         */
         this.findAllUsers = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const allUsers = yield this.userDao.findAllUsers();
             // send response JSON
             res.json(allUsers);
         });
+        /**
+         * Gets a user from the database with an ID matching the ID requested
+         * by a client. It will send the matching user in the response body
+         * in the JSON format.
+         * @param req {Request} A Request object containing the client's request
+         * as an express.Request object
+         * @param res {Response} A Response object that will be used to
+         * send a single user with id matching the userid from the req
+         * to the client
+         */
         this.findUserById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             // userid comes from url input
             const userIdToFind = req.params['userid'];
@@ -62,6 +110,16 @@ class UserController {
                 res.status(404).send(errorMessage);
             }
         });
+        /**
+         * Gets a user by their username from the database with a username matching the
+         * username requested by the client. This will send the matching user
+         * in the response body in JSON format.
+         * @param req {Request} A Request object containing the client's request
+         * as an express.Request object
+         * @param res {Response} A Response object that will be used to
+         * send a single user with username matching the username from the req
+         * to the client
+         */
         this.findUserbyUserName = (req, res) => __awaiter(this, void 0, void 0, function* () {
             let targetUserName = '';
             const userNameTargetOne = req.body['postedBy'];
