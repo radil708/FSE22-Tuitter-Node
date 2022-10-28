@@ -8,6 +8,8 @@ export default class BookmarkController {
         this.app = appIn;
 
         this.app.post('/tuits/:tid/users/:uid/bookmarks', this.bookmarkTuit)
+        this.app.get('/bookmarks/:bid', this.getBookmarkById)
+        this.app.get('/bookmarks', this.getAllBookmarks)
 
     }
 
@@ -21,5 +23,19 @@ export default class BookmarkController {
 
         res.send(newBookmark)
     }
+
+    async getBookmarkById(req: Request, res: Response){
+        const bId = req.params.bid
+        const bDao = BookmarkDao.getInstance();
+        const bookmark = await bDao.getBookmarkById(bId)
+        res.send(bookmark)
+    }
+
+    async getAllBookmarks(req: Request, res: Response){
+        const bDao = BookmarkDao.getInstance();
+        res.send(await bDao.getAllBookmarks())
+    }
+
+
 
 }

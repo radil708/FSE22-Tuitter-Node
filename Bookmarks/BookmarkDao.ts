@@ -29,4 +29,16 @@ export default class BookmarkDao {
 
         return await converter.convertToBookmark(dbResp);
     }
+
+    async getAllBookmarks(): Promise<Bookmark[]> {
+        const allDbBookmarks = await BookmarkModel.find();
+
+        const allBookmarks = []
+
+        for (const eachBookmark of allDbBookmarks) {
+            allBookmarks.push(await this.getBookmarkById(eachBookmark._id.toString()))
+        }
+
+        return allBookmarks;
+    }
 }

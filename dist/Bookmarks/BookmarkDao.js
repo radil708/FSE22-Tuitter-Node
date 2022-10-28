@@ -34,6 +34,16 @@ class BookmarkDao {
             return yield converter.convertToBookmark(dbResp);
         });
     }
+    getAllBookmarks() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const allDbBookmarks = yield BookmarkModel_1.default.find();
+            const allBookmarks = [];
+            for (const eachBookmark of allDbBookmarks) {
+                allBookmarks.push(yield this.getBookmarkById(eachBookmark._id.toString()));
+            }
+            return allBookmarks;
+        });
+    }
 }
 exports.default = BookmarkDao;
 BookmarkDao.bSingleton = new BookmarkDao();

@@ -14,6 +14,8 @@ class BookmarkController {
     constructor(appIn) {
         this.app = appIn;
         this.app.post('/tuits/:tid/users/:uid/bookmarks', this.bookmarkTuit);
+        this.app.get('/bookmarks/:bid', this.getBookmarkById);
+        this.app.get('/bookmarks', this.getAllBookmarks);
     }
     bookmarkTuit(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -22,6 +24,20 @@ class BookmarkController {
             const bDao = BookmarkDao_1.default.getInstance();
             const newBookmark = yield bDao.createBookmark(tuitId, userId);
             res.send(newBookmark);
+        });
+    }
+    getBookmarkById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bId = req.params.bid;
+            const bDao = BookmarkDao_1.default.getInstance();
+            const bookmark = yield bDao.getBookmarkById(bId);
+            res.send(bookmark);
+        });
+    }
+    getAllBookmarks(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bDao = BookmarkDao_1.default.getInstance();
+            res.send(yield bDao.getAllBookmarks());
         });
     }
 }
