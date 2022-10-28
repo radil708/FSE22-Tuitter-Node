@@ -1,11 +1,7 @@
-// import classes that the User class is composed of
 import AccountType from "./UserEnums/AccountType";
 import MaritalStatus from "./UserEnums/MaritalStatus";
 import Location from "./UserEnums/Location";
-/*
-The User class represents a user class on Tuiter. It uses the enums: AccountType and
-Marital status. It also uses a Location object as part of its attributes.
- */
+
 
 /**
  * This class represents any user on tuitter. A user has a username, password, firstName

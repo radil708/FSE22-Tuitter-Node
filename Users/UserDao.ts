@@ -3,16 +3,24 @@ import UserModel from "./UserModel";
 import UserDaoInterface from "./UserDaoInterface";
 import {MongoToClassConverter} from "../MongoToClassConverter";
 
+/**
+ * This dao will interact with the database via the UserModel
+ */
 export default class UserDao implements UserDaoInterface {
     // Singleton Architecture
     private static userDao: UserDao = new UserDao();
     private converter: MongoToClassConverter = new MongoToClassConverter();
 
+    /**
+     * Singleton Architecture
+     */
     public static getInstance() {
         return this.userDao;
     }
 
-
+    /**
+     * Singleton Architecture
+     */
     private constructor() {
     }
 
@@ -28,13 +36,18 @@ export default class UserDao implements UserDaoInterface {
 
     }
 
+    /**
+     * This will delete a user from the database
+     * @param uid {string} the user id of the user you want to delete
+     */
     async deleteUser(uid: string): Promise<number> {
         const modelsAfterDeletion = await UserModel.deleteOne({_id: uid});
         return modelsAfterDeletion.deletedCount;
     }
 
+
     /**
-     * Get all users from the database, password, first name and last names are omitted
+     * Returns an array of Users representing all Users in the database
      */
     async findAllUsers(): Promise<User[]> {
         // Get all users as a Promise and convert to lean
@@ -49,6 +62,11 @@ export default class UserDao implements UserDaoInterface {
         return allUsersArr
     }
 
+    /**
+     * Returns a user from the database with an object id
+     * matching the uid param passed in the param
+     * @param uid {string} the user id of the user you want to find
+     */
     async findUserById(uid: string): Promise<User> {
         const userFromDb = await UserModel.findById(uid).lean();
         console.log(userFromDb)
@@ -57,7 +75,10 @@ export default class UserDao implements UserDaoInterface {
         return this.converter.convertToUser(userFromDb)
     }
 
-    // get user by filterbyName
+    /**
+     * Get user by username
+     * @param userNameIn
+     */
     async findUserbyUserName(userNameIn: string): Promise<User> {
         // TODO gotta use findOne need to implement no same username
         const userFromDb = await UserModel.findOne({username: userNameIn }).lean();

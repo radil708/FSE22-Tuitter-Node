@@ -42,7 +42,7 @@ const connectionString = DB_PROTOCOL + "://" + DB_USERNAME + ":" + DB_PASSWORD +
 mongoose.connect(connectionString)
 
 
-
+/*************    Setup Default Page    *****************/
 function defaultPage (req: Request, res: Response) {
     res.send('Welcome to Ramzi\'s Fall2022 SoftEng Home Page')
 }
@@ -51,7 +51,7 @@ app.get('/',defaultPage)
 
 UserDao.getInstance();
 
-
+/*************    Connect To app to custom api via controllers    *****************/
 const userController = new UserController(app);
 const tuitConroller = new TuitController(app);
 const likeControoler = new LikeController(app);
