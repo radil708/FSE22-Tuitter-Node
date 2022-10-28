@@ -51,6 +51,7 @@ export default class UserDao implements UserDaoInterface {
 
     async findUserById(uid: string): Promise<User> {
         const userFromDb = await UserModel.findById(uid).lean();
+        console.log(userFromDb)
 
         // returns a user object
         return this.converter.convertToUser(userFromDb)

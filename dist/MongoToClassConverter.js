@@ -74,6 +74,10 @@ class MongoToClassConverter {
             const bId = mongoRes["_id"].toString();
             const bookmarkedTuitId = mongoRes.bookmarkedTuit._id.toString();
             const bookedBy = mongoRes.bookmarkedBy._id.toString();
+            //TODO remove prints
+            // console.log(bId)
+            console.log('tuit id', bookmarkedTuitId);
+            console.log("user id", bookedBy);
             const uDao = UserDao_1.default.getInstance();
             const tDao = TuitDao_1.default.getInstance();
             const userIn = yield uDao.findUserById(bookedBy);

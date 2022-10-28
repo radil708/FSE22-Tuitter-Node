@@ -52,6 +52,7 @@ class UserDao {
     findUserById(uid) {
         return __awaiter(this, void 0, void 0, function* () {
             const userFromDb = yield UserModel_1.default.findById(uid).lean();
+            console.log(userFromDb);
             // returns a user object
             return this.converter.convertToUser(userFromDb);
         });

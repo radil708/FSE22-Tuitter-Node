@@ -93,9 +93,15 @@ export class MongoToClassConverter {
     }
 
     async convertToBookmark(mongoRes): Promise<Bookmark> {
+
         const bId = mongoRes["_id"].toString()
         const bookmarkedTuitId = mongoRes.bookmarkedTuit._id.toString()
         const bookedBy = mongoRes.bookmarkedBy._id.toString();
+
+        //TODO remove prints
+        // console.log(bId)
+        console.log('tuit id', bookmarkedTuitId)
+        console.log("user id",bookedBy)
 
         const uDao = UserDao.getInstance();
         const tDao = TuitDao.getInstance()
@@ -105,6 +111,7 @@ export class MongoToClassConverter {
 
         return new Bookmark(bId, tuitIn,userIn)
     }
+
 
 
 

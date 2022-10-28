@@ -24,7 +24,7 @@ export default class BookmarkDao {
     }
 
     async getBookmarkById(bid: string): Promise<Bookmark> {
-        const dbResp = await BookmarkModel.findById(bid)
+        const dbResp = await BookmarkModel.findById(bid).lean()
         const converter = new MongoToClassConverter();
 
         return await converter.convertToBookmark(dbResp);
@@ -40,5 +40,28 @@ export default class BookmarkDao {
         }
 
         return allBookmarks;
+    }
+
+    async getUsersBookmarks(userId: string): Promise<Bookmark[]> {
+        const dbResp = await BookmarkModel.find({bookmarkedBy: userId})
+
+        const bookmarksIds = []
+
+        for (const eachBookmark of dbResp) {
+            bookmarksIds.push((await eachBookmark)._id.toString())
+        }
+
+        const bookmarks = []
+
+        for (const eachId of bookmarksIds) {
+            bookmarks.push(await this.getBookmarkById(eachId))
+        }
+
+        return bookmarks
+    }
+
+    async deleteBookmark(bookmarkId: string): Promise<any> {
+        const dbResp = await BookmarkModel.deleteOne({_id: bookmarkId})
+        return dbResp.deletedCount;
     }
 }

@@ -16,6 +16,8 @@ class BookmarkController {
         this.app.post('/tuits/:tid/users/:uid/bookmarks', this.bookmarkTuit);
         this.app.get('/bookmarks/:bid', this.getBookmarkById);
         this.app.get('/bookmarks', this.getAllBookmarks);
+        this.app.get('/users/:uid/bookmarks', this.getUsersBookmarks);
+        this.app.delete('/bookmarks/:bid', this.unbookmark);
     }
     bookmarkTuit(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,6 +40,21 @@ class BookmarkController {
         return __awaiter(this, void 0, void 0, function* () {
             const bDao = BookmarkDao_1.default.getInstance();
             res.send(yield bDao.getAllBookmarks());
+        });
+    }
+    getUsersBookmarks(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bDao = BookmarkDao_1.default.getInstance();
+            const bookmarksBookedByUser = yield bDao.getUsersBookmarks(req.params.uid);
+            res.send(bookmarksBookedByUser);
+        });
+    }
+    unbookmark(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bookmarkId = req.params.bid;
+            const bDao = BookmarkDao_1.default.getInstance();
+            const numDel = yield bDao.deleteBookmark(bookmarkId);
+            res.send("Bookmarks Deleted = " + numDel.toString());
         });
     }
 }

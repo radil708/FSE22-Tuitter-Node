@@ -29,7 +29,7 @@ class BookmarkDao {
     }
     getBookmarkById(bid) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dbResp = yield BookmarkModel_1.default.findById(bid);
+            const dbResp = yield BookmarkModel_1.default.findById(bid).lean();
             const converter = new MongoToClassConverter_1.MongoToClassConverter();
             return yield converter.convertToBookmark(dbResp);
         });
@@ -42,6 +42,26 @@ class BookmarkDao {
                 allBookmarks.push(yield this.getBookmarkById(eachBookmark._id.toString()));
             }
             return allBookmarks;
+        });
+    }
+    getUsersBookmarks(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dbResp = yield BookmarkModel_1.default.find({ bookmarkedBy: userId });
+            const bookmarksIds = [];
+            for (const eachBookmark of dbResp) {
+                bookmarksIds.push((yield eachBookmark)._id.toString());
+            }
+            const bookmarks = [];
+            for (const eachId of bookmarksIds) {
+                bookmarks.push(yield this.getBookmarkById(eachId));
+            }
+            return bookmarks;
+        });
+    }
+    deleteBookmark(bookmarkId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dbResp = yield BookmarkModel_1.default.deleteOne({ _id: bookmarkId });
+            return dbResp.deletedCount;
         });
     }
 }
