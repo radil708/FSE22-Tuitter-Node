@@ -29,7 +29,12 @@ class TuitController {
             // Get all info needed to make a Tuit object
             const tuitedById = req.params.uid;
             const tuitContent = req.body.tuit;
-            const tuitPostedDate = req.body.postedOn;
+            let tuitPostedDate = req.body.postedOn;
+            // if date not added in body then make one for today
+            if (tuitPostedDate = '' || tuitPostedDate == null) {
+                tuitPostedDate = new Date();
+            }
+            console.log(tuitPostedDate);
             const clientTuit = new Tuit_1.default('', tuitedById, tuitContent, tuitPostedDate);
             const dbResp = yield TuitDao_1.default.getInstance().createTuit(clientTuit);
             res.send(dbResp);

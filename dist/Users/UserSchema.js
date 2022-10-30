@@ -4,7 +4,7 @@ const mongoose_1 = require("mongoose");
 /**
  * This is the UsersSchema. This will match the format of every entry
  * in the 'Tuits' collection from the database and has default values
- * set where necessary
+ * set where necessary. The username and password properties are required/mandatory
  */
 const UserSchema = new mongoose_1.default.Schema({
     username: { type: String, required: true },

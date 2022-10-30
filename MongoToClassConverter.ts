@@ -21,6 +21,11 @@ export class MongoToClassConverter {
     async convertToUser(mongoRes, showPassword = false, showNames= true): Promise<User> {
         const jScriptObj = mongoRes
 
+        // throw error is object passed in is null or empty
+        if (jScriptObj == null || jScriptObj == undefined) {
+            throw new TypeError("user passed in is null or undefined, cannot convert to User objet")
+        }
+
         let pwd = '';
         let firstName = '';
         let lastName = '';
@@ -33,7 +38,6 @@ export class MongoToClassConverter {
             firstName = jScriptObj["firstName"];
             lastName = jScriptObj["lastName"];
         }
-
 
         return new User(
             jScriptObj["_id"],

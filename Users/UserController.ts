@@ -1,6 +1,7 @@
 import {Request, Response,Express} from "express";
 import UserDao from "./UserDao";
 import UserControllerInterface from "./UserControllerInterface";
+import debugHelper from "../debugHelper";
 
 /**
  * The controller will connect the get,post,delete request from clients
@@ -10,6 +11,7 @@ export default class UserController implements UserControllerInterface {
     // attributes
     app: Express;
     userDao: UserDao = UserDao.getInstance();
+    private className: string = "UserController" // used for debug statements
 
     /**
      * Singleton Architecture
@@ -17,10 +19,11 @@ export default class UserController implements UserControllerInterface {
     constructor(app: Express) {
         this.app = app;
         // Set attributes of app attribute
-        this.app.get('/users', this.findAllUsers);
-        this.app.get('/users/:userid', this.findUserById);
-        this.app.post('/users', this.createUser);
-        this.app.delete('/users/:userid', this.deleteUser);
+        this.app.get('/users', this.findAllUsers); // get all users
+        this.app.get('/users/:userid', this.findUserById); // get user by id
+        this.app.get('/username/:uname/users', this.findUserByUserName) // get user by username
+        this.app.post('/users', this.createUser); // create a new user
+        this.app.delete('/users/:userid', this.deleteUserByID); // delete user by userid
         //this.app.put('/users/:userid', this.updateUser);
     }
 
@@ -42,10 +45,30 @@ export default class UserController implements UserControllerInterface {
     createUser = async (req: Request, res: Response) => {
         // assign variable to store POST JSON body from client
         const newUserJSON = req.body;
-        // user model to create a new user in database
-        const newUserObject = await this.userDao.createUser(newUserJSON);
-        // add new user JSON info to response?
-        res.send(newUserObject);
+        const userNameInput = req.body.username
+        const userNameAlreadyTaken = await this.userDao.userNameAlreadyTaken(userNameInput);
+        let serverReponse
+
+        if (!userNameAlreadyTaken) {
+            serverReponse = await this.userDao.createUser(newUserJSON)
+        }
+        else {
+            serverReponse = "The username: " + req.body.username + " is already taken"
+            serverReponse += "\n Please choose a different username"
+        }
+
+        //Set to true to turn on debug statements
+        const printDebug = false
+
+        if (printDebug) {
+            console.log("Is username: " + userNameInput + " already taken?\n", userNameAlreadyTaken)
+            console.log("Client Request body:\n", newUserJSON);
+            debugHelper.printSingleLineDivider()
+            console.log("DAO response:\n",serverReponse)
+            debugHelper.printEnd("createUser", this.className)
+        }
+
+        res.send(serverReponse);
     }
 
     /**
@@ -57,30 +80,53 @@ export default class UserController implements UserControllerInterface {
      * @param res {Response} A Response object that will send
      * the amount of deleted users to the client
      */
-    deleteUser = async (req: Request, res: Response) => {
-        //TODO ask, by default params has a
-        // userid comes from line18, i.e. the userid in the url
-        // this has nothing to do with request JSON
+    deleteUserByID = async (req: Request, res: Response) => {
+        //TODO ask, if user id should come from uri or response body
         const userIdToDelete = req.params['userid'];
-
+        let hitError = false
         let count = 0;
-        //console.log(req.params);
+
         try {
             count = await this.userDao.deleteUser(userIdToDelete);
         }
         catch (BSONTypeError) {
-            let errorMessage = "BSONType Error, userid: " + userIdToDelete + " is INCORRECT format";
-            errorMessage += " \nFAILED to DELETE user";
-            res.status(400).send(errorMessage);
-            return;
-        }
-        if (count > 0) {
-            res.send("SUCCESFULLY DELETED " + count.toString() + " users");
-        }
-        else {
-            res.send("No users with _id: " + userIdToDelete + " found\n0 users deleted" )
+            hitError = true
         }
 
+        let messageSend
+        if (hitError) {
+            let messageSend = "BSONType Error, userid: " + userIdToDelete + " is INCORRECT format";
+            messageSend += " \nFAILED to DELETE user";
+        }
+        else {
+            let messageSend
+            if (count > 0) {
+                messageSend = "user with id: " + userIdToDelete + " deleted from database"
+            }
+            else {
+                messageSend = "No users with _id: " + userIdToDelete + " found\n0 users deleted"
+            }
+        }
+
+        if (hitError) {
+            res.status(400).send(messageSend)
+        }
+        else {
+            res.send(messageSend)
+        }
+
+        //Set to true to turn on debug statements
+        const printDebug = false
+        if (printDebug) {
+            console.log("uid from client request: ", userIdToDelete)
+            if (hitError) {
+                console.log("BSON type error raised")
+            }
+            else {
+                console.log(messageSend)
+            }
+            debugHelper.printEnd("deleteUser", this.className)
+        }
     }
 
     /**
@@ -94,6 +140,13 @@ export default class UserController implements UserControllerInterface {
         const allUsers = await this.userDao.findAllUsers();
         // send response JSON
         res.json(allUsers)
+
+        //Set to true to turn on debug statements
+        const printDebug = false
+        if (printDebug) {
+            console.log("Sending to client:\n", allUsers)
+            debugHelper.printEnd("findAllUsers",this.className)
+        }
 
     }
 
@@ -110,14 +163,32 @@ export default class UserController implements UserControllerInterface {
     findUserById = async (req: Request, res: Response) => {
         // userid comes from url input
         const userIdToFind = req.params['userid'];
+        let hitError = false
+        let messageSend
+
         try {
-            const targeted_user = await this.userDao.findUserById(userIdToFind);
-            res.json(targeted_user);
+            messageSend = await this.userDao.findUserById(userIdToFind);
         }
         catch (BSONTypeError) {
-            let errorMessage = "BSONType Error, userid: " + userIdToFind + " is INCORRECT format";
-            errorMessage+= " \nFAILED to GET/FIND user"
-            res.status(404).send(errorMessage);
+            messageSend = "FAILED to GET user with id:" + userIdToFind
+            messageSend += "\nEither user with ID does not exist\nOR\nID format is incorrect"
+            hitError = true;
+        }
+
+        if (hitError) {
+            res.status(404).send(messageSend)
+        }
+        else {
+            res.send(messageSend)
+        }
+
+        //Set to true to turn on debug statements
+        const printDebug = false
+        if (printDebug) {
+            console.log("UserId to delete: ", userIdToFind)
+            debugHelper.printSingleLineDivider()
+            console.log("Response to client:\n", messageSend)
+            debugHelper.printEnd("findUserById",this.className)
         }
     }
 
@@ -131,30 +202,37 @@ export default class UserController implements UserControllerInterface {
      * send a single user with username matching the username from the req
      * to the client
      */
-    findUserbyUserName = async (req: Request, res: Response) => {
-        let targetUserName = '';
-        const userNameTargetOne = req.body['postedBy']
-        const userNameTargetTwo = req.body['username']
+    findUserByUserName = async (req: Request, res: Response) => {
+        const targetUserName = req.params.uname
+        let userFound = false;
+        let targetedUser;
 
-        if (userNameTargetOne.length == 0 || userNameTargetOne == null) {
-            if (userNameTargetTwo.length > 0) {
-                targetUserName = userNameTargetTwo;
-            }
+        // check if user exists
+        try{
+            targetedUser = await this.userDao.findUserbyUserName(targetUserName)
+            userFound = true;
         }
-        else if (userNameTargetTwo.length == 0 || userNameTargetTwo == null) {
-            if (userNameTargetOne.length > 0) {
-                targetUserName = userNameTargetOne;
-            }
+        catch (TypeError) {
+            targetedUser = '';
+        }
+
+        if (userFound) {
+            res.send(targetedUser)
         }
         else {
-            let errorMessage = "JSON request body requires {username: value} or {postedBy: value}";
-            errorMessage += "\nusername NOT defined, UNABLE to search"
-            res.status(404).send(errorMessage)
-            return;
+            res.status(400).send("There are no users with the username: " + targetUserName )
         }
 
-        const targetedUser = await this.userDao.findUserbyUserName(targetUserName);
-        res.json(targetedUser);
+
+        const printDebug = false
+        if (printDebug) {
+            console.log("target username: ", targetUserName);
+            console.log("userFound: ", userFound)
+            debugHelper.printSingleLineDivider()
+            console.log("Response from dao:\n", targetedUser)
+            debugHelper.printEnd("findUserByUserName", this.className)
+        }
+
     }
 
     // updateUser = async (req: Request, res: Response) => {

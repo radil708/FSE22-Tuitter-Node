@@ -11,21 +11,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const UserModel_1 = require("./UserModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
+const debugHelper_1 = require("../debugHelper");
+const mongoose_1 = require("mongoose");
 /**
  * This dao will interact with the database via the UserModel
  */
 class UserDao {
     /**
-     * Singleton Architecture
+     * The constructor is private to enforce the singleton architecture
+     * of this class
      */
     constructor() {
         this.converter = new MongoToClassConverter_1.MongoToClassConverter();
+        // used for debug statements
+        this.className = "UserDao";
     }
     /**
-     * Singleton Architecture
+     * A static method used to enforce a singleton architecture.
+     * In order to use this dao, call UserDao.getInstance()
      */
     static getInstance() {
         return this.userDao;
+    }
+    /**
+     * helper function to determine if user already exists
+     * @param userName {string} The username you want to check
+     */
+    userNameAlreadyTaken(userName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let userNameAlreadyExists;
+            try {
+                yield this.findUserbyUserName(userName);
+                userNameAlreadyExists = true;
+            }
+            catch (TypeError) {
+                userNameAlreadyExists = false;
+            }
+            // set to true to turn on debug statements
+            const printDebug = false;
+            if (printDebug) {
+                console.log("Is username: " + userName + " already taken?\n" + userNameAlreadyExists);
+                debugHelper_1.default.printEnd("userNameAlreadyTaken", 'UserDao');
+            }
+            return userNameAlreadyExists;
+        });
     }
     /**
      * Creates a User in the database
@@ -33,18 +62,32 @@ class UserDao {
      */
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            // add to database
             const userModelObj = yield UserModel_1.default.create(user);
+            //set to true to turn on debug statements
+            const printDebugDao = false;
+            if (printDebugDao) {
+                console.log("Response from UserModel.create:\n ", userModelObj);
+                debugHelper_1.default.printEnd("createUser", this.className);
+            }
             return user;
         });
     }
     /**
-     * This will delete a user from the database
+     * This will delete a user from the database based on the id passed in.
+     * It will return the amount of users deleted. If successful,
+     * it will return 0.
      * @param uid {string} the user id of the user you want to delete
      */
     deleteUser(uid) {
         return __awaiter(this, void 0, void 0, function* () {
+            //set to true to turn on debug statements
+            const printDebug = false;
             const modelsAfterDeletion = yield UserModel_1.default.deleteOne({ _id: uid });
+            if (printDebug) {
+                console.log("Response from UserModel.deleteOne:\n", modelsAfterDeletion);
+                console.log("Returning: ", modelsAfterDeletion.deletedCount.toString());
+                debugHelper_1.default.printEnd("deleteUser", this.className);
+            }
             return modelsAfterDeletion.deletedCount;
         });
     }
@@ -53,11 +96,21 @@ class UserDao {
      */
     findAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
+            //set to true to turn on debug statements
+            const printDebug = false;
             // Get all users as a Promise and convert to lean
             const allUserJsons = yield UserModel_1.default.find().lean();
+            if (printDebug) {
+                console.log("Response from model.find():\n", allUserJsons);
+                debugHelper_1.default.printSingleLineDivider();
+            }
             const allUsersArr = [];
             for (const eachUserJSON of allUserJsons) {
                 allUsersArr.push(yield this.converter.convertToUser(eachUserJSON, false, false));
+            }
+            if (printDebug) {
+                console.log("userArr generated:\n", allUserJsons);
+                debugHelper_1.default.printEnd("findAllUsers", this.className);
             }
             return allUsersArr;
         });
@@ -69,8 +122,14 @@ class UserDao {
      */
     findUserById(uid) {
         return __awaiter(this, void 0, void 0, function* () {
+            //TODO what if user id doesn't exist?
+            //set to true to turn on debug statements
+            const printDebug = false;
             const userFromDb = yield UserModel_1.default.findById(uid).lean();
-            console.log(userFromDb);
+            if (printDebug) {
+                console.log("Reponse from model.findById:\n", userFromDb);
+                debugHelper_1.default.printEnd("findUserById", this.className);
+            }
             // returns a user object
             return this.converter.convertToUser(userFromDb);
         });
@@ -83,6 +142,12 @@ class UserDao {
         return __awaiter(this, void 0, void 0, function* () {
             // TODO gotta use findOne need to implement no same username
             const userFromDb = yield UserModel_1.default.findOne({ username: userNameIn }).lean();
+            //set to true to turn on debug statements
+            const printDebug = false;
+            if (printDebug) {
+                console.log("Response from model.findOne:\n", userFromDb);
+                debugHelper_1.default.printEnd("findUserbyUserName", this.className);
+            }
             return this.converter.convertToUser(userFromDb, false, true);
         });
     }
@@ -90,4 +155,14 @@ class UserDao {
 exports.default = UserDao;
 // Singleton Architecture
 UserDao.userDao = new UserDao();
+/**
+ * custom error class used to determine if user already exists in
+ * createUser method of UserDao class
+ */
+class ValidationError extends mongoose_1.Error {
+    constructor(message) {
+        super(message);
+        this.name = "ValidationError";
+    }
+}
 //# sourceMappingURL=UserDao.js.map

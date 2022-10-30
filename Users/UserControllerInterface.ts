@@ -40,7 +40,7 @@ export default interface UserControllerInterface {
      * send a single user with username matching the username from the req
      * to the client
      */
-    findUserbyUserName(req: Request, res: Response): void;
+    findUserByUserName(req: Request, res: Response): void;
 
     /**
      * Creates a user in the database as defined by the client's req body.
@@ -68,7 +68,7 @@ export default interface UserControllerInterface {
      * @param res {Response} A Response object that will send
      * the amount of deleted users to the client
      */
-    deleteUser(req: Request, res: Response): void;
+    deleteUserByID(req: Request, res: Response): void;
 
     // /**
     //  * Replaces a user from the database with a user

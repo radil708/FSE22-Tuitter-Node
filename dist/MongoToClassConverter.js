@@ -28,6 +28,10 @@ class MongoToClassConverter {
     convertToUser(mongoRes, showPassword = false, showNames = true) {
         return __awaiter(this, void 0, void 0, function* () {
             const jScriptObj = mongoRes;
+            // throw error is object passed in is null or empty
+            if (jScriptObj == null || jScriptObj == undefined) {
+                throw new TypeError("user passed in is null or undefined, cannot convert to User objet");
+            }
             let pwd = '';
             let firstName = '';
             let lastName = '';
