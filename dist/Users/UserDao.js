@@ -143,6 +143,20 @@ class UserDao {
             return this.converter.convertToUser(userFromDb);
         });
     }
+    doesUserIdExist(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let userIdExist;
+            let userFromDb;
+            userFromDb = yield UserModel_1.default.findById(userId).lean();
+            if (userFromDb == null) {
+                userIdExist = false;
+            }
+            else {
+                userIdExist = true;
+            }
+            return userIdExist;
+        });
+    }
     /**
      * Get user by username
      * @param userNameIn

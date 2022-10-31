@@ -142,7 +142,7 @@ class TuitController {
                 serverResponse = yield tuitdao.findTuitsByUser(req.params.uid);
             }
             catch (BSONTypeError) {
-                serverResponse = "No users with id: " + req.params.uid + "exist in the database";
+                serverResponse = "No users with id: " + req.params.uid + " exist in the database";
             }
             res.send(serverResponse);
         });

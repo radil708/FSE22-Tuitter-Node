@@ -154,6 +154,21 @@ export default class UserDao implements UserDaoInterface {
         return this.converter.convertToUser(userFromDb)
     }
 
+    async doesUserIdExist(userId): Promise<boolean> {
+        let userIdExist
+        let userFromDb
+
+        userFromDb = await UserModel.findById(userId).lean();
+
+        if (userFromDb == null) {
+            userIdExist = false
+        }
+        else {
+            userIdExist = true
+        }
+        return userIdExist;
+    }
+
     /**
      * Get user by username
      * @param userNameIn

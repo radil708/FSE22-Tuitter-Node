@@ -18,6 +18,10 @@ class FollowDao {
     static getInstance() {
         return this.fSingletonDao;
     }
+    /**
+     * Gets an entry from the database with an id matchin followIf
+     * @param followId {string} the id of the entry being requested
+     */
     findById(followId) {
         return __awaiter(this, void 0, void 0, function* () {
             const converter = new MongoToClassConverter_1.MongoToClassConverter();
@@ -25,6 +29,25 @@ class FollowDao {
             return yield converter.convertToFollow(followFromDb);
         });
     }
+    /**
+     * Checks if the follow entry already exists
+     * @param followerId {string} id of the user who is following
+     * @param userFollowedId {string} if of the user being followed
+     */
+    checkIfAlreadyFollowing(followerId, userFollowedId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const check = yield FollowModel_1.default.find({ userFollowed: userFollowedId, userFollowing: followerId });
+            if (check != null) {
+                return true;
+            }
+            return false;
+        });
+    }
+    /**
+     * Adds an entry to the Follows collection of the database
+     * @param followerId {string} The database entry id of the follower
+     * @param userFollowedId {string} the database entry id of the user being followed
+     */
     createFollow(followerId, userFollowedId) {
         return __awaiter(this, void 0, void 0, function* () {
             const followFromDb = yield FollowModel_1.default.create({

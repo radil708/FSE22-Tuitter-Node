@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const FollowDao_1 = require("./FollowDao");
+const UserDao_1 = require("../Users/UserDao");
 class FollowController {
     constructor(appIn) {
         this.app = appIn;
@@ -20,15 +21,57 @@ class FollowController {
         this.app.get('/follower/:uid', this.getUsersIAmFollowing);
         this.app.get('/following/:uid', this.getUsersFollowingMe);
     }
+    /**
+     * Add a follow entry to the database
+     * @param req {Request} an object containing the client's request
+     * @param res {Response} This object is used to send data back to the client
+     */
     createFollow(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const fDao = FollowDao_1.default.getInstance();
+            const uDao = UserDao_1.default.getInstance();
             const followerId = req.params.rid;
             const followingId = req.params.gid;
-            const createdFollow = yield fDao.createFollow(followerId, followingId);
-            res.send(createdFollow);
+            let followerExist;
+            let followingExist;
+            let followEntryAlreadyExist;
+            let userFollower = null;
+            let userFollowed = null;
+            let serverResponse;
+            followerExist = yield uDao.doesUserIdExist(followerId);
+            followingExist = yield uDao.doesUserIdExist(followingId);
+            if (followerExist == false) {
+                serverResponse = "Follower with id: " + followerId + "does not exist";
+            }
+            if (followingExist == false) {
+                serverResponse = "User being followed with id: " + followingId + "does not exist";
+            }
+            // if follower or user being followed does not exist let client know and stop here
+            if (followingExist == false || followerExist == false) {
+                res.send(serverResponse);
+                return;
+            }
+            console.log("check if follow already exists");
+            // if both are true then check if the follow already exists
+            followEntryAlreadyExist = yield fDao.checkIfAlreadyFollowing(followerId, followingId);
+            console.log();
+            // check if entry already exist
+            if (followEntryAlreadyExist == false && followingExist == true && followingExist == true) {
+                serverResponse = yield fDao.createFollow(followerId, followingId);
+            }
+            else {
+                userFollower = yield uDao.findUserById(followerId);
+                userFollowed = yield uDao.findUserById(followingId);
+                serverResponse = "User: " + userFollower.getUserName() + " is already following user: " + userFollowed.getUserName();
+            }
+            res.send(serverResponse);
         });
     }
+    /**
+     * Gets all the follows entries from the database
+     * @param req {Request} an object containing the client's request
+     * @param res {Response} This object is used to send data back to the client
+     */
     getAllFollows(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const fDao = FollowDao_1.default.getInstance();

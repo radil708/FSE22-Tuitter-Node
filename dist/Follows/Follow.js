@@ -1,6 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * This class represents a follow where one user follows another
+ */
 class Follow {
+    /**
+     * Constructor for follow
+     * @param followIdIn
+     * @param beingFollowed
+     * @param follower
+     */
     constructor(followIdIn, beingFollowed = null, follower = null) {
         this.followId = '';
         this.userFollowed = null;
