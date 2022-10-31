@@ -41,6 +41,10 @@ class BookmarkDao {
             return yield this.getBookmarkById(bId);
         });
     }
+    /**
+     * Get a bookmark by id
+     * @param bid
+     */
     getBookmarkById(bid) {
         return __awaiter(this, void 0, void 0, function* () {
             const dbResp = yield BookmarkModel_1.default.findById(bid).lean();
@@ -48,6 +52,11 @@ class BookmarkDao {
             return yield converter.convertToBookmark(dbResp);
         });
     }
+    /**
+     * check if a bookmark entry already exists
+     * @param tid
+     * @param uid
+     */
     doesBookmarkAlreadyExist(tid, uid) {
         return __awaiter(this, void 0, void 0, function* () {
             const check = yield BookmarkModel_1.default.find({ bookmarkedTuit: tid, bookmarkedBy: uid });
@@ -58,6 +67,9 @@ class BookmarkDao {
             return false;
         });
     }
+    /**
+     * get all bookmarks
+     */
     getAllBookmarks() {
         return __awaiter(this, void 0, void 0, function* () {
             const allDbBookmarks = yield BookmarkModel_1.default.find();
@@ -68,6 +80,10 @@ class BookmarkDao {
             return allBookmarks;
         });
     }
+    /**
+     * get all bookmarks of a specific user
+     * @param userId
+     */
     getUsersBookmarks(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const dbResp = yield BookmarkModel_1.default.find({ bookmarkedBy: userId });
@@ -82,6 +98,10 @@ class BookmarkDao {
             return bookmarks;
         });
     }
+    /**
+     * delete an entry from the Bookmarks collection
+     * @param bookmarkId
+     */
     deleteBookmark(bookmarkId) {
         return __awaiter(this, void 0, void 0, function* () {
             const dbResp = yield BookmarkModel_1.default.deleteOne({ _id: bookmarkId });

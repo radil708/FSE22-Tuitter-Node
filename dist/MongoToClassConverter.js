@@ -17,6 +17,7 @@ const Tuit_1 = require("./Tuits/Tuit");
 const Like_1 = require("./Likes/Like");
 const Follow_1 = require("./Follows/Follow");
 const Bookmark_1 = require("./Bookmarks/Bookmark");
+const Message_1 = require("./Messages/Message");
 /**
  * In the newer version of MongoDB you need to map the MongoQueries to the object itself, so I made
  * this helper class to take care of that for me. It converts mongoResponses to actual class objects
@@ -91,6 +92,19 @@ class MongoToClassConverter {
             const userIn = yield uDao.findUserById(bookedBy);
             const tuitIn = yield tDao.findTuitById(bookmarkedTuitId);
             return new Bookmark_1.default(bId, tuitIn, userIn);
+        });
+    }
+    convertToMessage(mongoRes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mId = mongoRes._id.toString();
+            const senderId = mongoRes.sender._id.toString();
+            const recipientId = mongoRes.recipient._id.toString();
+            const content = mongoRes.content;
+            const uDao = UserDao_1.default.getInstance();
+            const senderUser = yield uDao.findUserById(senderId);
+            const recipientUser = yield uDao.findUserById(recipientId);
+            const mResp = new Message_1.default(mId, content, senderUser, recipientUser, false);
+            return mResp;
         });
     }
 }

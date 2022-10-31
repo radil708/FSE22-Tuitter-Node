@@ -7,6 +7,7 @@ const TuitController_1 = require("./Tuits/TuitController");
 const LikeController_1 = require("./Likes/LikeController");
 const FollowController_1 = require("./Follows/FollowController");
 const BookmarkController_1 = require("./Bookmarks/BookmarkController");
+const MessagesController_1 = require("./Messages/MessagesController");
 const app = express();
 const cors = require('cors');
 app.use(cors());
@@ -43,6 +44,7 @@ const tuitConroller = new TuitController_1.default(app);
 const likeControoler = new LikeController_1.default(app);
 const followController = new FollowController_1.default(app);
 const bookmarkController = new BookmarkController_1.default(app);
+const messageController = new MessagesController_1.default(app);
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 //# sourceMappingURL=server.js.map

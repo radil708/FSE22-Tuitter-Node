@@ -38,6 +38,10 @@ export default class BookmarkDao {
         return await this.getBookmarkById(bId);
     }
 
+    /**
+     * Get a bookmark by id
+     * @param bid
+     */
     async getBookmarkById(bid: string): Promise<Bookmark> {
         const dbResp = await BookmarkModel.findById(bid).lean()
         const converter = new MongoToClassConverter();
@@ -45,6 +49,11 @@ export default class BookmarkDao {
         return await converter.convertToBookmark(dbResp);
     }
 
+    /**
+     * check if a bookmark entry already exists
+     * @param tid
+     * @param uid
+     */
     async doesBookmarkAlreadyExist(tid: string, uid: string): Promise<boolean> {
         const check = await BookmarkModel.find({bookmarkedTuit: tid ,bookmarkedBy: uid})
         console.log(check)
@@ -54,6 +63,9 @@ export default class BookmarkDao {
         return false
     }
 
+    /**
+     * get all bookmarks
+     */
     async getAllBookmarks(): Promise<Bookmark[]> {
         const allDbBookmarks = await BookmarkModel.find();
 
@@ -66,6 +78,10 @@ export default class BookmarkDao {
         return allBookmarks;
     }
 
+    /**
+     * get all bookmarks of a specific user
+     * @param userId
+     */
     async getUsersBookmarks(userId: string): Promise<Bookmark[]> {
         const dbResp = await BookmarkModel.find({bookmarkedBy: userId})
 
@@ -84,6 +100,10 @@ export default class BookmarkDao {
         return bookmarks
     }
 
+    /**
+     * delete an entry from the Bookmarks collection
+     * @param bookmarkId
+     */
     async deleteBookmark(bookmarkId: string): Promise<any> {
         const dbResp = await BookmarkModel.deleteOne({_id: bookmarkId})
         return dbResp.deletedCount;

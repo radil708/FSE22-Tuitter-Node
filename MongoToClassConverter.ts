@@ -7,6 +7,7 @@ import FollowModel from "./Follows/FollowModel";
 import Follow from "./Follows/Follow";
 import FollowDao from "./Follows/FollowDao";
 import Bookmark from "./Bookmarks/Bookmark";
+import Message from "./Messages/Message";
 
 /**
  * In the newer version of MongoDB you need to map the MongoQueries to the object itself, so I made
@@ -117,6 +118,20 @@ export class MongoToClassConverter {
         const tuitIn = await tDao.findTuitById(bookmarkedTuitId)
 
         return new Bookmark(bId, tuitIn,userIn)
+    }
+
+    async convertToMessage(mongoRes): Promise<Message> {
+        const mId = mongoRes._id.toString()
+        const senderId = mongoRes.sender._id.toString()
+        const recipientId = mongoRes.recipient._id.toString()
+        const content = mongoRes.content
+
+        const uDao = UserDao.getInstance();
+        const senderUser = await uDao.findUserById(senderId)
+        const recipientUser = await uDao.findUserById(recipientId)
+
+        const mResp = new Message(mId,content,senderUser,recipientUser,false)
+        return mResp
     }
 
 

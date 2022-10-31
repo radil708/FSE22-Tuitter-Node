@@ -3,6 +3,10 @@ import BookmarkDao from "./BookmarkDao";
 import TuitDao from "../Tuits/TuitDao";
 import UserDao from "../Users/UserDao";
 
+/**
+ * This parses client request and reads/writes data to/from the database
+ *
+ */
 export default class BookmarkController {
     app: Express;
 

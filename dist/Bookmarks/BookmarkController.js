@@ -12,6 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const BookmarkDao_1 = require("./BookmarkDao");
 const TuitDao_1 = require("../Tuits/TuitDao");
 const UserDao_1 = require("../Users/UserDao");
+/**
+ * This parses client request and reads/writes data to/from the database
+ *
+ */
 class BookmarkController {
     constructor(appIn) {
         this.app = appIn;

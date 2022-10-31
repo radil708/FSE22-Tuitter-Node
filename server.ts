@@ -7,6 +7,7 @@ import TuitController from "./Tuits/TuitController";
 import LikeController from "./Likes/LikeController";
 import FollowController from "./Follows/FollowController";
 import BookmarkController from "./Bookmarks/BookmarkController";
+import MessagesController from "./Messages/MessagesController";
 
 
 const app = express();
@@ -57,6 +58,7 @@ const tuitConroller = new TuitController(app);
 const likeControoler = new LikeController(app);
 const followController = new FollowController(app);
 const bookmarkController = new BookmarkController(app);
+const messageController = new MessagesController(app);
 
 
 const PORT = 4000;
