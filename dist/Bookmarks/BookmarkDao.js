@@ -11,12 +11,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const BookmarkModel_1 = require("./BookmarkModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
+/**
+ * This creates higher level api for database interactions
+ */
 class BookmarkDao {
+    /**
+     * This enforces Singleton Architecture
+     */
     constructor() {
     }
+    /**
+     * This enforces Singleton Architecture
+     */
     static getInstance() {
         return this.bSingleton;
     }
+    /**
+     * Adds a bookmark entry to the Bookmarks collection
+     * @param tid {string} the id of the tuit to be bookmarked
+     * @param uid {string} the id of the user that is bookmarking the tuit
+     */
     createBookmark(tid, uid) {
         return __awaiter(this, void 0, void 0, function* () {
             const dbResp = yield BookmarkModel_1.default.create({
@@ -32,6 +46,16 @@ class BookmarkDao {
             const dbResp = yield BookmarkModel_1.default.findById(bid).lean();
             const converter = new MongoToClassConverter_1.MongoToClassConverter();
             return yield converter.convertToBookmark(dbResp);
+        });
+    }
+    doesBookmarkAlreadyExist(tid, uid) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const check = yield BookmarkModel_1.default.find({ bookmarkedTuit: tid, bookmarkedBy: uid });
+            console.log(check);
+            if (check.length > 0) {
+                return true;
+            }
+            return false;
         });
     }
     getAllBookmarks() {

@@ -3,17 +3,32 @@ import {MongoToClassConverter} from "../MongoToClassConverter";
 import Bookmark from "./Bookmark";
 import User from "../Users/User";
 
+/**
+ * This creates higher level api for database interactions
+ */
 export default class BookmarkDao {
     private static bSingleton: BookmarkDao = new BookmarkDao()
 
+    /**
+     * This enforces Singleton Architecture
+     */
     public static getInstance() {
         return this.bSingleton;
     }
 
+    /**
+     * This enforces Singleton Architecture
+     */
     private constructor() {
     }
 
+    /**
+     * Adds a bookmark entry to the Bookmarks collection
+     * @param tid {string} the id of the tuit to be bookmarked
+     * @param uid {string} the id of the user that is bookmarking the tuit
+     */
     async createBookmark(tid: string, uid: string): Promise<Bookmark> {
+
         const dbResp = await BookmarkModel.create({
             bookmarkedTuit: tid,
             bookmarkedBy: uid
@@ -28,6 +43,15 @@ export default class BookmarkDao {
         const converter = new MongoToClassConverter();
 
         return await converter.convertToBookmark(dbResp);
+    }
+
+    async doesBookmarkAlreadyExist(tid: string, uid: string): Promise<boolean> {
+        const check = await BookmarkModel.find({bookmarkedTuit: tid ,bookmarkedBy: uid})
+        console.log(check)
+        if (check.length > 0 ) {
+            return true
+        }
+        return false
     }
 
     async getAllBookmarks(): Promise<Bookmark[]> {
