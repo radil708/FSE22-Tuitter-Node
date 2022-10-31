@@ -50,6 +50,12 @@ export class MongoToClassConverter {
     }
 
     async convertToTuit(mongoRes): Promise<Tuit> {
+
+        // throw error is object passed in is null or empty
+        if (mongoRes == null || mongoRes == undefined) {
+            throw new TypeError("user passed in is null or undefined, cannot convert to User objet")
+        }
+
         const tUserDao = UserDao.getInstance();
 
         const tid = mongoRes["_id"].toString()
@@ -60,7 +66,6 @@ export class MongoToClassConverter {
 
         const retTuit =  new Tuit(
             tid,
-            uid,
             mongoRes["tuit"],
             mongoRes["postedOn"],
             tuitedBy)
@@ -104,11 +109,6 @@ export class MongoToClassConverter {
         const bId = mongoRes["_id"].toString()
         const bookmarkedTuitId = mongoRes.bookmarkedTuit._id.toString()
         const bookedBy = mongoRes.bookmarkedBy._id.toString();
-
-        //TODO remove prints
-        // console.log(bId)
-        console.log('tuit id', bookmarkedTuitId)
-        console.log("user id",bookedBy)
 
         const uDao = UserDao.getInstance();
         const tDao = TuitDao.getInstance()

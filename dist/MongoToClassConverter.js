@@ -47,11 +47,15 @@ class MongoToClassConverter {
     }
     convertToTuit(mongoRes) {
         return __awaiter(this, void 0, void 0, function* () {
+            // throw error is object passed in is null or empty
+            if (mongoRes == null || mongoRes == undefined) {
+                throw new TypeError("user passed in is null or undefined, cannot convert to User objet");
+            }
             const tUserDao = UserDao_1.default.getInstance();
             const tid = mongoRes["_id"].toString();
             const uid = mongoRes["postedBy"]._id.toString();
             const tuitedBy = yield tUserDao.findUserById(uid);
-            const retTuit = new Tuit_1.default(tid, uid, mongoRes["tuit"], mongoRes["postedOn"], tuitedBy);
+            const retTuit = new Tuit_1.default(tid, mongoRes["tuit"], mongoRes["postedOn"], tuitedBy);
             return retTuit;
         });
     }
@@ -82,10 +86,6 @@ class MongoToClassConverter {
             const bId = mongoRes["_id"].toString();
             const bookmarkedTuitId = mongoRes.bookmarkedTuit._id.toString();
             const bookedBy = mongoRes.bookmarkedBy._id.toString();
-            //TODO remove prints
-            // console.log(bId)
-            console.log('tuit id', bookmarkedTuitId);
-            console.log("user id", bookedBy);
             const uDao = UserDao_1.default.getInstance();
             const tDao = TuitDao_1.default.getInstance();
             const userIn = yield uDao.findUserById(bookedBy);

@@ -130,13 +130,22 @@ export default class UserDao implements UserDaoInterface {
      * @param uid {string} the user id of the user you want to find
      */
     async findUserById(uid: string): Promise<User> {
-        //if ID does not exist, model throws a BSONTypeError
+        let userIdExist
+        let userFromDb
+
+        userFromDb = await UserModel.findById(uid).lean();
+
+        if (userFromDb == null) {
+            userIdExist = false
+        }
+        else {
+            userIdExist = true
+        }
+
         //set to true to turn on debug statements
         const printDebug = false;
-
-        const userFromDb = await UserModel.findById(uid).lean();
-
         if (printDebug) {
+            console.log("Does user with id: " + uid + " exist?\n", userIdExist)
             console.log("Reponse from model.findById:\n", userFromDb)
             debugHelper.printEnd("findUserById", this.className)
         }
@@ -180,7 +189,7 @@ export default class UserDao implements UserDaoInterface {
  * custom error class used to determine if user already exists in
  * createUser method of UserDao class
  */
-class ValidationError extends Error{
+export class ValidationError extends Error{
     constructor(message) {
         super(message);
         this.name = "ValidationError";

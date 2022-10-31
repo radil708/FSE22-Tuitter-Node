@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ValidationError = void 0;
 const UserModel_1 = require("./UserModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
 const debugHelper_1 = require("../debugHelper");
@@ -122,11 +123,19 @@ class UserDao {
      */
     findUserById(uid) {
         return __awaiter(this, void 0, void 0, function* () {
-            //TODO what if user id doesn't exist?
+            let userIdExist;
+            let userFromDb;
+            userFromDb = yield UserModel_1.default.findById(uid).lean();
+            if (userFromDb == null) {
+                userIdExist = false;
+            }
+            else {
+                userIdExist = true;
+            }
             //set to true to turn on debug statements
             const printDebug = false;
-            const userFromDb = yield UserModel_1.default.findById(uid).lean();
             if (printDebug) {
+                console.log("Does user with id: " + uid + " exist?\n", userIdExist);
                 console.log("Reponse from model.findById:\n", userFromDb);
                 debugHelper_1.default.printEnd("findUserById", this.className);
             }
@@ -165,4 +174,5 @@ class ValidationError extends mongoose_1.Error {
         this.name = "ValidationError";
     }
 }
+exports.ValidationError = ValidationError;
 //# sourceMappingURL=UserDao.js.map

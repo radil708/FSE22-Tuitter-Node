@@ -1,45 +1,48 @@
 import User from "../Users/User";
-/*
-this class represent a tuit/tweet. It uses the User class as an attribute.
+
+/**
+ * This class represents a tuit.
+ * A tuit has an id, some content, date posted, and the user who posted
  */
 export default class Tuit {
     private tuitID: string = '';
-    private userId: string = '';
     private tuitContent: string = '';
     private postedOn: Date = new Date();
     private postedBy: User | null;
 
 
-    constructor(tuitIdIn: string, userIdIn: string, contentIn : string, postedOnIn: Date, userIn: User | null = null) {
+    /**
+     * The constructor for the Tuit
+     * @param tuitIdIn {string} the id of the tuit corresponding to the entry id from the database
+     * @param contentIn {string} the content of the tuit
+     * @param postedOnIn {Date} the data the tuit was posted
+     * @param userIn {User} the user who posted the tuit
+     */
+    constructor(tuitIdIn: string, contentIn : string, postedOnIn: Date, userIn: User = null) {
         this.tuitID = tuitIdIn;
-        this.userId = userIdIn;
         this.tuitContent = contentIn;
         this.postedOn = postedOnIn;
         this.postedBy = userIn;
     }
 
+    /**
+     * @return {string} the id attribute of the tuit
+     */
     getTuitId(): string {
         return this.tuitID;
     }
 
-    getUserId(): string {
-        return this.userId;
-    }
 
+    /**
+     * @return {string} the content of the tuit
+     */
     getContent() : string {
         return this.tuitContent;
     }
 
-    setUser(userIn: User): void {
-        this.postedBy = new User(
-            userIn.getUserId(),
-            userIn.getUserName(),
-            userIn.getFirstName(),
-            userIn.getLastName(),
-            userIn.getPassword(),
-            userIn.getEmail())
-    }
-
+    /**
+     * @return {User} the user of who posted the Tuit
+     */
     getUser(): User | null {
         return this.postedBy
     }
@@ -54,15 +57,12 @@ export default class Tuit {
     }
 
 
-
+    /**
+     * @return {Date} the date the tuit was posted
+     */
     getDate(): Date {
         return this.postedOn;
     }
 
-
-
-    getUserID(): string {
-        return this.userId;
-    }
 
 }

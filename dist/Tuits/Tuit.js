@@ -1,33 +1,41 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const User_1 = require("../Users/User");
-/*
-this class represent a tuit/tweet. It uses the User class as an attribute.
+/**
+ * This class represents a tuit.
+ * A tuit has an id, some content, date posted, and the user who posted
  */
 class Tuit {
-    constructor(tuitIdIn, userIdIn, contentIn, postedOnIn, userIn = null) {
+    /**
+     * The constructor for the Tuit
+     * @param tuitIdIn {string} the id of the tuit corresponding to the entry id from the database
+     * @param contentIn {string} the content of the tuit
+     * @param postedOnIn {Date} the data the tuit was posted
+     * @param userIn {User} the user who posted the tuit
+     */
+    constructor(tuitIdIn, contentIn, postedOnIn, userIn = null) {
         this.tuitID = '';
-        this.userId = '';
         this.tuitContent = '';
         this.postedOn = new Date();
         this.tuitID = tuitIdIn;
-        this.userId = userIdIn;
         this.tuitContent = contentIn;
         this.postedOn = postedOnIn;
         this.postedBy = userIn;
     }
+    /**
+     * @return {string} the id attribute of the tuit
+     */
     getTuitId() {
         return this.tuitID;
     }
-    getUserId() {
-        return this.userId;
-    }
+    /**
+     * @return {string} the content of the tuit
+     */
     getContent() {
         return this.tuitContent;
     }
-    setUser(userIn) {
-        this.postedBy = new User_1.default(userIn.getUserId(), userIn.getUserName(), userIn.getFirstName(), userIn.getLastName(), userIn.getPassword(), userIn.getEmail());
-    }
+    /**
+     * @return {User} the user of who posted the Tuit
+     */
     getUser() {
         return this.postedBy;
     }
@@ -39,11 +47,11 @@ class Tuit {
     setContent(contentIn) {
         this.tuitContent = contentIn;
     }
+    /**
+     * @return {Date} the date the tuit was posted
+     */
     getDate() {
         return this.postedOn;
-    }
-    getUserID() {
-        return this.userId;
     }
 }
 exports.default = Tuit;

@@ -152,7 +152,7 @@ class UserController {
             }
             catch (BSONTypeError) {
                 messageSend = "FAILED to GET user with id:" + userIdToFind;
-                messageSend += "\nEither user with ID does not exist\n\tOR\nID format is incorrect";
+                messageSend += "\nEither user with ID does not exist\nOR\nID format is incorrect";
                 hitError = true;
             }
             if (hitError) {
