@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const LikeDao_1 = require("./LikeDao");
+const TuitDao_1 = require("../Tuits/TuitDao");
+const UserDao_1 = require("../Users/UserDao");
 /**
  * This parses client requests and reads/writes data to/from the database
  * using a dao.
@@ -29,22 +31,46 @@ class LikeController {
     /**
      * Creates a new Like entry based on the client provided
      * userid and tuitId from the req.params
-     * @param req
-     * @param res
+     * @param req {Request} This object is used to get the client request info
+     * @param res {Response} This object is used to send data back to the client
      */
     createLike(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tuitId = req.params.tid;
             const userId = req.params.uid;
+            // check if Tuit exists
+            const tDao = TuitDao_1.default.getInstance();
+            const uDao = UserDao_1.default.getInstance();
+            let doesTuitExist;
+            let doesUserExist;
+            let serverResponse;
+            doesTuitExist = yield tDao.doesTuitExist(tuitId);
+            doesUserExist = yield uDao.doesUserIdExist(userId);
+            if (doesTuitExist == false) {
+                serverResponse = "Tuit with id: " + tuitId + " does not exist";
+            }
+            if (doesUserExist == false) {
+                serverResponse = "User with id: " + userId + " does not exist";
+            }
+            if (doesTuitExist == false || doesUserExist == false) {
+                res.send(serverResponse);
+                return;
+            }
             const tLikeDao = LikeDao_1.default.getInstance();
-            const likeObj = yield tLikeDao.createLike(tuitId, userId);
-            res.send(likeObj);
+            const doesLikeAlreadyExist = yield tLikeDao.doesLikeEntryAlreadyExist(tuitId, userId);
+            if (doesLikeAlreadyExist == true) {
+                serverResponse = "user with id: " + userId + " has already liked tuit with id: " + tuitId;
+            }
+            else {
+                serverResponse = yield tLikeDao.createLike(tuitId, userId);
+            }
+            res.send(serverResponse);
         });
     }
     /**
      * Sends every Like entry to the client
-     * @param req
-     * @param res
+     * @param req {Request} This object is used to get the client request info
+     * @param res {Response} This object is used to send data back to the client
      */
     getAllLikes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -56,47 +82,69 @@ class LikeController {
     /**
      * Send a specific like entrty from the db to
      * the client with an id specified by the client
-     * @param req
-     * @param res
+     * @param req {Request} This object is used to get the client request info
+     * @param res {Response} This object is used to send data back to the client
      */
     getLikeById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
-            const targetedLike = yield tLikeDao.getLikeById(req.params.lid);
-            res.send(targetedLike);
+            let serverResponse;
+            try {
+                serverResponse = yield tLikeDao.getLikeById(req.params.lid);
+            }
+            catch (BSONTypeError) {
+                serverResponse = "Either like entry with id: " + req.params.lid + " does NOT exist \nOR\nFormat is incorrect";
+            }
+            res.send(serverResponse);
         });
     }
     /**
      * Sends all Tuits that were liked by User
      * with an id specified by the client in the req.params
-     * @param req
-     * @param res
+     * @param req {Request} This object is used to get the client request info
+     * @param res {Response} This object is used to send data back to the client
      */
     getAllTuitsLikedBy(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
-            const allTuitsLikedByUser = yield tLikeDao.getAllTuitsLikedBy(req.params.uid);
-            res.send(allTuitsLikedByUser);
+            const uDao = UserDao_1.default.getInstance();
+            const doesUserExist = yield uDao.doesUserIdExist(req.params.uid);
+            let serverResponse;
+            if (doesUserExist == false) {
+                serverResponse = "There is no user with id: " + req.params.uid + " in the database";
+            }
+            else {
+                serverResponse = yield tLikeDao.getAllTuitsLikedBy(req.params.uid);
+            }
+            res.send(serverResponse);
         });
     }
     /**
      * Sends all the Users that liked a Tuit with an id
      * matching an id specified by the client in the req.params
-     * @param req
-     * @param res
+     * @param req {Request} This object is used to get the client request info
+     * @param res {Response} This object is used to send data back to the client
      */
     getAllUsersThatLikedThisTuit(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
-            const usersThatLiked = yield tLikeDao.getAllUsersThatLikesThisTuit(req.params.tid);
-            res.send(usersThatLiked);
+            const tDao = TuitDao_1.default.getInstance();
+            const doesTuitExist = yield tDao.doesTuitExist(req.params.tid);
+            let serverResponse;
+            if (doesTuitExist == false) {
+                serverResponse = "Tuit with id: " + req.params.tid + " does NOT exist";
+            }
+            else {
+                serverResponse = yield tLikeDao.getAllUsersThatLikesThisTuit(req.params.tid);
+            }
+            res.send(serverResponse);
         });
     }
     /**
      * Deletes a like entry from the collection based
      * on the likeid specified by the client
-     * @param req
-     * @param res
+     * @param req {Request} This object is used to get the client request info
+     * @param res {Response} This object is used to send data back to the client
      */
     unlike(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

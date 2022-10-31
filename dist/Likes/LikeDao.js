@@ -44,6 +44,24 @@ class LikeDao {
         });
     }
     /**
+     * Checks if a user has already liked a tuit
+     * @param likedTuitId {string} id of tuit that was liked
+     * @param likedByUserId {string} id of user who liked
+     */
+    doesLikeEntryAlreadyExist(likedTuitId, likedByUserId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // this is an array
+            const check = yield LikeModel_1.default.find({
+                likedTuit: likedTuitId,
+                likedBy: likedByUserId
+            });
+            if (check.length > 0) {
+                return true;
+            }
+            return false;
+        });
+    }
+    /**
      * Get every Like entry from the database and return them
      * as Like objects
      */

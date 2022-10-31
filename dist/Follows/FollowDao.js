@@ -12,9 +12,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const FollowModel_1 = require("./FollowModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
 const UserDao_1 = require("../Users/UserDao");
+/**
+ * This DAO uses the FollowModel to interact with the database
+ */
 class FollowDao {
+    /**
+     * Enforces Singleton Architecture
+     * @private
+     */
     constructor() {
     }
+    /**
+     * Enforces Singleton Architecture. Call this method to get the FollowDao
+     */
     static getInstance() {
         return this.fSingletonDao;
     }
@@ -59,6 +69,9 @@ class FollowDao {
             return yield converter.convertToFollow(followFromDb);
         });
     }
+    /**
+     * Gets all follows from the database
+     */
     getAllFollows() {
         return __awaiter(this, void 0, void 0, function* () {
             const allFollowsFromDb = yield FollowModel_1.default.find();
@@ -70,12 +83,20 @@ class FollowDao {
             return allFollowsArr;
         });
     }
+    /**
+     * Gets a follow entry with an id matching followId
+     * @param followId {string} the id of the follow entry you want to get
+     */
     deleteFollow(followId) {
         return __awaiter(this, void 0, void 0, function* () {
             const dbResp = yield FollowModel_1.default.deleteOne({ _id: followId });
             return dbResp.deletedCount;
         });
     }
+    /**
+     * Gets all users that the current user is following
+     * @param userIdFollower {string} the id of the current user
+     */
     getUsersIAmFollowing(userIdFollower) {
         return __awaiter(this, void 0, void 0, function* () {
             // client is the one following
@@ -92,6 +113,10 @@ class FollowDao {
             return allUsersBeingFollowedByMe;
         });
     }
+    /**
+     * Gets all users following the current user
+     * @param followingId {string} the id of the current user
+     */
     getUsersFollowingMe(followingId) {
         return __awaiter(this, void 0, void 0, function* () {
             const followsDb = yield FollowModel_1.default.find({ userFollowed: followingId });

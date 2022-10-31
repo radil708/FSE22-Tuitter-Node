@@ -35,14 +35,25 @@ export default class TuitDao implements TuitDaoInterface{
         const tuitJSON = await TuitModel.create({
             tuit: tuitIn.getContent(),
             postedOn: tuitIn.getDate(),
-            postedBy: tuitIn.getUser().getUserId()});
+            postedBy: tuitIn.getUser().getUserId()
+        });
 
         const newTuitId = tuitJSON._id.toString()
 
         // get user after being made, this returns a User type obj
         return await this.findTuitById(newTuitId)
+    }
 
-
+    /**
+     * Checks if tuit entry already exists
+     * @param id {string} the id of the tuit entry you want to check
+     */
+    async doesTuitExist(id: string) {
+        const check = await TuitModel.findById(id)
+        if (check != null) {
+            return true
+        }
+        return false
     }
 
     /**

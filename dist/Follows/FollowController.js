@@ -11,6 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const FollowDao_1 = require("./FollowDao");
 const UserDao_1 = require("../Users/UserDao");
+/**
+ * This parses client requests and reads/writes data to/from the database
+ * using a dao.
+ */
 class FollowController {
     constructor(appIn) {
         this.app = appIn;
@@ -51,7 +55,6 @@ class FollowController {
                 res.send(serverResponse);
                 return;
             }
-            console.log("check if follow already exists");
             // if both are true then check if the follow already exists
             followEntryAlreadyExist = yield fDao.checkIfAlreadyFollowing(followerId, followingId);
             console.log();
@@ -79,6 +82,11 @@ class FollowController {
             res.send(allFollows);
         });
     }
+    /**
+     *
+     * @param req {Request} an object containing the client's request
+     * @param res {Response} This object is used to send data back to the client
+     */
     getFollowById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const fDao = FollowDao_1.default.getInstance();
@@ -87,6 +95,11 @@ class FollowController {
             res.send(followObj);
         });
     }
+    /**
+     * Delete a follow by entry id
+     * @param req {Request} an object containing the client's request
+     * @param res {Response} This object is used to send data back to the client
+     */
     unfollow(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const fDao = FollowDao_1.default.getInstance();
@@ -95,6 +108,11 @@ class FollowController {
             res.send("Number of Follows Deleted: " + numDeleted.toString());
         });
     }
+    /**
+     * Get all the users that the current user is following
+     * @param req {Request} an object containing the client's request
+     * @param res {Response} This object is used to send data back to the client
+     */
     getUsersIAmFollowing(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const fDao = FollowDao_1.default.getInstance();
@@ -103,6 +121,11 @@ class FollowController {
             res.send(usersIAmFollowing);
         });
     }
+    /**
+     * Get all users that are following the current user
+     * @param req {Request} an object containing the client's request
+     * @param res {Response} This object is used to send data back to the client
+     */
     getUsersFollowingMe(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const fDao = FollowDao_1.default.getInstance();

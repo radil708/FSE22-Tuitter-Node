@@ -33,6 +33,7 @@ export default class LikeDao implements LikeDaoInterface{
      * @param likedByUserId
      */
     async createLike(likedTuitId: string, likedByUserId: string): Promise<Like> {
+
         const newLike = await LikeModel.create({
             likedTuit: likedTuitId,
             likedBy: likedByUserId
@@ -42,6 +43,24 @@ export default class LikeDao implements LikeDaoInterface{
 
         return this.getLikeById(newLikeId);
 
+    }
+
+    /**
+     * Checks if a user has already liked a tuit
+     * @param likedTuitId {string} id of tuit that was liked
+     * @param likedByUserId {string} id of user who liked
+     */
+    async doesLikeEntryAlreadyExist(likedTuitId: string, likedByUserId: string): Promise<boolean> {
+        // this is an array
+        const check = await LikeModel.find({
+            likedTuit:likedTuitId,
+            likedBy:likedByUserId})
+
+
+        if (check.length > 0) {
+            return true
+        }
+        return false
     }
 
     /**

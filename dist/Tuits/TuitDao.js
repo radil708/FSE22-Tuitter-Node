@@ -44,6 +44,19 @@ class TuitDao {
         });
     }
     /**
+     * Checks if tuit entry already exists
+     * @param id {string} the id of the tuit entry you want to check
+     */
+    doesTuitExist(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const check = yield TuitModel_1.default.findById(id);
+            if (check != null) {
+                return true;
+            }
+            return false;
+        });
+    }
+    /**
      * This will delete a tuit entry from the Tuits collection
      * with an id matching the tuitID
      * @param tuitId {string} the id of the tuit to be deleted
