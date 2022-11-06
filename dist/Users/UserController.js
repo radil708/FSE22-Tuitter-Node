@@ -214,6 +214,13 @@ class UserController {
         this.app.get('/username/:uname/users', this.findUserByUserName); // get user by username
         this.app.post('/users', this.createUser); // create a new user
         this.app.delete('/users/:userid', this.deleteUserByID); // delete user by userid
+        // testing
+        this.app.get('/example', (req, res) => res.send("example"));
+        //Adding api, not deleting old or will break A2
+        this.app.post('/api/users', this.createUser); // create a new user
+        this.app.get('/api/users', this.findAllUsers); // get all users
+        this.app.get('/api/users/:userid', this.findUserById); // get user by id
+        this.app.delete('/api/users/:userid', this.deleteUserByID); // delete user by id
         //this.app.put('/users/:userid', this.updateUser);
     }
 }
