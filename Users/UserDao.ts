@@ -65,6 +65,7 @@ export default class UserDao implements UserDaoInterface {
 
         //set to true to turn on debug statements
         const printDebugDao = false;
+
         if (printDebugDao) {
             console.log("Response from UserModel.create:\n ", userModelObj)
             debugHelper.printEnd("createUser", this.className)
@@ -144,11 +145,18 @@ export default class UserDao implements UserDaoInterface {
 
         //set to true to turn on debug statements
         const printDebug = false;
+
         if (printDebug) {
             console.log("Does user with id: " + uid + " exist?\n", userIdExist)
             console.log("Reponse from model.findById:\n", userFromDb)
             debugHelper.printEnd("findUserById", this.className)
         }
+
+        // no user exist
+        if (userIdExist == false) {
+            return null;
+        }
+
 
         // returns a user object
         return this.converter.convertToUser(userFromDb)
@@ -196,6 +204,18 @@ export default class UserDao implements UserDaoInterface {
 
         const modelsAfterDeletion = await UserModel.deleteOne({_id: userFromDb._id.toString()});
         return modelsAfterDeletion.deletedCount;
+    }
+
+    async findUserByCredentials(username: string, password: string): Promise<User> {
+        const dbResp = await UserModel.findOne({username: username, password: password});
+
+        // no matching user found
+        if (dbResp == null || dbResp == undefined) {
+            return null
+        }
+
+        return this.converter.convertToUser(dbResp,true,true)
+
     }
 
     //

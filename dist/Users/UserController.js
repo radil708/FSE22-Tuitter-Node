@@ -145,30 +145,17 @@ class UserController {
         this.findUserById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             // userid comes from url input
             const userIdToFind = req.params['userid'];
-            let hitError = false;
-            let messageSend;
-            try {
-                messageSend = yield this.userDao.findUserById(userIdToFind);
-            }
-            catch (BSONTypeError) {
-                messageSend = "FAILED to GET user with id:" + userIdToFind;
+            //this should be either a user object or null if no user matching exists
+            let messageSend = yield this.userDao.findUserById(userIdToFind);
+            // if no user matches send empy array
+            if (messageSend == null || messageSend == undefined) {
+                //TODO delete error message
+                let messageSend = "FAILED to GET user with id:" + userIdToFind;
                 messageSend += "\nEither user with ID does not exist\nOR\nID format is incorrect";
-                hitError = true;
+                const emptyArr = [];
+                res.send(emptyArr);
             }
-            if (hitError) {
-                res.status(404).send(messageSend);
-            }
-            else {
-                res.send(messageSend);
-            }
-            //Set to true to turn on debug statements
-            const printDebug = false;
-            if (printDebug) {
-                console.log("UserId to delete: ", userIdToFind);
-                debugHelper_1.default.printSingleLineDivider();
-                console.log("Response to client:\n", messageSend);
-                debugHelper_1.default.printEnd("findUserById", this.className);
-            }
+            res.send(messageSend);
         });
         /**
          * Gets a user by their username from the database with a username matching the
@@ -213,6 +200,19 @@ class UserController {
             const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete;
             res.send(responseMessage);
         });
+        this.findUserByCredential = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            // username and password in body
+            const uName = req.body.username;
+            const uPassword = req.body.password;
+            const daoResp = yield this.userDao.findUserByCredentials(uName, uPassword);
+            // no matching user send empty
+            if (daoResp == null || daoResp == undefined) {
+                res.send(null);
+            }
+            else {
+                res.send(daoResp);
+            }
+        });
         this.app = app;
         // Set attributes of app attribute
         this.app.get('/users', this.findAllUsers); // get all users
@@ -226,6 +226,7 @@ class UserController {
         this.app.get('/api/users/:userid', this.findUserById); // get user by id
         this.app.delete('/api/users/:userid', this.deleteUserByID); // delete user by id
         this.app.delete('/api/users/username/:uname/delete', this.deleteUserByUserName);
+        this.app.post('/api/login', this.findUserByCredential);
         //this.app.put('/users/:userid', this.updateUser);
     }
 }

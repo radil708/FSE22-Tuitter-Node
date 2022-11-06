@@ -2,6 +2,7 @@ import {Request, Response,Express} from "express";
 import UserDao from "./UserDao";
 import UserControllerInterface from "./UserControllerInterface";
 import debugHelper from "../debugHelper";
+import User from "./User";
 
 /**
  * The controller will connect the get,post,delete request from clients
@@ -31,7 +32,7 @@ export default class UserController implements UserControllerInterface {
         this.app.get('/api/users/:userid', this.findUserById); // get user by id
         this.app.delete('/api/users/:userid', this.deleteUserByID) // delete user by id
         this.app.delete('/api/users/username/:uname/delete', this.deleteUserByUserName)
-
+        this.app.post('/api/login', this.findUserByCredential)
         //this.app.put('/users/:userid', this.updateUser);
     }
 
@@ -171,33 +172,22 @@ export default class UserController implements UserControllerInterface {
     findUserById = async (req: Request, res: Response) => {
         // userid comes from url input
         const userIdToFind = req.params['userid'];
-        let hitError = false
-        let messageSend
 
-        try {
-            messageSend = await this.userDao.findUserById(userIdToFind);
-        }
-        catch (BSONTypeError) {
-            messageSend = "FAILED to GET user with id:" + userIdToFind
+        //this should be either a user object or null if no user matching exists
+        let messageSend = await this.userDao.findUserById(userIdToFind);
+
+        // if no user matches send empy array
+        if (messageSend == null || messageSend == undefined) {
+            //TODO delete error message
+            let messageSend = "FAILED to GET user with id:" + userIdToFind
             messageSend += "\nEither user with ID does not exist\nOR\nID format is incorrect"
-            hitError = true;
+            const emptyArr = [];
+            res.send(emptyArr)
         }
 
-        if (hitError) {
-            res.status(404).send(messageSend)
-        }
-        else {
-            res.send(messageSend)
-        }
+        res.send(messageSend)
 
-        //Set to true to turn on debug statements
-        const printDebug = false
-        if (printDebug) {
-            console.log("UserId to delete: ", userIdToFind)
-            debugHelper.printSingleLineDivider()
-            console.log("Response to client:\n", messageSend)
-            debugHelper.printEnd("findUserById",this.className)
-        }
+
     }
 
     /**
@@ -248,6 +238,25 @@ export default class UserController implements UserControllerInterface {
         const dbResp = await this.userDao.deleteUserByUserName(usernameToDelete)
         const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete
         res.send(responseMessage)
+    }
+
+    findUserByCredential = async (req: Request, res: Response) => {
+        // username and password in body
+        const uName = req.body.username
+        const uPassword = req.body.password
+
+        const daoResp = await this.userDao.findUserByCredentials(uName, uPassword)
+
+        // no matching user send empty
+        if (daoResp == null || daoResp == undefined) {
+            res.send(null);
+        }
+        else {
+            res.send(daoResp)
+        }
+
+
+
     }
 
     // updateUser = async (req: Request, res: Response) => {

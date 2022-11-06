@@ -139,6 +139,10 @@ class UserDao {
                 console.log("Reponse from model.findById:\n", userFromDb);
                 debugHelper_1.default.printEnd("findUserById", this.className);
             }
+            // no user exist
+            if (userIdExist == false) {
+                return null;
+            }
             // returns a user object
             return this.converter.convertToUser(userFromDb);
         });
@@ -182,6 +186,16 @@ class UserDao {
             }
             const modelsAfterDeletion = yield UserModel_1.default.deleteOne({ _id: userFromDb._id.toString() });
             return modelsAfterDeletion.deletedCount;
+        });
+    }
+    findUserByCredentials(username, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dbResp = yield UserModel_1.default.findOne({ username: username, password: password });
+            // no matching user found
+            if (dbResp == null || dbResp == undefined) {
+                return null;
+            }
+            return this.converter.convertToUser(dbResp, true, true);
         });
     }
 }
