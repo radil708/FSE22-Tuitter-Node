@@ -207,6 +207,12 @@ class UserController {
                 debugHelper_1.default.printEnd("findUserByUserName", this.className);
             }
         });
+        this.deleteUserByUserName = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const usernameToDelete = req.params.uname;
+            const dbResp = yield this.userDao.deleteUserByUserName(usernameToDelete);
+            const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete;
+            res.send(responseMessage);
+        });
         this.app = app;
         // Set attributes of app attribute
         this.app.get('/users', this.findAllUsers); // get all users
@@ -214,13 +220,12 @@ class UserController {
         this.app.get('/username/:uname/users', this.findUserByUserName); // get user by username
         this.app.post('/users', this.createUser); // create a new user
         this.app.delete('/users/:userid', this.deleteUserByID); // delete user by userid
-        // testing
-        this.app.get('/example', (req, res) => res.send("example"));
         //Adding api, not deleting old or will break A2
         this.app.post('/api/users', this.createUser); // create a new user
         this.app.get('/api/users', this.findAllUsers); // get all users
         this.app.get('/api/users/:userid', this.findUserById); // get user by id
         this.app.delete('/api/users/:userid', this.deleteUserByID); // delete user by id
+        this.app.delete('/api/users/username/:uname/delete', this.deleteUserByUserName);
         //this.app.put('/users/:userid', this.updateUser);
     }
 }

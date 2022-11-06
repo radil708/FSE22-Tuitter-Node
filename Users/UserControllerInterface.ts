@@ -70,6 +70,14 @@ export default interface UserControllerInterface {
      */
     deleteUserByID(req: Request, res: Response): void;
 
+    /**
+     * Deletes a user from the database whose username matches the user
+     * defined by username from a client's request
+     * @param req
+     * @param res
+     */
+    deleteUserByUserName(req: Request, res: Response): void;
+
     // /**
     //  * Replaces a user from the database with a user
     //  * defined by the client as a JSON in the client's

@@ -30,7 +30,7 @@ export default class UserController implements UserControllerInterface {
         this.app.get('/api/users', this.findAllUsers); // get all users
         this.app.get('/api/users/:userid', this.findUserById); // get user by id
         this.app.delete('/api/users/:userid', this.deleteUserByID) // delete user by id
-
+        this.app.delete('/api/users/username/:uname/delete', this.deleteUserByUserName)
 
         //this.app.put('/users/:userid', this.updateUser);
     }
@@ -241,6 +241,13 @@ export default class UserController implements UserControllerInterface {
             debugHelper.printEnd("findUserByUserName", this.className)
         }
 
+    }
+
+    deleteUserByUserName = async (req: Request, res: Response) => {
+        const usernameToDelete = req.params.uname
+        const dbResp = await this.userDao.deleteUserByUserName(usernameToDelete)
+        const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete
+        res.send(responseMessage)
     }
 
     // updateUser = async (req: Request, res: Response) => {

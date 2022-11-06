@@ -174,6 +174,16 @@ class UserDao {
             return this.converter.convertToUser(userFromDb, false, true);
         });
     }
+    deleteUserByUserName(userNameIn) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userFromDb = yield UserModel_1.default.findOne({ username: userNameIn });
+            if (userFromDb == null || userFromDb == undefined) {
+                return 0;
+            }
+            const modelsAfterDeletion = yield UserModel_1.default.deleteOne({ _id: userFromDb._id.toString() });
+            return modelsAfterDeletion.deletedCount;
+        });
+    }
 }
 exports.default = UserDao;
 // Singleton Architecture

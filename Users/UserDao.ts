@@ -186,6 +186,18 @@ export default class UserDao implements UserDaoInterface {
 
         return this.converter.convertToUser(userFromDb,false,true)
     }
+
+    async deleteUserByUserName(userNameIn: string): Promise<number>  {
+        const userFromDb = await UserModel.findOne({username: userNameIn });
+
+        if (userFromDb == null || userFromDb == undefined ) {
+            return 0;
+        }
+
+        const modelsAfterDeletion = await UserModel.deleteOne({_id: userFromDb._id.toString()});
+        return modelsAfterDeletion.deletedCount;
+    }
+
     //
     // async updateUser(uid: string, user: User): Promise<number> {
     //     //The $set operator replaces the value of a field with the specified value.
