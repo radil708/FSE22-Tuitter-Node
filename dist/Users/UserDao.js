@@ -70,7 +70,9 @@ class UserDao {
                 console.log("Response from UserModel.create:\n ", userModelObj);
                 debugHelper_1.default.printEnd("createUser", this.className);
             }
-            return this.converter.convertToUser(userModelObj);
+            // I had obscured that password by setting showPassword to False but
+            // starter code tests for A3 want to see password
+            return this.converter.convertToUser(userModelObj, true);
         });
     }
     /**
@@ -107,7 +109,9 @@ class UserDao {
             }
             const allUsersArr = [];
             for (const eachUserJSON of allUserJsons) {
-                allUsersArr.push(yield this.converter.convertToUser(eachUserJSON, false, false));
+                // I had obscured that password by setting showPassword to False but
+                // starter code tests for A3 want to see password
+                allUsersArr.push(yield this.converter.convertToUser(eachUserJSON, true, true));
             }
             if (printDebug) {
                 console.log("userArr generated:\n", allUserJsons);
@@ -144,7 +148,9 @@ class UserDao {
                 return null;
             }
             // returns a user object
-            return this.converter.convertToUser(userFromDb);
+            // I had obscured that password by setting showPassword to False but
+            // starter code tests for A3 want to see password
+            return this.converter.convertToUser(userFromDb, true);
         });
     }
     doesUserIdExist(userId) {
@@ -195,6 +201,8 @@ class UserDao {
             if (dbResp == null || dbResp == undefined) {
                 return null;
             }
+            // I had obscured that password by setting showPassword to False but
+            // starter code tests for A3 want to see password
             return this.converter.convertToUser(dbResp, true, true);
         });
     }

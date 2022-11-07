@@ -70,8 +70,9 @@ export default class UserDao implements UserDaoInterface {
             console.log("Response from UserModel.create:\n ", userModelObj)
             debugHelper.printEnd("createUser", this.className)
         }
-
-        return this.converter.convertToUser(userModelObj);
+        // I had obscured that password by setting showPassword to False but
+        // starter code tests for A3 want to see password
+        return this.converter.convertToUser(userModelObj,true);
     }
 
     /**
@@ -114,7 +115,9 @@ export default class UserDao implements UserDaoInterface {
         const allUsersArr = [];
 
         for (const eachUserJSON of allUserJsons) {
-            allUsersArr.push(await this.converter.convertToUser(eachUserJSON,false,false))
+            // I had obscured that password by setting showPassword to False but
+            // starter code tests for A3 want to see password
+            allUsersArr.push(await this.converter.convertToUser(eachUserJSON,true,true))
         }
 
         if (printDebug) {
@@ -159,7 +162,9 @@ export default class UserDao implements UserDaoInterface {
 
 
         // returns a user object
-        return this.converter.convertToUser(userFromDb)
+        // I had obscured that password by setting showPassword to False but
+        // starter code tests for A3 want to see password
+        return this.converter.convertToUser(userFromDb, true)
     }
 
     async doesUserIdExist(userId): Promise<boolean> {
@@ -214,6 +219,8 @@ export default class UserDao implements UserDaoInterface {
             return null
         }
 
+        // I had obscured that password by setting showPassword to False but
+        // starter code tests for A3 want to see password
         return this.converter.convertToUser(dbResp,true,true)
 
     }
