@@ -237,7 +237,7 @@ export default class UserController implements UserControllerInterface {
         const usernameToDelete = req.params.uname
         const dbResp = await this.userDao.deleteUserByUserName(usernameToDelete)
         const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete
-        res.status(200).send(responseMessage)
+        res.status(200).send(dbResp)
     }
 
     findUserByCredential = async (req: Request, res: Response) => {
