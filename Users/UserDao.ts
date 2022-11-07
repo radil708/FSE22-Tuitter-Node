@@ -71,7 +71,7 @@ export default class UserDao implements UserDaoInterface {
             debugHelper.printEnd("createUser", this.className)
         }
 
-        return user;
+        return this.converter.convertToUser(userModelObj);
     }
 
     /**

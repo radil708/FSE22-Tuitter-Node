@@ -70,7 +70,7 @@ class UserDao {
                 console.log("Response from UserModel.create:\n ", userModelObj);
                 debugHelper_1.default.printEnd("createUser", this.className);
             }
-            return user;
+            return this.converter.convertToUser(userModelObj);
         });
     }
     /**

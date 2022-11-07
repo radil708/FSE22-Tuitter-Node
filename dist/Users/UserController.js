@@ -59,7 +59,7 @@ class UserController {
                 console.log("DAO response:\n", serverReponse);
                 debugHelper_1.default.printEnd("createUser", this.className);
             }
-            res.send(serverReponse);
+            res.json(serverReponse);
         });
         /**
          * Deletes a user from the database whose userid matches the user
@@ -198,7 +198,6 @@ class UserController {
             const usernameToDelete = req.params.uname;
             const dbResp = yield this.userDao.deleteUserByUserName(usernameToDelete);
             const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete;
-            console.log(dbResp);
             res.json({ "usersDeleted": dbResp });
         });
         this.findUserByCredential = (req, res) => __awaiter(this, void 0, void 0, function* () {

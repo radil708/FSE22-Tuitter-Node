@@ -77,7 +77,7 @@ export default class UserController implements UserControllerInterface {
             debugHelper.printEnd("createUser", this.className)
         }
 
-        res.send(serverReponse);
+        res.json(serverReponse);
     }
 
     /**
@@ -237,7 +237,6 @@ export default class UserController implements UserControllerInterface {
         const usernameToDelete = req.params.uname
         const dbResp = await this.userDao.deleteUserByUserName(usernameToDelete)
         const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete
-        console.log(dbResp)
         res.json({"usersDeleted": dbResp})
     }
 
