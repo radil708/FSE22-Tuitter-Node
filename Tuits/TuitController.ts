@@ -89,7 +89,14 @@ export default class TuitController implements TuitControllerInterface {
             debugHelper.printEnd("createTuit", "TuitController")
         }
 
-        res.send(serverResponse)
+        // modifying to work with tests in A3
+        if (userIdExists == false) {
+            res.json()
+        }
+        else {
+            res.json(serverResponse)
+        }
+
     }
 
     /**
@@ -105,7 +112,8 @@ export default class TuitController implements TuitControllerInterface {
         const stringResp = "Number of tuits deleted: " + numDeleted.toString()
 
         // send needs to be a string otherwise it will think status code
-        res.send(stringResp)
+        // modifying to work with tests in A3
+        res.json({"tuitsDeleted": numDeleted})
     }
 
     /**
@@ -116,7 +124,7 @@ export default class TuitController implements TuitControllerInterface {
      */
     async findAllTuits(req: Request, res: Response) {
 
-        res.send(await TuitDao.getInstance().findAllTuits())
+        res.json(await TuitDao.getInstance().findAllTuits())
     }
 
     /**
@@ -145,7 +153,14 @@ export default class TuitController implements TuitControllerInterface {
             debugHelper.printEnd("findTuitById", "TuitController")
         }
 
-        res.send(serverResponse)
+        // modifying for tests in A3
+        if (isTuitIdInDb == false) {
+            res.json()
+        }
+        else {
+            res.send(serverResponse)
+        }
+
     }
 
     /**
@@ -156,14 +171,22 @@ export default class TuitController implements TuitControllerInterface {
     async findTuitsByUser(req: Request, res: Response) {
         const tuitdao = TuitDao.getInstance();
         let serverResponse
+        let anyMatchingUsers = false
         try{
             serverResponse = await tuitdao.findTuitsByUser(req.params.uid)
+            anyMatchingUsers = true
         }
         catch (BSONTypeError) {
             serverResponse = "No users with id: " + req.params.uid + " exist in the database"
         }
 
-        res.send(serverResponse)
+        if (anyMatchingUsers == false) {
+            res.json()
+        }
+        else {
+            res.json(serverResponse)
+        }
+
 
     }
 
