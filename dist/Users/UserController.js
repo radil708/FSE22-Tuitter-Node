@@ -198,7 +198,8 @@ class UserController {
             const usernameToDelete = req.params.uname;
             const dbResp = yield this.userDao.deleteUserByUserName(usernameToDelete);
             const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete;
-            res.status(200).send(responseMessage);
+            console.log(dbResp);
+            res.status(200).send(dbResp);
         });
         this.findUserByCredential = (req, res) => __awaiter(this, void 0, void 0, function* () {
             // username and password in body
