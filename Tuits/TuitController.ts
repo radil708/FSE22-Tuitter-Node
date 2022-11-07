@@ -22,12 +22,18 @@ export default class TuitController implements TuitControllerInterface {
         this.tuitDao = TuitDao.getInstance();
         this.userDao = UserDao.getInstance();
 
-
         this.app.get('/tuits', this.findAllTuits); // get all tuits
         this.app.get('/tuits/:tid', this.findTuitById); // get a specific tuit by id
         this.app.delete('/tuits/:tid', this.deleteTuit) // delete a tuit
         this.app.post('/users/:uid/tuits', this.createTuit) // create a new tuit
         this.app.get('/users/:uid/tuits',this.findTuitsByUser) // find tuits by a specific user
+
+        // api for A3
+        this.app.get('/api/tuits', this.findAllTuits); // get all tuits
+        this.app.get('/api/tuits/:tid', this.findTuitById); // get a specific tuit by id
+        this.app.delete('/api/tuits/:tid', this.deleteTuit) // delete a tuit
+        this.app.post('/api/users/:uid/tuits', this.createTuit) // create a new tuit
+        this.app.get('/api/users/:uid/tuits',this.findTuitsByUser) // find tuits by a specific user
 
     }
 
