@@ -199,7 +199,7 @@ class UserController {
             const dbResp = yield this.userDao.deleteUserByUserName(usernameToDelete);
             const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete;
             console.log(dbResp);
-            res.status(200).send(dbResp);
+            res.json({ "usersDeleted": dbResp });
         });
         this.findUserByCredential = (req, res) => __awaiter(this, void 0, void 0, function* () {
             // username and password in body
