@@ -73,7 +73,13 @@ class TuitController {
                 console.log("Response to client:\n", serverResponse);
                 debugHelper_1.default.printEnd("createTuit", "TuitController");
             }
-            res.send(serverResponse);
+            // modifying to work with tests in A3
+            if (userIdExists == false) {
+                res.json();
+            }
+            else {
+                res.json(serverResponse);
+            }
         });
     }
     /**
@@ -88,7 +94,8 @@ class TuitController {
             const numDeleted = yield tdao.deleteTuit(targetTid);
             const stringResp = "Number of tuits deleted: " + numDeleted.toString();
             // send needs to be a string otherwise it will think status code
-            res.send(stringResp);
+            // modifying to work with tests in A3
+            res.json({ "tuitsDeleted": numDeleted });
         });
     }
     /**
@@ -99,7 +106,7 @@ class TuitController {
      */
     findAllTuits(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            res.send(yield TuitDao_1.default.getInstance().findAllTuits());
+            res.json(yield TuitDao_1.default.getInstance().findAllTuits());
         });
     }
     /**
@@ -126,7 +133,13 @@ class TuitController {
                 console.log("serverResponse: ", serverResponse);
                 debugHelper_1.default.printEnd("findTuitById", "TuitController");
             }
-            res.send(serverResponse);
+            // modifying for tests in A3
+            if (isTuitIdInDb == false) {
+                res.json();
+            }
+            else {
+                res.send(serverResponse);
+            }
         });
     }
     /**
@@ -138,13 +151,20 @@ class TuitController {
         return __awaiter(this, void 0, void 0, function* () {
             const tuitdao = TuitDao_1.default.getInstance();
             let serverResponse;
+            let anyMatchingUsers = false;
             try {
                 serverResponse = yield tuitdao.findTuitsByUser(req.params.uid);
+                anyMatchingUsers = true;
             }
             catch (BSONTypeError) {
                 serverResponse = "No users with id: " + req.params.uid + " exist in the database";
             }
-            res.send(serverResponse);
+            if (anyMatchingUsers == false) {
+                res.json();
+            }
+            else {
+                res.json(serverResponse);
+            }
         });
     }
 }
