@@ -41,20 +41,57 @@ class MessageDao {
     }
     getAllMessages() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield MessageModel_1.default.find();
+            const allMsgJSON = yield MessageModel_1.default.find();
+            const converter = new MongoToClassConverter_1.MongoToClassConverter();
+            let arrResp = [];
+            for (const eachJSON of allMsgJSON) {
+                arrResp.push(yield converter.convertToMessage(eachJSON));
+            }
+            return arrResp;
         });
     }
-    getAllMessagesSentTo(username) {
+    getAllMessagesSentBy(username) {
         return __awaiter(this, void 0, void 0, function* () {
             const uDao = UserDao_1.default.getInstance();
-            const receivingUser = yield uDao.findUserbyUserName(username);
+            const senderUser = yield uDao.findUserbyUserName(username);
             //If user does not exist return null
-            if (receivingUser == null || receivingUser == undefined) {
+            if (senderUser == null || senderUser == undefined) {
                 return null;
             }
             // if user exists get user id
-            const userId = receivingUser.getUserId();
+            const userId = senderUser.getUserId();
             const converter = new MongoToClassConverter_1.MongoToClassConverter();
+            const allMessagesSentByUser = yield MessageModel_1.default.find({ sender: userId });
+            let arrResp = [];
+            for (const eachJSON of allMessagesSentByUser) {
+                arrResp.push(yield converter.convertToMessage(eachJSON));
+            }
+            return arrResp;
+        });
+    }
+    getAllMessagesReceivedBy(username) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const uDao = UserDao_1.default.getInstance();
+            const senderUser = yield uDao.findUserbyUserName(username);
+            //If user does not exist return null
+            if (senderUser == null || senderUser == undefined) {
+                return null;
+            }
+            // if user exists get user id
+            const userId = senderUser.getUserId();
+            const converter = new MongoToClassConverter_1.MongoToClassConverter();
+            const allMessagesSentByUser = yield MessageModel_1.default.find({ recipient: userId });
+            let arrResp = [];
+            for (const eachJSON of allMessagesSentByUser) {
+                arrResp.push(yield converter.convertToMessage(eachJSON));
+            }
+            return arrResp;
+        });
+    }
+    deleteById(mid) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const modResp = yield MessageModel_1.default.deleteOne({ _id: mid });
+            return modResp.deletedCount;
         });
     }
 }

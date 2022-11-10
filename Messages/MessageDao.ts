@@ -36,22 +36,80 @@ export default class MessageDao {
         return await conv.convertToMessage(mResp)
     }
 
+    /**
+     * Gets all messages from db
+     */
     async getAllMessages(): Promise<Message[]> {
-        return await MessageModel.find()
+        const allMsgJSON =  await MessageModel.find()
+        const converter = new MongoToClassConverter();
+
+        let arrResp = []
+        for (const eachJSON of allMsgJSON) {
+            arrResp.push(await converter.convertToMessage(eachJSON))
+        }
+
+        return arrResp
+
     }
 
-    async getAllMessagesSentTo(username: string): Promise<Message[]> {
+    /**
+     * Gets all messages seny by user with matching username
+     * @param username
+     */
+    async getAllMessagesSentBy(username: string): Promise<Message[]> {
         const uDao = UserDao.getInstance()
-        const receivingUser = await uDao.findUserbyUserName(username)
+        const senderUser = await uDao.findUserbyUserName(username)
 
         //If user does not exist return null
-        if (receivingUser == null || receivingUser == undefined) {
+        if (senderUser == null || senderUser == undefined) {
             return null;
         }
 
         // if user exists get user id
-        const userId = receivingUser.getUserId()
+        const userId = senderUser.getUserId()
         const converter = new MongoToClassConverter();
+
+        const allMessagesSentByUser = await MessageModel.find({sender: userId});
+
+        let arrResp = []
+
+        for (const eachJSON of allMessagesSentByUser) {
+            arrResp.push(await converter.convertToMessage(eachJSON))
+        }
+        return arrResp
+
+    }
+
+    /**
+     * Gets all messages received by user with matching username
+     * @param username
+     */
+    async getAllMessagesReceivedBy(username: string): Promise<Message[]> {
+        const uDao = UserDao.getInstance()
+        const senderUser = await uDao.findUserbyUserName(username)
+
+        //If user does not exist return null
+        if (senderUser == null || senderUser == undefined) {
+            return null;
+        }
+
+        // if user exists get user id
+        const userId = senderUser.getUserId()
+        const converter = new MongoToClassConverter();
+
+        const allMessagesSentByUser = await MessageModel.find({recipient: userId});
+
+        let arrResp = []
+
+        for (const eachJSON of allMessagesSentByUser) {
+            arrResp.push(await converter.convertToMessage(eachJSON))
+        }
+        return arrResp
+    }
+
+    async deleteById(mid: string): Promise<number> {
+        const modResp = await MessageModel.deleteOne({_id: mid})
+        return modResp.deletedCount
 
 
     }
