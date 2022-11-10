@@ -60,7 +60,6 @@ class BookmarkDao {
     doesBookmarkAlreadyExist(tid, uid) {
         return __awaiter(this, void 0, void 0, function* () {
             const check = yield BookmarkModel_1.default.find({ bookmarkedTuit: tid, bookmarkedBy: uid });
-            console.log(check);
             if (check.length > 0) {
                 return true;
             }

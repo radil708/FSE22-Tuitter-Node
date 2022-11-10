@@ -107,9 +107,14 @@ class LikeController {
                 serverResponse = yield tLikeDao.getLikeById(req.params.lid);
             }
             catch (BSONTypeError) {
-                serverResponse = "Either like entry with id: " + req.params.lid + " does NOT exist \nOR\nFormat is incorrect";
+                serverResponse = { "Error": "Format is for lid incorrect or lid does not exist in db" };
+                res.json(serverResponse);
+                return;
             }
-            res.send(serverResponse);
+            if (serverResponse == null) {
+                serverResponse = { "Error": "No entry with like id: " + req.params.lid };
+            }
+            res.json(serverResponse);
         });
     }
     /**
@@ -122,15 +127,24 @@ class LikeController {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
             const uDao = UserDao_1.default.getInstance();
-            const doesUserExist = yield uDao.doesUserIdExist(req.params.uid);
+            let doesUserExist;
+            let controllerResp;
+            try {
+                doesUserExist = yield uDao.doesUserIdExist(req.params.uid);
+            }
+            catch (BSONTypeError) {
+                controllerResp = { "Error": "Incorrect format for uid: " + req.params.uid };
+                res.json(controllerResp);
+                return;
+            }
             let serverResponse;
             if (doesUserExist == false) {
-                serverResponse = "There is no user with id: " + req.params.uid + " in the database";
+                serverResponse = { "Error": "There is no user with id: " + req.params.uid + " in the database" };
             }
             else {
                 serverResponse = yield tLikeDao.getAllTuitsLikedBy(req.params.uid);
             }
-            res.send(serverResponse);
+            res.json(serverResponse);
         });
     }
     /**
@@ -143,15 +157,23 @@ class LikeController {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
             const tDao = TuitDao_1.default.getInstance();
-            const doesTuitExist = yield tDao.doesTuitExist(req.params.tid);
-            let serverResponse;
+            let doesTuitExist;
+            let controllerResp;
+            try {
+                doesTuitExist = yield tDao.doesTuitExist(req.params.tid);
+            }
+            catch (BSONTypeError) {
+                controllerResp = { "Error": "Incorrect format for tid: " + req.params.tid };
+                res.json(controllerResp);
+                return;
+            }
             if (doesTuitExist == false) {
-                serverResponse = "Tuit with id: " + req.params.tid + " does NOT exist";
+                controllerResp = { "Error": "Tuit with id: " + req.params.tid + " does NOT exist" };
             }
             else {
-                serverResponse = yield tLikeDao.getAllUsersThatLikesThisTuit(req.params.tid);
+                controllerResp = yield tLikeDao.getAllUsersThatLikesThisTuit(req.params.tid);
             }
-            res.send(serverResponse);
+            res.send(controllerResp);
         });
     }
     /**
@@ -163,9 +185,17 @@ class LikeController {
     unlike(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const tLikeDao = LikeDao_1.default.getInstance();
-            const numDeleted = yield tLikeDao.deleteLike(req.params.lid);
-            const resp = "Likes Deleted = " + numDeleted.toString();
-            res.send(resp);
+            let numDeleted = 0;
+            try {
+                numDeleted = yield tLikeDao.deleteLike(req.params.lid);
+            }
+            catch (BSONTypeError) {
+                const errorResp = { "Error": "lid format incorrect" };
+                res.json(errorResp);
+                return;
+            }
+            const resp = { "likesDeleted": numDeleted.toString() };
+            res.json(resp);
         });
     }
 }

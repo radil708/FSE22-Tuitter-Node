@@ -109,10 +109,16 @@ export default class LikeController{
             serverResponse = await tLikeDao.getLikeById(req.params.lid)
         }
         catch (BSONTypeError) {
-            serverResponse = "Either like entry with id: " + req.params.lid + " does NOT exist \nOR\nFormat is incorrect"
+            serverResponse = {"Error": "Format is for lid incorrect or lid does not exist in db"}
+            res.json(serverResponse)
+            return
         }
 
-        res.send(serverResponse)
+        if (serverResponse == null) {
+            serverResponse = {"Error": "No entry with like id: " + req.params.lid }
+        }
+
+        res.json(serverResponse)
     }
 
     /**
@@ -125,16 +131,26 @@ export default class LikeController{
         const tLikeDao= LikeDao.getInstance();
 
         const uDao = UserDao.getInstance()
-        const doesUserExist = await uDao.doesUserIdExist(req.params.uid)
+        let doesUserExist;
+        let controllerResp;
+        try {
+            doesUserExist = await uDao.doesUserIdExist(req.params.uid)
+        }
+        catch (BSONTypeError) {
+            controllerResp = {"Error": "Incorrect format for uid: " + req.params.uid}
+            res.json(controllerResp)
+            return
+        }
+
         let serverResponse
         if (doesUserExist == false) {
-            serverResponse = "There is no user with id: " + req.params.uid + " in the database"
+            serverResponse = {"Error": "There is no user with id: " + req.params.uid + " in the database"}
         }
         else {
             serverResponse = await tLikeDao.getAllTuitsLikedBy(req.params.uid);
         }
 
-        res.send(serverResponse);
+        res.json(serverResponse);
     }
 
     /**
@@ -146,17 +162,26 @@ export default class LikeController{
     async getAllUsersThatLikedThisTuit (req: Request, res: Response) {
         const tLikeDao= LikeDao.getInstance();
         const tDao = TuitDao.getInstance()
-        const doesTuitExist = await tDao.doesTuitExist(req.params.tid)
-        let serverResponse
+        let doesTuitExist
+        let controllerResp
+
+        try {
+            doesTuitExist = await tDao.doesTuitExist(req.params.tid)
+        }
+        catch (BSONTypeError) {
+            controllerResp = {"Error": "Incorrect format for tid: " + req.params.tid}
+            res.json(controllerResp)
+            return
+        }
 
         if (doesTuitExist == false ) {
-            serverResponse = "Tuit with id: " + req.params.tid + " does NOT exist"
+            controllerResp = {"Error": "Tuit with id: " + req.params.tid + " does NOT exist"}
         }
         else {
-            serverResponse = await tLikeDao.getAllUsersThatLikesThisTuit(req.params.tid)
+            controllerResp = await tLikeDao.getAllUsersThatLikesThisTuit(req.params.tid)
         }
 
-        res.send(serverResponse);
+        res.send(controllerResp);
     }
 
     /**
@@ -167,9 +192,18 @@ export default class LikeController{
      */
     async unlike(req: Request, res: Response) {
         const tLikeDao= LikeDao.getInstance();
-        const numDeleted = await tLikeDao.deleteLike(req.params.lid)
-        const resp = "Likes Deleted = " + numDeleted.toString()
-        res.send(resp)
+        let numDeleted = 0
+
+        try {
+            numDeleted = await tLikeDao.deleteLike(req.params.lid)}
+        catch (BSONTypeError) {
+            const errorResp = {"Error": "lid format incorrect"}
+            res.json(errorResp)
+            return
+        }
+
+        const resp = {"likesDeleted": numDeleted.toString()}
+        res.json(resp)
     }
 
 

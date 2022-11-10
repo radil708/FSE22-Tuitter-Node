@@ -61,7 +61,7 @@ export default class FollowDao {
 
         const converter = new MongoToClassConverter();
         const newFollow = await FollowModel.findById(followFromDb._id.toString()).lean()
-        return await converter.convertToFollow(followFromDb);
+        return await converter.convertToFollow(newFollow);
     }
 
     /**

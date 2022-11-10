@@ -37,8 +37,24 @@ export default class BookmarkController {
         let doesUserExist;
         let serverResponse
 
-        doesTuitExist = await tDao.doesTuitExist(tuitId)
-        doesUserExist = await uDao.doesUserIdExist(userId)
+        try {
+            doesTuitExist = await tDao.doesTuitExist(tuitId)
+        }
+        catch (BSONTypeError) {
+            serverResponse = {"Error": "Format is incorrect for tid\n" + "tid must be a string of 12 bytes or a string of 24 hex characters or an integer"}
+            res.json(serverResponse)
+            return
+        }
+
+        try {
+            doesUserExist = await uDao.doesUserIdExist(userId)
+        }
+        catch (BSONTypeError) {
+            serverResponse = {"Error": "Format is incorrect for uid\n" + "uid must be a string of 12 bytes or a string of 24 hex characters or an integer"}
+            res.json(serverResponse)
+            return
+        }
+
 
         if (doesTuitExist == false ) {
             serverResponse = "Tuit with id: " + tuitId +" does not exist"
@@ -48,7 +64,7 @@ export default class BookmarkController {
         }
 
         if (doesTuitExist == false || doesUserExist == false) {
-            res.send(serverResponse)
+            res.send({"Error": serverResponse})
             return
         }
 
@@ -56,13 +72,13 @@ export default class BookmarkController {
         const alreadyBookmarked = await bDao.doesBookmarkAlreadyExist(tuitId,userId)
 
         if (alreadyBookmarked == true) {
-            serverResponse = "User with id: " + userId + " has already bookmarked tuit with id: " + tuitId
+            serverResponse = {"Error": "User with id: " + userId + " has already bookmarked tuit with id: " + tuitId}
         }
         else {
             serverResponse = await bDao.createBookmark(tuitId, userId)
         }
 
-        res.send(serverResponse)
+        res.json(serverResponse)
     }
 
     /**
@@ -73,8 +89,15 @@ export default class BookmarkController {
     async getBookmarkById(req: Request, res: Response) {
         const bId = req.params.bid
         const bDao = BookmarkDao.getInstance();
-        const bookmark = await bDao.getBookmarkById(bId)
-        res.send(bookmark)
+        let bookmark
+
+        try {
+            bookmark = await bDao.getBookmarkById(bId)
+        }
+        catch (BSONTypeError) {
+            bookmark = {"Error": "No entries with bookmark id = " + bId}
+        }
+        res.json(bookmark)
     }
 
     /**
@@ -94,8 +117,15 @@ export default class BookmarkController {
      */
     async getUsersBookmarks(req: Request, res: Response) {
         const bDao = BookmarkDao.getInstance();
-        const bookmarksBookedByUser = await bDao.getUsersBookmarks(req.params.uid)
-        res.send(bookmarksBookedByUser)
+        let bookmarksBookedByUser
+        try {
+            bookmarksBookedByUser = await bDao.getUsersBookmarks(req.params.uid)
+        }
+        catch (BSONTypeError) {
+            bookmarksBookedByUser = {"Error": "Incorrect format for uid"}
+        }
+
+        res.json(bookmarksBookedByUser)
     }
 
     /**
@@ -106,7 +136,17 @@ export default class BookmarkController {
     async unbookmark(req: Request, res: Response) {
         const bookmarkId = req.params.bid
         const bDao = BookmarkDao.getInstance();
-        const numDel = await bDao.deleteBookmark(bookmarkId)
-        res.send("Bookmarks Deleted = " + numDel.toString())
+        let numDel = 0;
+
+        try {
+            numDel = await bDao.deleteBookmark(bookmarkId)
+        }
+        catch (BSONTypeError) {
+            const errorResp = {"Error": "Incorrect format for uid"}
+            res.json(errorResp)
+            return
+        }
+
+        res.send({"bookmarksDeleted" : + numDel.toString()})
     }
 }

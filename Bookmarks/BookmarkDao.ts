@@ -56,7 +56,6 @@ export default class BookmarkDao {
      */
     async doesBookmarkAlreadyExist(tid: string, uid: string): Promise<boolean> {
         const check = await BookmarkModel.find({bookmarkedTuit: tid ,bookmarkedBy: uid})
-        console.log(check)
         if (check.length > 0 ) {
             return true
         }

@@ -40,28 +40,38 @@ export default class FollowController {
         let userFollowed = null;
         let serverResponse
 
+        try {
+            followerExist = await uDao.doesUserIdExist(followerId)
+        }
+        catch (BSONTypeError) {
+            res.json({"Error" : "format of uid of follower incorrect"})
+            return
+        }
 
-        followerExist = await uDao.doesUserIdExist(followerId)
-        followingExist = await uDao.doesUserIdExist(followingId)
+        try {
+            followingExist = await uDao.doesUserIdExist(followingId)
+        }
+        catch (BSONTypeError) {
+            res.json({"Error" : "format of uid of following incorrect"})
+            return
+        }
 
 
         if (followerExist == false) {
-            serverResponse = "Follower with id: " + followerId +"does not exist"
+            serverResponse = {"Error" : "Follower with id: " + followerId +"does not exist"}
         }
         if (followingExist == false) {
-            serverResponse = "User being followed with id: " + followingId + "does not exist"
+            serverResponse = {"Error":"User being followed with id: " + followingId + "does not exist"}
         }
 
         // if follower or user being followed does not exist let client know and stop here
         if (followingExist == false || followerExist == false) {
-            res.send(serverResponse)
+            res.json(serverResponse)
             return
         }
 
         // if both are true then check if the follow already exists
         followEntryAlreadyExist = await fDao.checkIfAlreadyFollowing(followerId,followingId)
-        console.log()
-
 
         // check if entry already exist
         if (followEntryAlreadyExist == false && followingExist == true && followingExist == true) {
@@ -70,10 +80,10 @@ export default class FollowController {
         else {
             userFollower = await uDao.findUserById(followerId)
             userFollowed = await uDao.findUserById(followingId)
-            serverResponse = "User: " + userFollower.getUserName() + " is already following user: " + userFollowed.getUserName()
+            serverResponse = {"Error": "User: " + userFollower.getUserName() + " is already following user: " + userFollowed.getUserName()}
         }
 
-        res.send(serverResponse)
+        res.json(serverResponse)
     }
 
     /**
@@ -95,8 +105,15 @@ export default class FollowController {
     async getFollowById(req: Request, res: Response) {
         const fDao = FollowDao.getInstance();
         const followId = req.params.fid
-        const followObj = await fDao.findById(followId);
-        res.send(followObj)
+        let followObj;
+
+        try {
+            followObj = await fDao.findById(followId);
+        }
+        catch (BSONTypeError) {
+            followObj = {"Error": "format of fid incorrect or no entry in db with id = " + followId }
+        }
+        res.json(followObj)
     }
 
     /**
@@ -107,8 +124,16 @@ export default class FollowController {
     async unfollow(req: Request, res: Response) {
         const fDao = FollowDao.getInstance();
         const targetFollow = req.params.fid
-        const numDeleted = await fDao.deleteFollow(targetFollow)
-        res.send("Number of Follows Deleted: " + numDeleted.toString())
+        let numDeleted = 0
+        let controllerResp;
+        try {
+            numDeleted = await fDao.deleteFollow(targetFollow)
+            controllerResp = {"followsDeleted": numDeleted.toString()}
+        }
+        catch (BSONTypeError) {
+            controllerResp = {"Error": "Incorrect format for fid"}
+        }
+        res.json(controllerResp)
     }
 
     /**
@@ -119,8 +144,16 @@ export default class FollowController {
     async getUsersIAmFollowing(req: Request, res: Response) {
         const fDao = FollowDao.getInstance();
         const myUserId = req.params.uid
-        const usersIAmFollowing = await fDao.getUsersIAmFollowing(myUserId)
-        res.send(usersIAmFollowing);
+        let controllerResp
+
+        try {
+            controllerResp = await fDao.getUsersIAmFollowing(myUserId)
+        }
+        catch (BSONTypeError) {
+            controllerResp = {"Error": "Incorrect format for uid"}
+        }
+
+        res.json(controllerResp)
     }
 
     /**
@@ -130,7 +163,15 @@ export default class FollowController {
      */
     async getUsersFollowingMe(req: Request, res: Response) {
         const fDao = FollowDao.getInstance();
-        const usersFollowingMeArr = await fDao.getUsersFollowingMe(req.params.uid)
-        res.send(usersFollowingMeArr)
+        let controllerResp
+
+        try {
+            controllerResp = await fDao.getUsersFollowingMe(req.params.uid)
+        }
+        catch (BSONTypeError) {
+            controllerResp = {"Error": "Incorrect format for uid"}
+        }
+
+        res.json(controllerResp)
     }
 }

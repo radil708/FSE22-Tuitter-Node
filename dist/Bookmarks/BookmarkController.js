@@ -40,8 +40,22 @@ class BookmarkController {
             let doesTuitExist;
             let doesUserExist;
             let serverResponse;
-            doesTuitExist = yield tDao.doesTuitExist(tuitId);
-            doesUserExist = yield uDao.doesUserIdExist(userId);
+            try {
+                doesTuitExist = yield tDao.doesTuitExist(tuitId);
+            }
+            catch (BSONTypeError) {
+                serverResponse = { "Error": "Format is incorrect for tid\n" + "tid must be a string of 12 bytes or a string of 24 hex characters or an integer" };
+                res.json(serverResponse);
+                return;
+            }
+            try {
+                doesUserExist = yield uDao.doesUserIdExist(userId);
+            }
+            catch (BSONTypeError) {
+                serverResponse = { "Error": "Format is incorrect for uid\n" + "uid must be a string of 12 bytes or a string of 24 hex characters or an integer" };
+                res.json(serverResponse);
+                return;
+            }
             if (doesTuitExist == false) {
                 serverResponse = "Tuit with id: " + tuitId + " does not exist";
             }
@@ -49,18 +63,18 @@ class BookmarkController {
                 serverResponse = "User with id: " + userId + " does not exist";
             }
             if (doesTuitExist == false || doesUserExist == false) {
-                res.send(serverResponse);
+                res.send({ "Error": serverResponse });
                 return;
             }
             const bDao = BookmarkDao_1.default.getInstance();
             const alreadyBookmarked = yield bDao.doesBookmarkAlreadyExist(tuitId, userId);
             if (alreadyBookmarked == true) {
-                serverResponse = "User with id: " + userId + " has already bookmarked tuit with id: " + tuitId;
+                serverResponse = { "Error": "User with id: " + userId + " has already bookmarked tuit with id: " + tuitId };
             }
             else {
                 serverResponse = yield bDao.createBookmark(tuitId, userId);
             }
-            res.send(serverResponse);
+            res.json(serverResponse);
         });
     }
     /**
@@ -72,8 +86,14 @@ class BookmarkController {
         return __awaiter(this, void 0, void 0, function* () {
             const bId = req.params.bid;
             const bDao = BookmarkDao_1.default.getInstance();
-            const bookmark = yield bDao.getBookmarkById(bId);
-            res.send(bookmark);
+            let bookmark;
+            try {
+                bookmark = yield bDao.getBookmarkById(bId);
+            }
+            catch (BSONTypeError) {
+                bookmark = { "Error": "No entries with bookmark id = " + bId };
+            }
+            res.json(bookmark);
         });
     }
     /**
@@ -95,8 +115,14 @@ class BookmarkController {
     getUsersBookmarks(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const bDao = BookmarkDao_1.default.getInstance();
-            const bookmarksBookedByUser = yield bDao.getUsersBookmarks(req.params.uid);
-            res.send(bookmarksBookedByUser);
+            let bookmarksBookedByUser;
+            try {
+                bookmarksBookedByUser = yield bDao.getUsersBookmarks(req.params.uid);
+            }
+            catch (BSONTypeError) {
+                bookmarksBookedByUser = { "Error": "Incorrect format for uid" };
+            }
+            res.json(bookmarksBookedByUser);
         });
     }
     /**
@@ -108,8 +134,16 @@ class BookmarkController {
         return __awaiter(this, void 0, void 0, function* () {
             const bookmarkId = req.params.bid;
             const bDao = BookmarkDao_1.default.getInstance();
-            const numDel = yield bDao.deleteBookmark(bookmarkId);
-            res.send("Bookmarks Deleted = " + numDel.toString());
+            let numDel = 0;
+            try {
+                numDel = yield bDao.deleteBookmark(bookmarkId);
+            }
+            catch (BSONTypeError) {
+                const errorResp = { "Error": "Incorrect format for uid" };
+                res.json(errorResp);
+                return;
+            }
+            res.send({ "bookmarksDeleted": +numDel.toString() });
         });
     }
 }

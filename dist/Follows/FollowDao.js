@@ -66,7 +66,7 @@ class FollowDao {
             });
             const converter = new MongoToClassConverter_1.MongoToClassConverter();
             const newFollow = yield FollowModel_1.default.findById(followFromDb._id.toString()).lean();
-            return yield converter.convertToFollow(followFromDb);
+            return yield converter.convertToFollow(newFollow);
         });
     }
     /**
