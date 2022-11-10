@@ -33,7 +33,6 @@ export default class LikeController{
     async createLike(req: Request, res: Response) {
         const tuitId = req.params.tid;
         const userId = req.params.uid;
-
         // check if Tuit exists
         const tDao = TuitDao.getInstance()
         const uDao = UserDao.getInstance()
@@ -41,8 +40,24 @@ export default class LikeController{
         let doesUserExist;
         let serverResponse
 
-        doesTuitExist = await tDao.doesTuitExist(tuitId)
-        doesUserExist = await uDao.doesUserIdExist(userId)
+        try {
+            doesTuitExist = await tDao.doesTuitExist(tuitId)
+        }
+        catch (BSONTypeError) {
+            serverResponse = {"Error": "Format is incorrect for tid\n" + "tid must be a string of 12 bytes or a string of 24 hex characters or an integer"}
+            res.json(serverResponse)
+            return
+        }
+
+        try {
+            doesUserExist = await uDao.doesUserIdExist(userId)
+        }
+        catch (BSONTypeError) {
+            serverResponse = {"Error": "Format is incorrect for uid\n" + "uid must be a string of 12 bytes or a string of 24 hex characters or an integer"}
+            res.json(serverResponse)
+            return
+        }
+
 
         if (doesTuitExist == false ) {
             serverResponse = "Tuit with id: " + tuitId +" does not exist"
@@ -52,7 +67,7 @@ export default class LikeController{
         }
 
         if (doesTuitExist == false || doesUserExist == false) {
-            res.send(serverResponse)
+            res.json({"Error": serverResponse})
             return
         }
 
@@ -61,13 +76,13 @@ export default class LikeController{
         const doesLikeAlreadyExist = await tLikeDao.doesLikeEntryAlreadyExist(tuitId,userId)
 
         if (doesLikeAlreadyExist == true) {
-            serverResponse = "user with id: " + userId + " has already liked tuit with id: " + tuitId
+            serverResponse = {"Error":"user with id: " + userId + " has already liked tuit with id: " + tuitId}
         }
         else {
             serverResponse = await tLikeDao.createLike(tuitId,userId)
         }
 
-        res.send(serverResponse)
+        res.json(serverResponse)
     }
 
     /**

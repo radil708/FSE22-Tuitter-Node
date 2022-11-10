@@ -25,6 +25,7 @@ const Message_1 = require("./Messages/Message");
 class MongoToClassConverter {
     // TODO ask, why can't I set more than one wihtout TypeError: MongoToClassConverter_1.MongoToClassConverter is not a constructor
     //  attr??
+    //Pass in instance of DAO in getinstance
     constructor() { }
     convertToUser(mongoRes, showPassword = false, showNames = true) {
         return __awaiter(this, void 0, void 0, function* () {

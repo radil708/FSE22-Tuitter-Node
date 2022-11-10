@@ -44,8 +44,22 @@ class LikeController {
             let doesTuitExist;
             let doesUserExist;
             let serverResponse;
-            doesTuitExist = yield tDao.doesTuitExist(tuitId);
-            doesUserExist = yield uDao.doesUserIdExist(userId);
+            try {
+                doesTuitExist = yield tDao.doesTuitExist(tuitId);
+            }
+            catch (BSONTypeError) {
+                serverResponse = { "Error": "Format is incorrect for tid\n" + "tid must be a string of 12 bytes or a string of 24 hex characters or an integer" };
+                res.json(serverResponse);
+                return;
+            }
+            try {
+                doesUserExist = yield uDao.doesUserIdExist(userId);
+            }
+            catch (BSONTypeError) {
+                serverResponse = { "Error": "Format is incorrect for uid\n" + "uid must be a string of 12 bytes or a string of 24 hex characters or an integer" };
+                res.json(serverResponse);
+                return;
+            }
             if (doesTuitExist == false) {
                 serverResponse = "Tuit with id: " + tuitId + " does not exist";
             }
@@ -53,18 +67,18 @@ class LikeController {
                 serverResponse = "User with id: " + userId + " does not exist";
             }
             if (doesTuitExist == false || doesUserExist == false) {
-                res.send(serverResponse);
+                res.json({ "Error": serverResponse });
                 return;
             }
             const tLikeDao = LikeDao_1.default.getInstance();
             const doesLikeAlreadyExist = yield tLikeDao.doesLikeEntryAlreadyExist(tuitId, userId);
             if (doesLikeAlreadyExist == true) {
-                serverResponse = "user with id: " + userId + " has already liked tuit with id: " + tuitId;
+                serverResponse = { "Error": "user with id: " + userId + " has already liked tuit with id: " + tuitId };
             }
             else {
                 serverResponse = yield tLikeDao.createLike(tuitId, userId);
             }
-            res.send(serverResponse);
+            res.json(serverResponse);
         });
     }
     /**

@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
 const TuitModel_1 = require("./TuitModel");
-const UserDao_1 = require("../Users/UserDao");
 const debugHelper_1 = require("../debugHelper");
 class TuitDao {
     /**
@@ -92,13 +91,13 @@ class TuitDao {
      */
     findTuitById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            // I can't make this an attribute without an nmp error
+            // I can't make this an attribute without an npm error
             const conv = new MongoToClassConverter_1.MongoToClassConverter();
             const tartgetT = yield TuitModel_1.default.findById(id).lean();
             let tuitIdExist;
             let retTuit;
             if (tartgetT == null || tartgetT == undefined) {
-                tuitIdExist = false;
+                retTuit = null;
             }
             else {
                 tuitIdExist = true;
@@ -110,12 +109,7 @@ class TuitDao {
                 console.log("Tuit returned by model:\n", retTuit);
                 debugHelper_1.default.printEnd("findTuitById", "TuitDao");
             }
-            if (tuitIdExist) {
-                return retTuit;
-            }
-            else {
-                throw new UserDao_1.ValidationError("Tuit id: " + id + "does not exist in database");
-            }
+            return retTuit;
         });
     }
     /**

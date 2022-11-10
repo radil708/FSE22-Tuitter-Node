@@ -60,30 +60,36 @@ export default class UserDao implements UserDaoInterface {
 
     /**
      * Creates a User in the database
-     * @param user {User} The user that will be created in the database
+     * @param clientNewUserReqJson {User} The user that will be created in the database
      */
-    async createUser(user: User): Promise<User> {
+    async createUser(clientNewUserReqJson): Promise<User> {
+
         // check if username already taken
-        const isUserNameAlreadyTaken = await this.userNameAlreadyTaken(user.getUserName());
+        const isUserNameAlreadyTaken = await this.userNameAlreadyTaken(clientNewUserReqJson.username);
+
+        let userObj
 
         // username is taken do not create user, let controller know with null
         if (isUserNameAlreadyTaken == true) {
-            return null;
+            userObj = null
+        }
+        else {
+            const DbResp = await UserModel.create(clientNewUserReqJson);
+            // I had obscured that password by setting showPassword to False but
+            // starter code tests for A3 want to see password
+            userObj = this.converter.convertToUser(userObj,true)
         }
 
-        const userModelObj = await UserModel.create(user);
 
         //set to true to turn on debug statements
         const printDebugDao = false;
 
         if (printDebugDao) {
-            console.log("Response from UserModel.create:\n ", userModelObj)
+            console.log("Response from UserModel.create:\n ", userObj)
             debugHelper.printEnd("createUser", this.className)
         }
 
-        // I had obscured that password by setting showPassword to False but
-        // starter code tests for A3 want to see password
-        return this.converter.convertToUser(userModelObj,true);
+        return userObj;
     }
 
     /**
@@ -145,37 +151,31 @@ export default class UserDao implements UserDaoInterface {
      * @param uid {string} the user id of the user you want to find
      */
     async findUserById(uid: string): Promise<User> {
-        let userIdExist
-        let userFromDb
+        let userObj
+        const doesUserIdExist = await this.doesUserIdExist(uid)
 
-        userFromDb = await UserModel.findById(uid).lean();
-
-        if (userFromDb == null) {
-            userIdExist = false
+        if (doesUserIdExist == true) {
+            const userFromDb = await UserModel.findById(uid).lean();
+            userObj = this.converter.convertToUser(userFromDb, true)
         }
         else {
-            userIdExist = true
+            userObj = null
         }
+
 
         //set to true to turn on debug statements
         const printDebug = false;
 
         if (printDebug) {
-            console.log("Does user with id: " + uid + " exist?\n", userIdExist)
-            console.log("Reponse from model.findById:\n", userFromDb)
+            console.log("Does user with id: " + uid + " exist?\n", doesUserIdExist)
+            console.log("Reponse from model.findById:\n", await UserModel.findById(uid).lean() )
             debugHelper.printEnd("findUserById", this.className)
         }
-
-        // no user exist
-        if (userIdExist == false) {
-            return null;
-        }
-
 
         // returns a user object
         // I had obscured that password by setting showPassword to False but
         // starter code tests for A3 want to see password
-        return this.converter.convertToUser(userFromDb, true)
+        return userObj
     }
 
     async doesUserIdExist(userId): Promise<boolean> {
@@ -198,17 +198,27 @@ export default class UserDao implements UserDaoInterface {
      * @param userNameIn
      */
     async findUserbyUserName(userNameIn: string): Promise<User> {
-        // TODO gotta use findOne need to implement no same username
+
         const userFromDb = await UserModel.findOne({username: userNameIn }).lean();
+
+        let daoResp;
+
+        if (userFromDb == null) {
+            daoResp = null;
+        }
+        else {
+            daoResp = this.converter.convertToUser(userFromDb,false,true)
+        }
 
         //set to true to turn on debug statements
         const printDebug = false;
         if (printDebug) {
+            console.log("Looking for username: " + userNameIn)
             console.log("Response from model.findOne:\n", userFromDb)
             debugHelper.printEnd("findUserbyUserName", this.className)
         }
 
-        return this.converter.convertToUser(userFromDb,false,true)
+        return daoResp
     }
 
     async deleteUserByUserName(userNameIn: string): Promise<number>  {

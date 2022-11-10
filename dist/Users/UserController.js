@@ -41,25 +41,33 @@ class UserController {
             // assign variable to store POST JSON body from client
             const newUserJSON = req.body;
             const userNameInput = req.body.username;
-            const userNameAlreadyTaken = yield this.userDao.userNameAlreadyTaken(userNameInput);
-            let serverReponse;
-            if (!userNameAlreadyTaken) {
-                serverReponse = yield this.userDao.createUser(newUserJSON);
+            // will be null if username already taken
+            let userDaoResp = yield this.userDao.createUser(newUserJSON);
+            let controllerResp;
+            if (userDaoResp == null) {
+                const errorMsg = "The username: " + req.body.username + " is already taken" + "\n Please choose a different username";
+                controllerResp = { "Error": errorMsg };
             }
             else {
-                serverReponse = "The username: " + req.body.username + " is already taken";
-                serverReponse += "\n Please choose a different username";
+                controllerResp = userDaoResp;
             }
             //Set to true to turn on debug statements
             const printDebug = false;
             if (printDebug) {
-                console.log("Is username: " + userNameInput + " already taken?\n", userNameAlreadyTaken);
+                let taken;
+                if (userDaoResp == null) {
+                    taken = false;
+                }
+                else {
+                    taken = true;
+                }
+                console.log("Is username: " + userNameInput + " already taken?\n", taken);
                 console.log("Client Request body:\n", newUserJSON);
                 debugHelper_1.default.printSingleLineDivider();
-                console.log("DAO response:\n", serverReponse);
+                console.log("DAO response:\n", controllerResp);
                 debugHelper_1.default.printEnd("createUser", this.className);
             }
-            res.json(serverReponse);
+            res.json(controllerResp);
         });
         /**
          * Deletes a user from the database whose userid matches the user
@@ -146,14 +154,22 @@ class UserController {
             // userid comes from url input
             const userIdToFind = req.params['userid'];
             //this should be either a user object or null if no user matching exists
-            let messageSend = yield this.userDao.findUserById(userIdToFind);
+            let messageSend;
+            // Error handling for incorrect format
+            try {
+                messageSend = yield this.userDao.findUserById(userIdToFind);
+            }
+            catch (BSONTypeError) {
+                let errMsg = "Incorrect format for userid, userid must be a string of 12 bytes or a string of 24 hex characters or an integer\n ";
+                res.json({ "Error": errMsg });
+                return;
+            }
             // if no user matches send empy array
             if (messageSend == null || messageSend == undefined) {
-                //TODO delete error message
-                let messageSend = "FAILED to GET user with id:" + userIdToFind;
+                messageSend = "FAILED to GET user with id:" + userIdToFind;
                 messageSend += "\nEither user with ID does not exist\nOR\nID format is incorrect";
-                const emptyArr = [];
-                res.send(emptyArr);
+                const errorMsg = { "Error": messageSend };
+                res.json(errorMsg);
             }
             res.send(messageSend);
         });
@@ -171,33 +187,29 @@ class UserController {
             const targetUserName = req.params.uname;
             let userFound = false;
             let targetedUser;
-            // check if user exists
-            try {
-                targetedUser = yield this.userDao.findUserbyUserName(targetUserName);
-                userFound = true;
-            }
-            catch (TypeError) {
-                targetedUser = '';
-            }
-            if (userFound) {
-                res.send(targetedUser);
+            const daoResp = yield this.userDao.findUserbyUserName(targetUserName);
+            let controllerResp;
+            // user with matching username does not exist
+            if (daoResp == null) {
+                controllerResp = { "Error": "There are no users with the username: " + targetUserName };
             }
             else {
-                res.status(400).send("There are no users with the username: " + targetUserName);
+                controllerResp = daoResp;
+                userFound = true;
             }
             const printDebug = false;
             if (printDebug) {
                 console.log("target username: ", targetUserName);
                 console.log("userFound: ", userFound);
                 debugHelper_1.default.printSingleLineDivider();
-                console.log("Response from dao:\n", targetedUser);
+                console.log("Response from dao:\n", controllerResp);
                 debugHelper_1.default.printEnd("findUserByUserName", this.className);
             }
+            res.json(controllerResp);
         });
         this.deleteUserByUserName = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const usernameToDelete = req.params.uname;
             const dbResp = yield this.userDao.deleteUserByUserName(usernameToDelete);
-            const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete;
             res.json({ "usersDeleted": dbResp });
         });
         this.findUserByCredential = (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -224,6 +236,7 @@ class UserController {
         this.app.post('/api/users', this.createUser); // create a new user
         this.app.get('/api/users', this.findAllUsers); // get all users
         this.app.get('/api/users/:userid', this.findUserById); // get user by id
+        this.app.get('/api/username/:uname/users', this.findUserByUserName); // get user by username
         this.app.delete('/api/users/:userid', this.deleteUserByID); // delete user by id
         this.app.delete('/api/users/username/:uname/delete', this.deleteUserByUserName);
         this.app.post('/api/login', this.findUserByCredential);

@@ -30,6 +30,7 @@ export default class UserController implements UserControllerInterface {
         this.app.post('/api/users', this.createUser); // create a new user
         this.app.get('/api/users', this.findAllUsers); // get all users
         this.app.get('/api/users/:userid', this.findUserById); // get user by id
+        this.app.get('/api/username/:uname/users', this.findUserByUserName) // get user by username
         this.app.delete('/api/users/:userid', this.deleteUserByID) // delete user by id
         this.app.delete('/api/users/username/:uname/delete', this.deleteUserByUserName)
         this.app.post('/api/login', this.findUserByCredential)
@@ -63,7 +64,7 @@ export default class UserController implements UserControllerInterface {
 
         if (userDaoResp == null) {
             const errorMsg = "The username: " + req.body.username + " is already taken" + "\n Please choose a different username"
-            controllerResp = {"error": errorMsg}
+            controllerResp = {"Error": errorMsg}
         }
         else {
             controllerResp = userDaoResp;
@@ -184,15 +185,25 @@ export default class UserController implements UserControllerInterface {
         const userIdToFind = req.params['userid'];
 
         //this should be either a user object or null if no user matching exists
-        let messageSend = await this.userDao.findUserById(userIdToFind);
+        let messageSend;
+
+        // Error handling for incorrect format
+        try {
+            messageSend = await this.userDao.findUserById(userIdToFind);
+        }
+        catch (BSONTypeError) {
+            let errMsg = "Incorrect format for userid, userid must be a string of 12 bytes or a string of 24 hex characters or an integer\n "
+            res.json({"Error" : errMsg})
+            return
+        }
+
 
         // if no user matches send empy array
         if (messageSend == null || messageSend == undefined) {
-            //TODO delete error message
-            let messageSend = "FAILED to GET user with id:" + userIdToFind
+            messageSend = "FAILED to GET user with id:" + userIdToFind
             messageSend += "\nEither user with ID does not exist\nOR\nID format is incorrect"
-            const emptyArr = [];
-            res.send(emptyArr)
+            const errorMsg = {"Error": messageSend};
+            res.json(errorMsg)
         }
 
         res.send(messageSend)
@@ -215,38 +226,33 @@ export default class UserController implements UserControllerInterface {
         let userFound = false;
         let targetedUser;
 
-        // check if user exists
-        try{
-            targetedUser = await this.userDao.findUserbyUserName(targetUserName)
-            userFound = true;
-        }
-        catch (TypeError) {
-            targetedUser = '';
-        }
-
-        if (userFound) {
-            res.send(targetedUser)
+        const daoResp = await this.userDao.findUserbyUserName(targetUserName)
+        let controllerResp
+        // user with matching username does not exist
+        if (daoResp == null) {
+            controllerResp = {"Error" : "There are no users with the username: " + targetUserName}
         }
         else {
-            res.status(400).send("There are no users with the username: " + targetUserName )
+            controllerResp = daoResp
+            userFound = true
         }
-
 
         const printDebug = false
         if (printDebug) {
             console.log("target username: ", targetUserName);
             console.log("userFound: ", userFound)
             debugHelper.printSingleLineDivider()
-            console.log("Response from dao:\n", targetedUser)
+            console.log("Response from dao:\n", controllerResp)
             debugHelper.printEnd("findUserByUserName", this.className)
         }
+
+        res.json(controllerResp)
 
     }
 
     deleteUserByUserName = async (req: Request, res: Response) => {
         const usernameToDelete = req.params.uname
         const dbResp = await this.userDao.deleteUserByUserName(usernameToDelete)
-        const responseMessage = "Deleted: " + dbResp.toString() + " users with username: " + usernameToDelete
         res.json({"usersDeleted": dbResp})
     }
 

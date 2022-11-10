@@ -92,14 +92,14 @@ export default class TuitDao implements TuitDaoInterface{
      * @param id {string} the id of the tuit you are looking for
      */
     async findTuitById(id: string): Promise<Tuit> {
-        // I can't make this an attribute without an nmp error
+        // I can't make this an attribute without an npm error
         const conv = new MongoToClassConverter();
         const tartgetT = await TuitModel.findById(id).lean();
         let tuitIdExist;
         let retTuit;
 
         if (tartgetT == null || tartgetT == undefined) {
-            tuitIdExist = false;
+            retTuit = null;
         }
         else {
             tuitIdExist = true;
@@ -113,12 +113,7 @@ export default class TuitDao implements TuitDaoInterface{
             debugHelper.printEnd("findTuitById", "TuitDao")
         }
 
-        if (tuitIdExist) {
-            return retTuit
-        }
-        else {
-            throw new ValidationError("Tuit id: " + id + "does not exist in database")
-        }
+        return retTuit
 
     }
 

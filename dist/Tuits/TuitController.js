@@ -44,47 +44,46 @@ class TuitController {
             const tuitedById = req.params.uid;
             const tuitContent = req.body.tuit;
             let tuitPostedDate = req.body.postedOn;
-            let userIdExists = true;
-            let userWhoTuited = null;
+            let userIdExists = false;
+            // create a new date if no data passed in the request body
+            if (tuitPostedDate == '' || tuitPostedDate == null) {
+                tuitPostedDate = new Date();
+            }
+            // BSON error may occur here, if userid passed is incorrect format
             try {
-                //TODO ask why code below does not work but code below that one does
-                //userWhoTuited = await this.userDao.findUserById(tuitedById)
-                userWhoTuited = yield UserDao_1.default.getInstance().findUserById(tuitedById);
+                userIdExists = yield UserDao_1.default.getInstance().doesUserIdExist(tuitedById);
             }
             catch (BSONTypeError) {
-                userIdExists = false;
+                let msg = "Format is incorrect for uid\n" + "uid must be a string of 12 bytes or a string of 24 hex characters or an integer";
+                const errorMsg = { "Error": msg };
+                res.json(errorMsg);
+                return;
             }
-            let serverResponse;
+            let controllerResp;
+            let userWhoTuited;
+            // if tuit property is empty send error
             if (tuitContent == '' || tuitContent == null) {
-                serverResponse = "tuit property cannot be empty string or null";
-                serverResponse += "\nPlease enter some value into tuit property";
+                controllerResp = "tuit property cannot be empty string or null";
+                controllerResp += "\nPlease enter some value into tuit property";
+                controllerResp = { "Error": controllerResp };
             }
-            // if userId not in database
-            if (userIdExists == false) {
-                serverResponse = 'user with id: ' + tuitedById + ' does not exist in database';
-                serverResponse += '\nPlease check user id value and format';
+            //user id is not in database
+            else if (userIdExists == false) {
+                let msg = "There are no users with id: " + tuitedById.toString() + " in the database";
+                controllerResp = { "Error": msg };
             }
             else {
-                // if date not added in body then make one for today
-                if (tuitPostedDate == '' || tuitPostedDate == null) {
-                    tuitPostedDate = new Date();
-                }
+                userWhoTuited = yield UserDao_1.default.getInstance().findUserById(tuitedById);
                 const clientTuit = new Tuit_1.default('', tuitContent, tuitPostedDate, userWhoTuited);
-                serverResponse = yield TuitDao_1.default.getInstance().createTuit(clientTuit);
+                controllerResp = yield TuitDao_1.default.getInstance().createTuit(clientTuit);
             }
+            res.json(controllerResp);
             // Set to true to see debug statements
-            const printDebug = true;
+            const printDebug = false;
             if (printDebug) {
                 console.log("Does user with id: " + tuitedById + " exist?\n", userIdExists);
-                console.log("Response to client:\n", serverResponse);
+                console.log("Response to client:\n", controllerResp);
                 debugHelper_1.default.printEnd("createTuit", "TuitController");
-            }
-            // modifying to work with tests in A3
-            if (userIdExists == false) {
-                res.json();
-            }
-            else {
-                res.json(serverResponse);
             }
         });
     }
@@ -97,9 +96,16 @@ class TuitController {
         return __awaiter(this, void 0, void 0, function* () {
             const tdao = TuitDao_1.default.getInstance();
             const targetTid = req.params.tid;
-            const numDeleted = yield tdao.deleteTuit(targetTid);
-            const stringResp = "Number of tuits deleted: " + numDeleted.toString();
-            // send needs to be a string otherwise it will think status code
+            let numDeleted;
+            try {
+                numDeleted = yield tdao.deleteTuit(targetTid);
+            }
+            catch (BSONTypeError) {
+                let msg = "Format is incorrect for tid\n" + "tid must be a string of 12 bytes or a string of 24 hex characters or an integer";
+                const errorMsg = { "Error": msg };
+                res.json(errorMsg);
+                return;
+            }
             // modifying to work with tests in A3
             res.json({ "tuitsDeleted": numDeleted });
         });
@@ -125,27 +131,27 @@ class TuitController {
             const tuitdao = TuitDao_1.default.getInstance();
             const tidString = req.params.tid;
             let isTuitIdInDb = false;
-            let serverResponse;
+            let controllerResp;
+            //BSONTypeError if value passed incorrect format
             try {
-                serverResponse = yield tuitdao.findTuitById(tidString);
-                isTuitIdInDb = true;
+                controllerResp = yield tuitdao.findTuitById(tidString);
             }
-            catch (ValidationError) {
-                serverResponse = "Tuit with id: " + tidString + " does not exist in database";
+            catch (BSONTypeError) {
+                controllerResp = { "Error": "Incorrect format for tid. Tid must be a string of 12 bytes or a string of 24 hex characters or an integer" };
+                res.json(controllerResp);
+                return;
+            }
+            if (controllerResp == null) {
+                isTuitIdInDb = true;
+                controllerResp = { "Error": "There are no tuits with the id: " + tidString };
             }
             const printDebug = false;
             if (printDebug) {
                 console.log("Does user with id" + tidString + "exist? ", isTuitIdInDb);
-                console.log("serverResponse: ", serverResponse);
+                console.log("serverResponse: ", controllerResp);
                 debugHelper_1.default.printEnd("findTuitById", "TuitController");
             }
-            // modifying for tests in A3
-            if (isTuitIdInDb == false) {
-                res.json();
-            }
-            else {
-                res.send(serverResponse);
-            }
+            res.json(controllerResp);
         });
     }
     /**

@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const MessageModel_1 = require("./MessageModel");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
+const UserDao_1 = require("../Users/UserDao");
 class MessageDao {
     /**
      * This enforces Singleton Architecture
@@ -41,6 +42,19 @@ class MessageDao {
     getAllMessages() {
         return __awaiter(this, void 0, void 0, function* () {
             return yield MessageModel_1.default.find();
+        });
+    }
+    getAllMessagesSentTo(username) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const uDao = UserDao_1.default.getInstance();
+            const receivingUser = yield uDao.findUserbyUserName(username);
+            //If user does not exist return null
+            if (receivingUser == null || receivingUser == undefined) {
+                return null;
+            }
+            // if user exists get user id
+            const userId = receivingUser.getUserId();
+            const converter = new MongoToClassConverter_1.MongoToClassConverter();
         });
     }
 }
