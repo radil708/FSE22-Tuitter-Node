@@ -38,22 +38,24 @@ export default class UserDao implements UserDaoInterface {
     async userNameAlreadyTaken(userName: string): Promise<boolean> {
         let userNameAlreadyExists;
 
-        try {
-            await this.findUserbyUserName(userName)
-            userNameAlreadyExists = true
-        }
-        catch (TypeError) {
+        const userDbVal = await UserModel.find({username: userName});
+
+        if (userDbVal == null || userDbVal == undefined) {
             userNameAlreadyExists = false
         }
+        else {
+            userNameAlreadyExists = true
+        }
 
-        // set to true to turn on debug statements
         const printDebug = false
         if (printDebug) {
             console.log("Is username: " + userName + " already taken?\n" + userNameAlreadyExists)
             debugHelper.printEnd("userNameAlreadyTaken", 'UserDao')
         }
 
-        return userNameAlreadyExists;
+        return userNameAlreadyExists
+
+
     }
 
     /**
@@ -61,6 +63,14 @@ export default class UserDao implements UserDaoInterface {
      * @param user {User} The user that will be created in the database
      */
     async createUser(user: User): Promise<User> {
+        // check if username already taken
+        const isUserNameAlreadyTaken = await this.userNameAlreadyTaken(user.getUserName());
+
+        // username is taken do not create user, let controller know with null
+        if (isUserNameAlreadyTaken == true) {
+            return null;
+        }
+
         const userModelObj = await UserModel.create(user);
 
         //set to true to turn on debug statements
@@ -70,6 +80,7 @@ export default class UserDao implements UserDaoInterface {
             console.log("Response from UserModel.create:\n ", userModelObj)
             debugHelper.printEnd("createUser", this.className)
         }
+
         // I had obscured that password by setting showPassword to False but
         // starter code tests for A3 want to see password
         return this.converter.convertToUser(userModelObj,true);
@@ -229,6 +240,7 @@ export default class UserDao implements UserDaoInterface {
     // async updateUser(uid: string, user: User): Promise<number> {
     //     //The $set operator replaces the value of a field with the specified value.
     //     // TODO ask, only updates certain fields or all?? what if only 1 attr change?
+    //     // TODO import mongoose datatypes for set
     //     const updatedUserArr =  await UserModel.updateOne(
     //         {_id: uid},
     //         {$set: user}

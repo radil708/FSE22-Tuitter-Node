@@ -55,29 +55,39 @@ export default class UserController implements UserControllerInterface {
         // assign variable to store POST JSON body from client
         const newUserJSON = req.body;
         const userNameInput = req.body.username
-        const userNameAlreadyTaken = await this.userDao.userNameAlreadyTaken(userNameInput);
-        let serverReponse
 
-        if (!userNameAlreadyTaken) {
-            serverReponse = await this.userDao.createUser(newUserJSON)
+        // will be null if username already taken
+        let userDaoResp = await this.userDao.createUser(newUserJSON)
+
+        let controllerResp;
+
+        if (userDaoResp == null) {
+            const errorMsg = "The username: " + req.body.username + " is already taken" + "\n Please choose a different username"
+            controllerResp = {"error": errorMsg}
         }
         else {
-            serverReponse = "The username: " + req.body.username + " is already taken"
-            serverReponse += "\n Please choose a different username"
+            controllerResp = userDaoResp;
         }
 
         //Set to true to turn on debug statements
         const printDebug = false
 
         if (printDebug) {
-            console.log("Is username: " + userNameInput + " already taken?\n", userNameAlreadyTaken)
+            let taken;
+            if (userDaoResp == null) {
+                taken = false
+            }
+            else {
+                taken = true
+            }
+            console.log("Is username: " + userNameInput + " already taken?\n", taken)
             console.log("Client Request body:\n", newUserJSON);
             debugHelper.printSingleLineDivider()
-            console.log("DAO response:\n",serverReponse)
+            console.log("DAO response:\n",controllerResp)
             debugHelper.printEnd("createUser", this.className)
         }
 
-        res.json(serverReponse);
+        res.json(controllerResp);
     }
 
     /**

@@ -17,6 +17,8 @@ export class MongoToClassConverter {
     // TODO ask, why can't I set more than one wihtout TypeError: MongoToClassConverter_1.MongoToClassConverter is not a constructor
     //  attr??
 
+    //Pass in instance of DAO in getinstance
+
     constructor() {}
 
     async convertToUser(mongoRes, showPassword = false, showNames= true): Promise<User> {

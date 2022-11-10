@@ -37,4 +37,5 @@ export default class MessagesController {
         const mDao = MessageDao.getInstance()
         res.send(await mDao.getAllMessages())
     }
+
 }
