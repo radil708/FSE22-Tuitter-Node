@@ -39,7 +39,9 @@ export default class UserDao implements UserDaoInterface {
         let userNameAlreadyExists;
 
         const userDbVal = await UserModel.find({username: userName});
-        //f
+
+        //fixed bug
+
                                                         // model.find returns an array, if length = 0 then no results
         if (userDbVal == null || userDbVal == undefined || userDbVal.length == 0) {
             userNameAlreadyExists = false
