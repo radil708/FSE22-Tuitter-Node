@@ -42,7 +42,7 @@ class UserDao {
         return __awaiter(this, void 0, void 0, function* () {
             let userNameAlreadyExists;
             const userDbVal = yield UserModel_1.default.find({ username: userName });
-            //f
+            //fixed bug
             // model.find returns an array, if length = 0 then no results
             if (userDbVal == null || userDbVal == undefined || userDbVal.length == 0) {
                 userNameAlreadyExists = false;
