@@ -40,7 +40,8 @@ export default class UserDao implements UserDaoInterface {
 
         const userDbVal = await UserModel.find({username: userName});
 
-        if (userDbVal == null || userDbVal == undefined) {
+                                                        // model.find returns an array, if length = 0 then no results
+        if (userDbVal == null || userDbVal == undefined || userDbVal.length == 0) {
             userNameAlreadyExists = false
         }
         else {
@@ -49,7 +50,8 @@ export default class UserDao implements UserDaoInterface {
 
         const printDebug = false
         if (printDebug) {
-            console.log("Is username: " + userName + " already taken?\n" + userNameAlreadyExists)
+            console.log("Is username: " + userName + " already taken? ->" + userNameAlreadyExists)
+            console.log("Result of usermodel.find -> ", userDbVal)
             debugHelper.printEnd("userNameAlreadyTaken", 'UserDao')
         }
 
@@ -68,16 +70,17 @@ export default class UserDao implements UserDaoInterface {
         const isUserNameAlreadyTaken = await this.userNameAlreadyTaken(clientNewUserReqJson.username);
 
         let userObj
+        let DbResp;
 
         // username is taken do not create user, let controller know with null
         if (isUserNameAlreadyTaken == true) {
             userObj = null
         }
         else {
-            const DbResp = await UserModel.create(clientNewUserReqJson);
+            DbResp = await UserModel.create(clientNewUserReqJson);
             // I had obscured that password by setting showPassword to False but
             // starter code tests for A3 want to see password
-            userObj = this.converter.convertToUser(userObj,true)
+            userObj = this.converter.convertToUser(DbResp,true)
         }
 
 
@@ -85,7 +88,10 @@ export default class UserDao implements UserDaoInterface {
         const printDebugDao = false;
 
         if (printDebugDao) {
-            console.log("Response from UserModel.create:\n ", userObj)
+            console.log("is user name already taken? -> ", isUserNameAlreadyTaken)
+            console.log("JSON param passed in = \n", clientNewUserReqJson)
+            console.log("Response from UserModel.create:\n ", DbResp)
+            console.log("created userobj =\n", userObj)
             debugHelper.printEnd("createUser", this.className)
         }
 
