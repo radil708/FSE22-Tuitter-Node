@@ -39,6 +39,9 @@ class MessageDao {
             return yield conv.convertToMessage(mResp);
         });
     }
+    /**
+     * Gets all messages from db
+     */
     getAllMessages() {
         return __awaiter(this, void 0, void 0, function* () {
             const allMsgJSON = yield MessageModel_1.default.find();
@@ -50,6 +53,10 @@ class MessageDao {
             return arrResp;
         });
     }
+    /**
+     * Gets all messages seny by user with matching username
+     * @param username
+     */
     getAllMessagesSentBy(username) {
         return __awaiter(this, void 0, void 0, function* () {
             const uDao = UserDao_1.default.getInstance();
@@ -69,6 +76,10 @@ class MessageDao {
             return arrResp;
         });
     }
+    /**
+     * Gets all messages received by user with matching username
+     * @param username
+     */
     getAllMessagesReceivedBy(username) {
         return __awaiter(this, void 0, void 0, function* () {
             const uDao = UserDao_1.default.getInstance();
