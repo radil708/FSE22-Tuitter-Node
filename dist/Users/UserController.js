@@ -43,6 +43,7 @@ class UserController {
             const userNameInput = req.body.username;
             // will be null if username already taken
             let userDaoResp = yield this.userDao.createUser(newUserJSON);
+            //f
             let controllerResp;
             if (userDaoResp == null) {
                 const errorMsg = "The username: " + req.body.username + " is already taken" + "\n Please choose a different username";

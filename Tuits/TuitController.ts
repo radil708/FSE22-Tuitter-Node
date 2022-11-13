@@ -97,6 +97,8 @@ export default class TuitController implements TuitControllerInterface {
         // Set to true to see debug statements
         const printDebug = false;
         if (printDebug) {
+            console.log("client request body -> ", req.body)
+            console.log("req tuit -> ", req.body.tuit)
             console.log("Does user with id: " + tuitedById + " exist?\n", userIdExists)
             console.log("Response to client:\n", controllerResp)
             debugHelper.printEnd("createTuit", "TuitController")
@@ -111,7 +113,7 @@ export default class TuitController implements TuitControllerInterface {
     async deleteTuit(req: Request, res: Response) {
         const tdao = TuitDao.getInstance()
         const targetTid = req.params.tid
-        let numDeleted;
+        let numDeleted = 0;
 
         try {
             numDeleted = await tdao.deleteTuit(targetTid)
@@ -121,6 +123,14 @@ export default class TuitController implements TuitControllerInterface {
             const errorMsg = {"Error": msg}
             res.json(errorMsg)
             return
+        }
+
+        const printDebug = false;
+        if (printDebug) {
+            console.log("Request header -> ", req.params)
+            console.log("Does user with id: " + targetTid + " exist?\n", numDeleted)
+            console.log("Response to client:\n", {"tuitsDeleted": numDeleted})
+            debugHelper.printEnd("deleteTuit", "TuitController")
         }
 
         // modifying to work with tests in A3

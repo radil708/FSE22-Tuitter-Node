@@ -81,6 +81,8 @@ class TuitController {
             // Set to true to see debug statements
             const printDebug = false;
             if (printDebug) {
+                console.log("client request body -> ", req.body);
+                console.log("req tuit -> ", req.body.tuit);
                 console.log("Does user with id: " + tuitedById + " exist?\n", userIdExists);
                 console.log("Response to client:\n", controllerResp);
                 debugHelper_1.default.printEnd("createTuit", "TuitController");
@@ -96,7 +98,7 @@ class TuitController {
         return __awaiter(this, void 0, void 0, function* () {
             const tdao = TuitDao_1.default.getInstance();
             const targetTid = req.params.tid;
-            let numDeleted;
+            let numDeleted = 0;
             try {
                 numDeleted = yield tdao.deleteTuit(targetTid);
             }
@@ -105,6 +107,13 @@ class TuitController {
                 const errorMsg = { "Error": msg };
                 res.json(errorMsg);
                 return;
+            }
+            const printDebug = false;
+            if (printDebug) {
+                console.log("Request header -> ", req.params);
+                console.log("Does user with id: " + targetTid + " exist?\n", numDeleted);
+                console.log("Response to client:\n", { "tuitsDeleted": numDeleted });
+                debugHelper_1.default.printEnd("deleteTuit", "TuitController");
             }
             // modifying to work with tests in A3
             res.json({ "tuitsDeleted": numDeleted });

@@ -8,6 +8,7 @@ const LikeController_1 = require("./Likes/LikeController");
 const FollowController_1 = require("./Follows/FollowController");
 const BookmarkController_1 = require("./Bookmarks/BookmarkController");
 const MessagesController_1 = require("./Messages/MessagesController");
+//iter 1
 const app = express();
 const cors = require('cors');
 app.use(cors());
