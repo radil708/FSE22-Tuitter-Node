@@ -8,7 +8,7 @@ const ResponderSchema = new mongoose.Schema({
     },
     pollId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'UserModel'
+        ref: 'PollModel'
     }
-}, {collection: "Polls"});
+}, {collection: "Responder_to_Poll"});
 export default ResponderSchema;
