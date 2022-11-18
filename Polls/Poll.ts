@@ -75,7 +75,7 @@ export default class Poll {
   }
 
   /**
-   * @return {string} the answerOptionsCount
+   * @return {string} the total amount of responses to a poll
    */
   getTotalResponseCount() : number {
     return this.answerOptionsCount.reduce((accumulator, current) => {
