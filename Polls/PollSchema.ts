@@ -7,7 +7,7 @@ import mongoose from "mongoose";
  */
 const PollSchema = new mongoose.Schema({
   question: {type: String, required: true},
-  options: {type: Array<String>},
+  options: {type: Array<string>},
   optionCount: {type: Array<number>},
   author: {
     type: mongoose.Schema.Types.ObjectId,
