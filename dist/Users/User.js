@@ -82,6 +82,9 @@ class User {
         }
         return retVal;
     }
+    setPassword(passwordIn) {
+        this.password = passwordIn;
+    }
 }
 exports.default = User;
 //# sourceMappingURL=User.js.map

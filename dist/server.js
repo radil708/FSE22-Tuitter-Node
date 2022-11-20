@@ -8,6 +8,7 @@ const LikeController_1 = require("./Likes/LikeController");
 const FollowController_1 = require("./Follows/FollowController");
 const BookmarkController_1 = require("./Bookmarks/BookmarkController");
 const MessagesController_1 = require("./Messages/MessagesController");
+const auth_controller_1 = require("./auth-controller");
 const app = express();
 const cors = require('cors');
 app.use(cors());
@@ -54,10 +55,14 @@ let sess = {
     }
 };
 //TODO ask how do I know if I am in production environment or not?
+// set environment var for local testing
+// i.e. export ENV=PRODUCTION, or for aws  eb setenv ENV=PRODUCTION
 if (process.env.ENV === 'PRODUCTION') {
     app.set('trust proxy', 1); // trust first proxy
     sess.cookie.secure = true; // serve secure cookies
 }
+app.use(session(sess));
+const authenticationController = new auth_controller_1.default(app);
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 //# sourceMappingURL=server.js.map

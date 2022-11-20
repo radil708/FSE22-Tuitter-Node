@@ -8,6 +8,7 @@ import LikeController from "./Likes/LikeController";
 import FollowController from "./Follows/FollowController";
 import BookmarkController from "./Bookmarks/BookmarkController";
 import MessagesController from "./Messages/MessagesController";
+import AuthenticationController from "./auth-controller";
 
 const app = express();
 const cors = require('cors');
@@ -69,10 +70,16 @@ let sess = {
 }
 //TODO ask how do I know if I am in production environment or not?
 
+// set environment var for local testing
+// i.e. export ENV=PRODUCTION, or for aws  eb setenv ENV=PRODUCTION
 if (process.env.ENV === 'PRODUCTION') {
     app.set('trust proxy', 1) // trust first proxy
     sess.cookie.secure = true // serve secure cookies
 }
+
+app.use(session(sess))
+
+const authenticationController = new AuthenticationController(app)
 
 
 

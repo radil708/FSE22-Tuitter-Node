@@ -93,5 +93,9 @@ export default class User {
         return retVal;
     }
 
+    setPassword(passwordIn: string): void {
+        this.password = passwordIn
+    }
+
 }
 
