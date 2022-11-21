@@ -5,6 +5,7 @@ import Tuit from "./Tuit";
 import User from "../Users/User";
 import UserDao from "../Users/UserDao";
 import debugHelper from "../debugHelper";
+const session = require("express-session");
 
 
 //IMPORTANT LEARNIN NOTE, MAKE THESE FUNCTIONS ASYNC BECAUSE
@@ -34,6 +35,94 @@ export default class TuitController implements TuitControllerInterface {
         this.app.delete('/api/tuits/:tid', this.deleteTuit) // delete a tuit
         this.app.post('/api/users/:uid/tuits', this.createTuit) // create a new tuit
         this.app.get('/api/users/:uid/tuits',this.findTuitsByUser) // find tuits by a specific user
+
+        //for A4
+        this.app.post('/api/auth/tuits/users/:uid', this.createTuitByUserAuth)
+        this.app.get('/api/auth/tuits/users/:uid', this.findTuitsByUserAuth)
+    }
+
+    async findTuitsByUserAuth(req: Request, res: Response) {
+        const tuitdao = TuitDao.getInstance();
+        let serverResponse
+        let anyMatchingUsers = false
+
+        let userId = req.params.uid === "me"
+        && session['profile'] ?
+            session['profile']._id :
+            req.params.uid;
+
+
+        try{
+            serverResponse = await tuitdao.findTuitsByUser(userId)
+            anyMatchingUsers = true
+        }
+        catch (BSONTypeError) {
+            serverResponse = "No users with id: " + userId + " exist in the database"
+        }
+
+        if (anyMatchingUsers == false) {
+            res.json()
+        }
+        else {
+            res.json(serverResponse)
+        }
+
+
+    }
+
+    async createTuitByUserAuth(req: Request, res: Response) {
+        let tuitedById = req.params.uid === "me"
+        && session['profile'] ?
+            session['profile']._id :
+            req.params.uid;
+
+        const tuitContent = req.body.tuit;
+        let tuitPostedDate = req.body.postedOn
+        let userIdExists = false;
+
+        // create a new date if no data passed in the request body
+        if (tuitPostedDate == '' || tuitPostedDate == null) {
+            tuitPostedDate = new Date();
+        }
+
+        // BSON error may occur here, if userid passed is incorrect format
+        try {
+            userIdExists = await UserDao.getInstance().doesUserIdExist(tuitedById)
+        }
+        catch (BSONTypeError) {
+            let msg = "Format is incorrect for uid\n" + "uid must be a string of 12 bytes or a string of 24 hex characters or an integer"
+            const errorMsg = {"Error": msg}
+            res.json(errorMsg)
+            return
+        }
+
+        let controllerResp;
+        let userWhoTuited;
+
+        // if tuit property is empty send error
+        if (tuitContent == '' || tuitContent == null) {
+            controllerResp = "tuit property cannot be empty string or null"
+            controllerResp += "\nPlease enter some value into tuit property"
+            controllerResp = {"Error": controllerResp}
+        }
+        //user id is not in database
+        else if (userIdExists == false) {
+            let msg = "There are no users with id: " + tuitedById.toString() + " in the database"
+            controllerResp = {"Error":msg}
+        }
+        else {
+            userWhoTuited = await UserDao.getInstance().findUserById(tuitedById)
+            const clientTuit = new Tuit(
+                '',
+                tuitContent,
+                tuitPostedDate,
+                userWhoTuited
+            )
+            controllerResp = await TuitDao.getInstance().createTuit(clientTuit)
+        }
+
+        res.json(controllerResp)
+
 
     }
 
