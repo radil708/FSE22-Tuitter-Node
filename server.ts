@@ -12,7 +12,7 @@ import AuthenticationController from "./auth-controller";
 
 const app = express();
 const cors = require('cors');
-app.use(cors({credentials: true}));
+app.use(cors({credentials: true, 'origin': '*'}));
 const mongoose = require('mongoose');
 
 app.use(express.json());

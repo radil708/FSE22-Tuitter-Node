@@ -37,8 +37,8 @@ export default class TuitController implements TuitControllerInterface {
         this.app.get('/api/users/:uid/tuits',this.findTuitsByUser) // find tuits by a specific user
 
         //for A4
-        this.app.post('/api/auth/tuits/users/:uid', this.createTuitByUserAuth)
-        this.app.get('/api/auth/tuits/users/:uid', this.findTuitsByUserAuth)
+        this.app.post('/api/auth/users/:uid/tuits', this.createTuitByUserAuth)
+        this.app.get('/api/auth/users/:uid/tuits', this.findTuitsByUserAuth)
     }
 
     async findTuitsByUserAuth(req: Request, res: Response) {

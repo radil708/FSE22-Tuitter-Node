@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const UserDao_1 = require("./Users/UserDao");
+const debugHelper_1 = require("./debugHelper");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const session = require('express-session');
-//import session from 'express-session';
 class AuthenticationController {
     constructor(appIn) {
         this.userDao = UserDao_1.default.getInstance();
@@ -26,94 +26,144 @@ class AuthenticationController {
     }
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            //set to true to see debug statements
+            let printDebug;
+            printDebug = true;
+            let sendError = false;
+            let error;
             const uDao = UserDao_1.default.getInstance();
             const user = req.body;
             const username = user.username;
             const password = user.password;
             // if properties not available send error message
             if (username == null || password == null) {
-                res.json({ "Error": "Missing username or password property" });
-                return;
+                sendError = true;
+                error = { "Error": "Missing username or password property" };
             }
-            //see if username already taken
-            const doesUserAlreadyExist = yield uDao.userNameAlreadyTaken(username);
-            console.log(req.body);
-            console.log(doesUserAlreadyExist);
-            //if user does not exist send error
-            if (doesUserAlreadyExist == false) {
-                console.log("user does not exist");
+            //set up some variables
+            let doesUserAlreadyExist;
+            let existingUser;
+            let match;
+            // no error so fat
+            if (sendError == false) {
+                //see if username already taken
+                doesUserAlreadyExist = yield uDao.userNameAlreadyTaken(username);
+                //if user does not exist send error
+                if (doesUserAlreadyExist == false) {
+                    sendError = true;
+                    error = { "Error": "user with username " + username + " does not exist" };
+                }
+                // if user does exist
+                else {
+                    //find user entry in database
+                    existingUser = yield uDao.findUserbyUserName(username);
+                    // compare encrypted passwords
+                    match = yield bcrypt.compare(password, existingUser.getPassword());
+                    //found profile with matching password
+                    if (match == true) {
+                        existingUser.setPassword("*******");
+                        req.session['profile'] = existingUser;
+                    }
+                }
+            }
+            //print debug here
+            if (sendError == true) {
                 res.sendStatus(403);
-                return;
             }
-            const existingUser = yield uDao.findUserbyUserName(username);
-            console.log(existingUser);
-            const match = yield bcrypt.compare(password, existingUser.getPassword());
-            console.log("what is match? -> ", match);
-            if (match) {
-                existingUser.setPassword("*******");
-                session['profile'] = existingUser;
+            else if (match == true && existingUser != null) {
                 res.json(existingUser);
-                return;
             }
             else {
-                res.sendStatus(403);
+                throw EvalError("Something went wrong line 78 auth-controller");
+            }
+            if (printDebug == true) {
+                console.log("Request Body -> ", req.body);
+                console.log("Send status of response = ", res.statusCode);
+                console.log("Status message of response -> ", res.statusMessage);
+                let resp;
+                if (sendError) {
+                    resp = error;
+                }
+                else {
+                    resp = existingUser;
+                }
+                console.log("Response sent -> ", resp);
+                console.log("Session info -> ", req.session);
+                debugHelper_1.default.printEnd('login', 'AuthenticationController');
             }
         });
     }
     profile(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const profile = session['profile'];
-            if (profile) {
-                profile.password = "";
-                res.json(profile);
-                return;
-            }
-            else {
-                res.sendStatus(403);
-            }
-        });
+        const profile = req.session['profile'];
+        if (profile) {
+            profile.password = "";
+            res.json(profile);
+            return;
+        }
+        else {
+            res.sendStatus(403);
+        }
     }
     logout(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            session['profile'] = null;
+            let printDebug;
+            printDebug = true;
+            req.session.destroy(function (err) {
+                console.log("Destroyed session/called logout method"); // TODO this method needed a function not sure why, ask
+            });
             res.sendStatus(200);
+            if (printDebug == true) {
+                console.log("Session info after callinng desroy -> ", req.session);
+                debugHelper_1.default.printEnd('logout', 'AuthenticationController');
+            }
         });
     }
     signUp(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            let printDebug;
+            //printDebug = true; // uncomment this line to see debug statements
             const uDao = UserDao_1.default.getInstance();
             // username and password must be in request body
             let wholeRequest = req.body;
             const usernameReg = req.body.username;
             const passwordReg = req.body.password;
+            let sendError = false;
+            let error;
             // if properties not available send error message
             if (usernameReg == null || passwordReg == null) {
-                res.json({ "Error": "Missing username or password property" });
-                return;
+                error = { "Error": "Missing username or password property" };
+                sendError = true;
             }
-            const hash = yield bcrypt.hash(passwordReg, saltRounds);
-            //change the password property
-            wholeRequest.password = hash;
-            //TODO delete, but first see what hash does
-            console.log(wholeRequest);
-            //see if username already taken
-            const doesUserAlreadyExist = yield uDao.userNameAlreadyTaken(usernameReg);
-            // if user already exists then send error status
-            if (doesUserAlreadyExist == true) {
-                res.sendStatus(403); //forbidden status
-                return;
+            let hash;
+            if (sendError == false) {
+                hash = yield bcrypt.hash(passwordReg, saltRounds);
+                wholeRequest.password = hash;
+                //see if username already taken
+                const doesUserAlreadyExist = yield uDao.userNameAlreadyTaken(usernameReg);
+                if (doesUserAlreadyExist == true) {
+                    error = { "Error": "User already exists, cannot register a new user with the same username" };
+                    sendError = true;
+                }
             }
-            else {
-                // returns a User object
-                const insertedUser = yield uDao.createUser(wholeRequest);
-                //obscure/hide password
+            let insertedUser;
+            if (sendError == false) {
+                insertedUser = yield uDao.createUser(wholeRequest);
                 insertedUser.setPassword('');
                 //not sure what this is doing// may be ok since app uses sesssion at server
-                session['profile'] = insertedUser;
-                //TODO delete
-                console.log(session['profile']);
-                console.log(session);
+                req.session['profile'] = insertedUser;
+            }
+            if (sendError == true) {
+                res.sendStatus(403);
+            }
+            else {
                 res.json(insertedUser);
+            }
+            if (printDebug == true) {
+                console.log("Request body -> ", req.body);
+                console.log("Request after encryption -> ", wholeRequest);
+                console.log("Response status code -> ", res.statusCode);
+                console.log("Response data payload -> ", insertedUser);
+                debugHelper_1.default.printEnd('signup', 'AuthenticationController');
             }
         });
     }
