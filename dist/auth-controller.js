@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const UserDao_1 = require("./Users/UserDao");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const session = require("express-session");
+const session = require('express-session');
 //import session from 'express-session';
 class AuthenticationController {
     constructor(appIn) {
@@ -22,6 +22,43 @@ class AuthenticationController {
         this.app.post('/api/auth/signup', this.signUp);
         this.app.post('/api/auth/profile', this.profile);
         this.app.post('/api/auth/logout', this.logout);
+        this.app.post('/api/auth/login', this.login);
+    }
+    login(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const uDao = UserDao_1.default.getInstance();
+            const user = req.body;
+            const username = user.username;
+            const password = user.password;
+            // if properties not available send error message
+            if (username == null || password == null) {
+                res.json({ "Error": "Missing username or password property" });
+                return;
+            }
+            //see if username already taken
+            const doesUserAlreadyExist = yield uDao.userNameAlreadyTaken(username);
+            console.log(req.body);
+            console.log(doesUserAlreadyExist);
+            //if user does not exist send error
+            if (doesUserAlreadyExist == false) {
+                console.log("user does not exist");
+                res.sendStatus(403);
+                return;
+            }
+            const existingUser = yield uDao.findUserbyUserName(username);
+            console.log(existingUser);
+            const match = yield bcrypt.compare(password, existingUser.getPassword());
+            console.log("what is match? -> ", match);
+            if (match) {
+                existingUser.setPassword("*******");
+                session['profile'] = existingUser;
+                res.json(existingUser);
+                return;
+            }
+            else {
+                res.sendStatus(403);
+            }
+        });
     }
     profile(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,6 +66,7 @@ class AuthenticationController {
             if (profile) {
                 profile.password = "";
                 res.json(profile);
+                return;
             }
             else {
                 res.sendStatus(403);
@@ -37,7 +75,7 @@ class AuthenticationController {
     }
     logout(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            session.destroy();
+            session['profile'] = null;
             res.sendStatus(200);
         });
     }
@@ -71,10 +109,10 @@ class AuthenticationController {
                 //obscure/hide password
                 insertedUser.setPassword('');
                 //not sure what this is doing// may be ok since app uses sesssion at server
-                req.session['profile'] = insertedUser;
+                session['profile'] = insertedUser;
                 //TODO delete
-                //console.log(session['profile'])
-                //console.log(session)
+                console.log(session['profile']);
+                console.log(session);
                 res.json(insertedUser);
             }
         });

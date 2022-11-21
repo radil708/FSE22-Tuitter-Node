@@ -215,7 +215,8 @@ export default class UserDao implements UserDaoInterface {
             daoResp = null;
         }
         else {
-            daoResp = this.converter.convertToUser(userFromDb,false,true)
+            // had to set my set password var to true for A4
+            daoResp = this.converter.convertToUser(userFromDb,true,true)
         }
 
         //set to true to turn on debug statements

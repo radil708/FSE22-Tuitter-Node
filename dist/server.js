@@ -11,7 +11,7 @@ const MessagesController_1 = require("./Messages/MessagesController");
 const auth_controller_1 = require("./auth-controller");
 const app = express();
 const cors = require('cors');
-app.use(cors());
+app.use(cors({ credentials: true }));
 const mongoose = require('mongoose');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -39,13 +39,6 @@ function defaultPage(req, res) {
 }
 app.get('/', defaultPage);
 UserDao_1.default.getInstance();
-/*************    Connect app to custom api via controllers    *****************/
-const userController = new UserController_1.default(app);
-const tuitConroller = new TuitController_1.default(app);
-const likeControoler = new LikeController_1.default(app);
-const followController = new FollowController_1.default(app);
-const bookmarkController = new BookmarkController_1.default(app);
-const messageController = new MessagesController_1.default(app);
 /************* A4 Setting up Security *************************/
 const session = require("express-session");
 let sess = {
@@ -63,6 +56,13 @@ if (process.env.ENV === 'PRODUCTION') {
 }
 app.use(session(sess));
 const authenticationController = new auth_controller_1.default(app);
+/*************    A2 Connect app to custom api via controllers    *****************/
+const userController = new UserController_1.default(app);
+const tuitConroller = new TuitController_1.default(app);
+const likeControoler = new LikeController_1.default(app);
+const followController = new FollowController_1.default(app);
+const bookmarkController = new BookmarkController_1.default(app);
+const messageController = new MessagesController_1.default(app);
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 //# sourceMappingURL=server.js.map

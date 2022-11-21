@@ -12,7 +12,7 @@ import AuthenticationController from "./auth-controller";
 
 const app = express();
 const cors = require('cors');
-app.use(cors());
+app.use(cors({credentials: true}));
 const mongoose = require('mongoose');
 
 app.use(express.json());
@@ -52,13 +52,6 @@ app.get('/',defaultPage)
 
 UserDao.getInstance();
 
-/*************    Connect app to custom api via controllers    *****************/
-const userController = new UserController(app);
-const tuitConroller = new TuitController(app);
-const likeControoler = new LikeController(app);
-const followController = new FollowController(app);
-const bookmarkController = new BookmarkController(app);
-const messageController = new MessagesController(app);
 
 /************* A4 Setting up Security *************************/
 const session = require("express-session");
@@ -80,6 +73,14 @@ if (process.env.ENV === 'PRODUCTION') {
 app.use(session(sess))
 
 const authenticationController = new AuthenticationController(app)
+
+/*************    A2 Connect app to custom api via controllers    *****************/
+const userController = new UserController(app);
+const tuitConroller = new TuitController(app);
+const likeControoler = new LikeController(app);
+const followController = new FollowController(app);
+const bookmarkController = new BookmarkController(app);
+const messageController = new MessagesController(app);
 
 
 

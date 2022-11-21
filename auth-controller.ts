@@ -2,7 +2,7 @@ import {Express, Request, Response} from "express";
 import UserDao from "./Users/UserDao";
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const session = require("express-session");
+const session = require('express-session')
 //import session from 'express-session';
 
 export default class AuthenticationController {
@@ -15,6 +15,51 @@ export default class AuthenticationController {
         this.app.post('/api/auth/signup', this.signUp)
         this.app.post('/api/auth/profile', this.profile)
         this.app.post('/api/auth/logout', this.logout)
+        this.app.post('/api/auth/login', this.login)
+    }
+
+    async login(req: Request, res: Response) {
+        const uDao = UserDao.getInstance()
+        const user = req.body;
+        const username = user.username;
+        const password = user.password;
+
+        // if properties not available send error message
+        if (username == null || password == null) {
+            res.json({"Error":"Missing username or password property"})
+            return
+        }
+
+        //see if username already taken
+        const doesUserAlreadyExist = await uDao.userNameAlreadyTaken(username)
+
+        console.log(req.body)
+        console.log(doesUserAlreadyExist)
+
+        //if user does not exist send error
+        if (doesUserAlreadyExist == false) {
+            console.log("user does not exist")
+            res.sendStatus(403)
+            return
+        }
+
+        const existingUser = await uDao.findUserbyUserName(username)
+        console.log(existingUser)
+
+        const match = await bcrypt.compare(password, existingUser.getPassword())
+        console.log("what is match? -> ", match)
+
+        if (match) {
+
+            existingUser.setPassword("*******")
+            session['profile'] = existingUser;
+            res.json(existingUser)
+            return
+        }
+        else {
+            res.sendStatus(403);
+        }
+
     }
 
     async profile(req: Request, res: Response) {
@@ -22,6 +67,7 @@ export default class AuthenticationController {
         if (profile) {
             profile.password = "";
             res.json(profile);
+            return
         }
         else {
             res.sendStatus(403);
@@ -30,7 +76,7 @@ export default class AuthenticationController {
     }
 
     async logout(req: Request, res: Response) {
-        session.destroy();
+        session['profile'] = null;
         res.sendStatus(200)
     }
 
@@ -69,11 +115,11 @@ export default class AuthenticationController {
             insertedUser.setPassword('');
 
             //not sure what this is doing// may be ok since app uses sesssion at server
-            req.session['profile'] = insertedUser;
+            session['profile'] = insertedUser;
 
             //TODO delete
-            //console.log(session['profile'])
-            //console.log(session)
+            console.log(session['profile'])
+            console.log(session)
 
             res.json(insertedUser);
 
