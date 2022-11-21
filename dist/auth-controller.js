@@ -13,7 +13,6 @@ const UserDao_1 = require("./Users/UserDao");
 const debugHelper_1 = require("./debugHelper");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const session = require('express-session');
 class AuthenticationController {
     constructor(appIn) {
         this.userDao = UserDao_1.default.getInstance();
@@ -28,7 +27,7 @@ class AuthenticationController {
         return __awaiter(this, void 0, void 0, function* () {
             //set to true to see debug statements
             let printDebug;
-            printDebug = true;
+            //printDebug = true;
             let sendError = false;
             let error;
             const uDao = UserDao_1.default.getInstance();
@@ -66,7 +65,6 @@ class AuthenticationController {
                     }
                 }
             }
-            //print debug here
             if (sendError == true) {
                 res.sendStatus(403);
             }
@@ -74,7 +72,7 @@ class AuthenticationController {
                 res.json(existingUser);
             }
             else {
-                throw EvalError("Something went wrong line 78 auth-controller");
+                throw EvalError("Something went wrong line 80 auth-controller");
             }
             if (printDebug == true) {
                 console.log("Request Body -> ", req.body);
@@ -95,7 +93,7 @@ class AuthenticationController {
     }
     profile(req, res) {
         const profile = req.session['profile'];
-        if (profile) {
+        if (profile != undefined) {
             profile.password = "";
             res.json(profile);
             return;
