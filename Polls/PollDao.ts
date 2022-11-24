@@ -1,6 +1,7 @@
 import Poll from "./Poll";
 import PollModel from "./PollModel";
 import pollModel from "./PollModel";
+import {MongoToClassConverter} from "../MongoToClassConverter";
 
 export default class PollDao {
     // Singleton Pattern
@@ -26,6 +27,17 @@ export default class PollDao {
             optionCount: pollIn.getAnswerOptionsCount(),
             author: pollIn.getPosterID()})
 
+        return dbResp;
+    }
+
+    /**
+     * Searches for an entry in the Polls collection
+     * with a matching id
+     * @param pollId {string} id of requested poll
+     */
+    async findPollById(pollId: string) {
+        const dbResp = await PollModel.findById(pollId);
+        const conv = new MongoToClassConverter();
         return dbResp;
     }
 

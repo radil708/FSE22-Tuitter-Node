@@ -3,6 +3,7 @@ import UserDao from "../Users/UserDao";
 import Poll from "./Poll";
 import PollDao from "./PollDao";
 import debugHelper from "../debugHelper";
+import {MongoToClassConverter} from "../MongoToClassConverter";
 
 export default class PollController {
     app: Express;
@@ -10,7 +11,9 @@ export default class PollController {
     public constructor(appIn: Express) {
         this.app = appIn;
 
-        this.app.post('/api/users/:uid/polls')
+        this.app.post('/api/users/:uid/polls', this.createPoll)
+        this.app.get('/api/polls/:pid', this.findPollById)
+
 
     }
 
@@ -79,7 +82,66 @@ export default class PollController {
             debugHelper.printEnd("createPoll", "PollController")
 
         }
+    }
 
+    async findPollById(req: Request, res: Response) {
+        let errorMsg;
+        const pollIdTarget = req.params.pid;
+        const conv = new MongoToClassConverter();
+        let dbResp
+
+        try {
+             dbResp = await PollDao.getInstance().findPollById(pollIdTarget)
+        }
+        catch (BSONTypeError) {
+            let msg = "Format is incorrect for uid\n" + "uid must be a string of 12 bytes or a string of 24 hex characters or an integer"
+            errorMsg = {"Error": msg}
+        }
+
+        let controllerResp;
+
+        if (errorMsg != null || dbResp == null) {
+            controllerResp = null;
+        }
+        else if (errorMsg == null && dbResp != null) {
+            controllerResp = conv.convertToPoll(dbResp);
+        }
+
+        // no format error
+        if (errorMsg == null && dbResp != null) {
+            controllerResp = conv.convertToPoll(dbResp);
+            const author = controllerResp.getAuthor();
+            // abstract password
+            author.setPassword("*******")
+            controllerResp.setAuthor(author);
+        }
+        else if (errorMsg != null && dbResp)
+
+        if (dbResp == null) {
+            errorMsg = {"Error" : "poll with id " + pollIdTarget + " does not exist"}
+        }
+        else {
+            controllerResp = conv.convertToPoll(dbResp);
+        }
+
+        if (errorMsg != null) {
+            controllerResp = errorMsg
+        }
+
+        res.json(controllerResp);
+
+        let printDebug = false;
+
+        if (printDebug) {
+            if (errorMsg == null) {
+                console.log("No error message sent")
+            }
+            else {
+                console.log("Encountered Error")
+                console.log("Error msg sent -> ", errorMsg)
+            }
+            console.log()
+        }
 
     }
 

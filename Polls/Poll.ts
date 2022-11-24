@@ -48,10 +48,13 @@ export default class Poll {
   /**
    * @return {string} the Author's username (posterUserName)
    */
-  getAuthor() : string {
+  getAuthorUserName() : string {
     return this.poster.getUserName()
   }
 
+  getAuthor() : User {
+    return this.poster;
+  }
   /**
    * @return {string} the question
    */
@@ -80,6 +83,10 @@ export default class Poll {
     return this.answerOptionsCount.reduce((accumulator, current) => {
       return accumulator + current
     }, 0);
+  }
+
+  setAuthor(posterIn: User) : null {
+    this.poster = posterIn;
   }
 
 
