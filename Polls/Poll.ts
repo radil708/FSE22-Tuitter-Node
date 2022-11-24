@@ -6,7 +6,7 @@ import User from "../Users/User";
 
 export default class Poll {
   private pollID: string = '';
-  private poster: User = null;
+  private poster: User;
   private question: string = '';
   private answerOptions: string[];
   private answerOptionsCount: number[];
