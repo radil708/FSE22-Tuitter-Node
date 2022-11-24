@@ -15,8 +15,7 @@ export default class Poll {
   /**
    * Constructor for polls.
    * @param pollIDIn {string} unique ID of poll
-   * @param posterIDIn {string} unique ID of user who posted poll
-   * @param posterUserNameIn {string} username of poster
+   * @param posterIn {User} User who made the poll
    * @param questionIn {string} the text of the poll prompt
    * @param answerOptionsIn {string[]} array of response options to prompt
    * @param answerOptionsCountIn {number[]} array of tally of responses
