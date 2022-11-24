@@ -8,6 +8,7 @@ import Follow from "./Follows/Follow";
 import FollowDao from "./Follows/FollowDao";
 import Bookmark from "./Bookmarks/Bookmark";
 import Message from "./Messages/Message";
+import Poll from "./Polls/Poll";
 
 /**
  * In the newer version of MongoDB you need to map the MongoQueries to the object itself, so I made
@@ -134,6 +135,18 @@ export class MongoToClassConverter {
 
         const mResp = new Message(mId,content,senderUser,recipientUser,false)
         return mResp
+    }
+
+    convertToPoll(mongoRes): Poll {
+        const pId = mongoRes._id.toString();
+        const userId = mongoRes.author._id.toString()
+        const posterName = mongoRes.author.username.toString()
+        const pollQuestion = mongoRes.question.toString();
+        const pollAnswerOptionsArrStr = mongoRes.options
+        const pollAnswerCountArrNum = mongoRes.optionCount
+
+        const converted = new Poll(pId, userId, posterName, pollQuestion,pollAnswerOptionsArrStr,pollAnswerCountArrNum);
+        return converted;
     }
 
 
