@@ -18,15 +18,21 @@ export default class Poll {
    * @param posterIn {User} User who made the poll
    * @param questionIn {string} the text of the poll prompt
    * @param answerOptionsIn {string[]} array of response options to prompt
-   * @param answerOptionsCountIn {number[]} array of tally of responses
    */
   constructor(pollIDIn: string, posterIn: User, questionIn: string,
-              answerOptionsIn: string[], answerOptionsCountIn: number[]) {
+              answerOptionsIn: string[]) {
     this.pollID = pollIDIn;
     this.poster = posterIn;
     this.question = questionIn;
     this.answerOptions = answerOptionsIn;
-    this.answerOptionsCount = answerOptionsCountIn;
+
+    // make new associative array to answerOptions all values to 0
+    let arrAssociative = []
+
+    for (let i = 0; i < this.answerOptions.length; i++) {
+      arrAssociative.push(0)
+    }
+    this.answerOptionsCount = arrAssociative;
   }
 
 
@@ -85,8 +91,12 @@ export default class Poll {
     }, 0);
   }
 
-  setAuthor(posterIn: User) : null {
+  setAuthor(posterIn: User) {
     this.poster = posterIn;
+  }
+
+  incrementVote(optionsIndex: number) {
+    this.answerOptionsCount[optionsIndex] += 1;
   }
 
 

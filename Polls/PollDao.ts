@@ -35,10 +35,30 @@ export default class PollDao {
      * with a matching id
      * @param pollId {string} id of requested poll
      */
-    async findPollById(pollId: string) {
+    async findPollById(pollId: string): Promise<Poll> {
         const dbResp = await PollModel.findById(pollId);
         const conv = new MongoToClassConverter();
-        return dbResp;
+        return await conv.convertToPoll(dbResp);
+    }
+
+    /**
+     * Deletes an entry from the Polls collection with matching id
+     * @param pollId
+     */
+    async deletePollById(pollId: string): Promise<number> {
+        const dbResp = await PollModel.deleteOne({_id: pollId})
+        return dbResp.deletedCount;
+    }
+
+    async updateVote(pollIn: Poll) {
+        const targetPollID = pollIn.getPollID();
+        const updatedVoteCountArr = pollIn.getAnswerOptionsCount();
+        //update poll on database side by replace optionCount with updated Arr
+        await PollModel.findByIdAndUpdate(
+            targetPollID,
+            {optionCount: updatedVoteCountArr}
+        )
+        return await this.findPollById(targetPollID);
     }
 
 
