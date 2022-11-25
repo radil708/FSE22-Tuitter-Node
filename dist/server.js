@@ -8,6 +8,7 @@ const LikeController_1 = require("./Likes/LikeController");
 const FollowController_1 = require("./Follows/FollowController");
 const BookmarkController_1 = require("./Bookmarks/BookmarkController");
 const MessagesController_1 = require("./Messages/MessagesController");
+const PollController_1 = require("./Polls/PollController");
 //iter 1
 const app = express();
 const cors = require('cors');
@@ -16,6 +17,7 @@ const mongoose = require('mongoose');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 /*************    Connect To Remote MongoDB Database    *****************/
+//
 /*IMPORTANT** Make sure environment variable set up before running
 i.e. for aws elastic beanstalk deployment:
     eb setenv DB_CLUSTER_USERNAME=<username>
@@ -46,6 +48,8 @@ const likeControoler = new LikeController_1.default(app);
 const followController = new FollowController_1.default(app);
 const bookmarkController = new BookmarkController_1.default(app);
 const messageController = new MessagesController_1.default(app);
+/*************    Final Project Server code    *****************/
+const pollController = new PollController_1.default(app);
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
 //# sourceMappingURL=server.js.map

@@ -11,10 +11,11 @@ export default class PollController {
     public constructor(appIn: Express) {
         this.app = appIn;
 
-        this.app.post('/api/users/:uid/polls', this.createPoll) // make a new poll
+        this.app.post('/api/polls/users/:uid', this.createPoll) // make a new poll
         this.app.get('/api/polls/:pid', this.findPollById) // find a poll by id
         this.app.delete('/api/polls/:pid', this.deletePollById) // delete a poll by id
-        this.app.put('/api/polls/:pid/users/:uid', this.vote) // vote on a poll
+        this.app.put('/api/polls/vote/:pid/users/:uid', this.vote) // vote on a poll
+        this.app.put('/api/polls/unvote/:pid/users/:uid', this.unvote)
 
 
     }
@@ -351,7 +352,7 @@ export default class PollController {
         }
         //all checks pass
         else {
-            //TODO @Lauryn Responder_to_user DAO should add entry to collection here
+            //TODO @Lauryn Responder_to_user DAO should remove entry to collection here
             targetPoll.decrementVote(matchingResponseIndex);
             // updates the vote
             controllerResp = await PollDao.getInstance().updateVote(targetPoll)

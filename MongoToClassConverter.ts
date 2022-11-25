@@ -150,7 +150,7 @@ export class MongoToClassConverter {
         const pollAnswerOptionsArrStr = mongoRes.options
         const pollAnswerCountArrNum = mongoRes.optionCount
 
-        const converted = new Poll(pId, posterUserObj, pollQuestion, pollAnswerOptionsArrStr, pollAnswerCountArrNum);
+        const converted = new Poll(pId, posterUserObj, pollQuestion, pollAnswerOptionsArrStr);
         return converted;
     }
 
