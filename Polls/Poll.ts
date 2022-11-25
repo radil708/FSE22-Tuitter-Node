@@ -99,5 +99,9 @@ export default class Poll {
     this.answerOptionsCount[optionsIndex] += 1;
   }
 
+  decrementVote(optionsIndex: number) {
+    this.answerOptionsCount[optionsIndex] -= 1;
+  }
+
 
 }

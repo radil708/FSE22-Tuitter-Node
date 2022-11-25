@@ -2,6 +2,7 @@ import Poll from "./Poll";
 import PollModel from "./PollModel";
 import pollModel from "./PollModel";
 import {MongoToClassConverter} from "../MongoToClassConverter";
+import UserDao from "../Users/UserDao";
 
 export default class PollDao {
     // Singleton Pattern
@@ -39,6 +40,10 @@ export default class PollDao {
         const dbResp = await PollModel.findById(pollId);
         const conv = new MongoToClassConverter();
         return await conv.convertToPoll(dbResp);
+    }
+
+    async findPollsByAuthor(usernameIn: string) {
+        const pollArr = await PollModel.find({author : {username: usernameIn}}, {})
     }
 
     /**
