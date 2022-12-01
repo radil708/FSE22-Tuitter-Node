@@ -137,7 +137,24 @@ export class MongoToClassConverter {
     }
 
 
+    async convertToResponse(mongoRes): Promise<ResponseToPoll> {
+        // throw error is object passed in is null or empty
+        if (mongoRes == null) {
+            throw new TypeError("user passed in is null or undefined, cannot convert to User objet")
+        }
+        const tUserDao = UserDao.getInstance();
+        const content = mongoRes.content
+        const pollid = mongoRes["_id"].toString()
+        const responderId = mongoRes["responderId"]._id.toString()
+
+        const userResponded = await tUserDao.findUserById(responderId)
+        const pollCreater = await PollDao.findPollById(pollid)
 
 
+        const retResponse =  new ResponseToPoll(
+            content,pollid,responderId
+        )
 
+        return ResponseToPoll
+    }
 }
