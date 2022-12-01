@@ -2,10 +2,11 @@
  * This class represents a Poll.
  * A Poll has an id, a question, responses, and the user who posted
  */
+import User from "../Users/User";
+
 export default class Poll {
   private pollID: string = '';
-  private posterID: string = '';
-  private posterUserName: string = '';
+  private poster: User;
   private question: string = '';
   private answerOptions: string[];
   private answerOptionsCount: number[];
@@ -14,20 +15,24 @@ export default class Poll {
   /**
    * Constructor for polls.
    * @param pollIDIn {string} unique ID of poll
-   * @param posterIDIn {string} unique ID of user who posted poll
-   * @param posterUserNameIn {string} username of poster
+   * @param posterIn {User} User who made the poll
    * @param questionIn {string} the text of the poll prompt
    * @param answerOptionsIn {string[]} array of response options to prompt
-   * @param answerOptionsCountIn {number[]} array of tally of responses
    */
-  constructor(pollIDIn: string, posterIDIn : string, posterUserNameIn: string, questionIn: string,
-              answerOptionsIn: string[], answerOptionsCountIn: number[]) {
+  constructor(pollIDIn: string, posterIn: User, questionIn: string,
+              answerOptionsIn: string[]) {
     this.pollID = pollIDIn;
-    this.posterID = posterIDIn;
-    this.posterUserName = posterUserNameIn;
+    this.poster = posterIn;
     this.question = questionIn;
     this.answerOptions = answerOptionsIn;
-    this.answerOptionsCount = answerOptionsCountIn;
+
+    // make new associative array to answerOptions all values to 0
+    let arrAssociative = []
+
+    for (let i = 0; i < this.answerOptions.length; i++) {
+      arrAssociative.push(0)
+    }
+    this.answerOptionsCount = arrAssociative;
   }
 
 
@@ -43,16 +48,19 @@ export default class Poll {
    * @return {string} the posterID
    */
   getPosterID() : string {
-    return this.posterID;
+    return this.poster.getUserId()
   }
 
   /**
    * @return {string} the Author's username (posterUserName)
    */
-  getAuthor() : string {
-    return this.posterUserName;
+  getAuthorUserName() : string {
+    return this.poster.getUserName()
   }
 
+  getAuthor() : User {
+    return this.poster;
+  }
   /**
    * @return {string} the question
    */
@@ -81,6 +89,18 @@ export default class Poll {
     return this.answerOptionsCount.reduce((accumulator, current) => {
       return accumulator + current
     }, 0);
+  }
+
+  setAuthor(posterIn: User) {
+    this.poster = posterIn;
+  }
+
+  incrementVote(optionsIndex: number) {
+    this.answerOptionsCount[optionsIndex] += 1;
+  }
+
+  decrementVote(optionsIndex: number) {
+    this.answerOptionsCount[optionsIndex] -= 1;
   }
 
 
