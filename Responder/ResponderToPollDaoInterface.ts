@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import User from "../Users/User";
 import Poll from "../Polls/Poll";
+import ResponderToPoll from "./ResponderToPoll";
 
 export default interface ResponderToPollDaoInterface{
 

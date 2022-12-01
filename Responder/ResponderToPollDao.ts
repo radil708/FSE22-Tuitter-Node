@@ -5,6 +5,9 @@ import debugHelper from "../debugHelper";
 import PollModel from "../Polls/PollModel";
 import Poll from "../Polls/Poll";
 import User from "../Users/User";
+import ResponderToPoll from "./ResponderToPoll";
+import ResponderToPollModel from "./ResponderToPollModel";
+
 
 export default class ResponderToPollDao implements ResponderToPollDaoInterface {
     //Singleton Architecture
