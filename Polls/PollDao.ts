@@ -69,10 +69,6 @@ export default class PollDao {
         const targetPollID = pollIn.getPollID();
         const updatedVoteCountArr = pollIn.getAnswerOptionsCount();
 
-        //TODO delete
-        //console.log("updatedArr = ", updatedVoteCountArr)
-        //console.log("targetPollId ", targetPollID)
-
         //update poll on database side by replace optionCount with updated Arr
         await PollModel.findByIdAndUpdate(
             targetPollID,
@@ -82,8 +78,6 @@ export default class PollDao {
 
         const updated = await PollModel.findById(targetPollID)
 
-        //TODO delete
-        console.log("entry after update: ", updated)
 
         return updated;
     }

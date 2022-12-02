@@ -248,16 +248,11 @@ export default class PollController {
         }
         //all checks pass
         else {
-            //TODO delete
-            //TODO delete
-            console.log("current options count: ", targetPoll.getAnswerOptionsCount())
 
             //TODO @Lauryn Responder_to_user DAO should add entry to collection here
             targetPoll.incrementVote(matchingResponseIndex);
             // updates the vote
 
-            //todo delete
-            //console.log("after incrementation", targetPoll)
             controllerResp = await PollDao.getInstance().updateVote(targetPoll)
         }
 
@@ -302,10 +297,11 @@ export default class PollController {
 
         let targetPoll;
 
+
         // if format is correct check if poll id exists in database
         if (errorMsg == null) {
             // poll DOES exist in database
-            if (pollObjInstance == null) {
+            if (pollObjInstance != null) {
                 targetPoll = pollObjInstance;
                 doesPollExist = true
             }
@@ -313,6 +309,7 @@ export default class PollController {
             else {
                 errorMsg = {"Error" : "Poll with id " + targetPollId + " does NOT exist in database"}
             }
+
         }
 
         //****** CHECK USER ID FORMAT CORRECT AND USER EXISTS *******//
@@ -343,13 +340,14 @@ export default class PollController {
         let isResponseValid = false;
         let matchingResponseIndex;
         let arrValidAnswers;
+
         if (doesPollExist == true && doesUserExist == true) {
             // if response is not null or empty string check it's a response option
             if (clientAnswer != null && clientAnswer != "") {
                 arrValidAnswers = targetPoll.getAllOptions()
 
                 for (let i = 0; i < arrValidAnswers.length; i++) {
-                    if (arrValidAnswers[i].equals(clientAnswer)) {
+                    if (arrValidAnswers[i] == (clientAnswer)) {
                         isResponseValid = true;
                         matchingResponseIndex = i;
                         break;
@@ -362,6 +360,7 @@ export default class PollController {
             errorMsg = {"Error": "Response: " + clientAnswer + " is NOT a valid option, options are " + arrValidAnswers.toString() }
         }
 
+
         //******* MAKE RESPONSE BASED ON PAST 3 CHECKS ******** //
 
         let controllerResp;
@@ -372,9 +371,11 @@ export default class PollController {
         }
         //all checks pass
         else {
-            //TODO @Lauryn Responder_to_user DAO should remove entry to collection here
+
+            //TODO @Lauryn Responder_to_user DAO should add entry to collection here
             targetPoll.decrementVote(matchingResponseIndex);
             // updates the vote
+
             controllerResp = await PollDao.getInstance().updateVote(targetPoll)
         }
 
