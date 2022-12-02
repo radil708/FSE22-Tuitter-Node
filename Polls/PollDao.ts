@@ -18,15 +18,25 @@ export default class PollDao {
     }
 
     /**
+     * Get all poll entried
+     */
+    async findAll() {
+        const dbResp = await PollModel.find()
+        return dbResp;
+    }
+
+    /**
      * Adds an entry to the poll collection
      * @param pollIn
      */
     async createPoll(pollIn: Poll) {
+
         const dbResp = await PollModel.create({
             question: pollIn.getQuestion(),
             options: pollIn.getAllOptions(),
             optionCount: pollIn.getAnswerOptionsCount(),
-            author: pollIn.getPosterID()})
+            author: pollIn.getAuthor().getUserId()
+        })
 
         return dbResp;
     }
@@ -41,11 +51,11 @@ export default class PollDao {
         const conv = new MongoToClassConverter();
         return await conv.convertToPoll(dbResp);
     }
-
-    async findPollsByAuthor(usernameIn: string) {
-        const pollArr = await PollModel.find({author : {username: usernameIn}}, {})
-    }
-
+    //
+    // async findPollsByAuthor(usernameIn: string) {
+    //     const pollArr = await PollModel.find({author : {username: usernameIn}}, {})
+    // }
+    //
     /**
      * Deletes an entry from the Polls collection with matching id
      * @param pollId
@@ -58,12 +68,18 @@ export default class PollDao {
     async updateVote(pollIn: Poll) {
         const targetPollID = pollIn.getPollID();
         const updatedVoteCountArr = pollIn.getAnswerOptionsCount();
+
         //update poll on database side by replace optionCount with updated Arr
         await PollModel.findByIdAndUpdate(
             targetPollID,
-            {optionCount: updatedVoteCountArr}
+            {optionCount: updatedVoteCountArr},
+            {new: true}
         )
-        return await this.findPollById(targetPollID);
+
+        const updated = await PollModel.findById(targetPollID)
+
+
+        return updated;
     }
 
 
