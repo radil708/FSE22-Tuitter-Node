@@ -11,13 +11,20 @@ export default class PollController {
     public constructor(appIn: Express) {
         this.app = appIn;
 
+        this.app.get("/api/polls", this.findAllPolls) // get all poll entries
         this.app.post('/api/polls/users/:uid', this.createPoll) // make a new poll
         this.app.get('/api/polls/:pid', this.findPollById) // find a poll by id
         this.app.delete('/api/polls/:pid', this.deletePollById) // delete a poll by id
         this.app.put('/api/polls/vote/:pid/users/:uid', this.vote) // vote on a poll
-        this.app.put('/api/polls/unvote/:pid/users/:uid', this.unvote)
+        //this.app.put('/api/polls/unvote/:pid/users/:uid', this.unvote)
 
 
+    }
+
+    async findAllPolls(req: Request, res: Response) {
+        const pDao = PollDao.getInstance()
+        const all_polls = await pDao.findAll();
+        res.send(all_polls)
     }
 
     async createPoll(req: Request, res: Response) {
@@ -54,6 +61,7 @@ export default class PollController {
             if (errorMsg == null) {
                 const userProfile = await UserDao.getInstance().findUserById(userId)
                 const pollInstanceNew = new Poll('',userProfile,clientQuestion,clientQAnswerOptions);
+
                 dbResp = await PollDao.getInstance().createPoll(pollInstanceNew);
             }
             else {
@@ -92,7 +100,7 @@ export default class PollController {
         let dbResp
 
         try {
-            dbResp = await PollDao.getInstance().findPollById(pollIdTarget)
+             dbResp = await PollDao.getInstance().findPollById(pollIdTarget)
         }
         catch (BSONTypeError) {
             let msg = "Format is incorrect for pid\n" + "pid must be a string of 12 bytes or a string of 24 hex characters or an integer"
@@ -123,6 +131,7 @@ export default class PollController {
         let printDebug = false;
 
         if (printDebug) {
+            console.log("Queried poll id: ", pollIdTarget)
             if (errorMsg == null) {
                 console.log("No error message sent")
             }
@@ -165,10 +174,11 @@ export default class PollController {
 
         let targetPoll;
 
+
         // if format is correct check if poll id exists in database
         if (errorMsg == null) {
             // poll DOES exist in database
-            if (pollObjInstance == null) {
+            if (pollObjInstance != null) {
                 targetPoll = pollObjInstance;
                 doesPollExist = true
             }
@@ -176,6 +186,7 @@ export default class PollController {
             else {
                 errorMsg = {"Error" : "Poll with id " + targetPollId + " does NOT exist in database"}
             }
+
         }
 
         //****** CHECK USER ID FORMAT CORRECT AND USER EXISTS *******//
@@ -206,13 +217,14 @@ export default class PollController {
         let isResponseValid = false;
         let matchingResponseIndex;
         let arrValidAnswers;
+
         if (doesPollExist == true && doesUserExist == true) {
             // if response is not null or empty string check it's a response option
             if (clientAnswer != null && clientAnswer != "") {
                 arrValidAnswers = targetPoll.getAllOptions()
 
                 for (let i = 0; i < arrValidAnswers.length; i++) {
-                    if (arrValidAnswers[i].equals(clientAnswer)) {
+                    if (arrValidAnswers[i] == (clientAnswer)) {
                         isResponseValid = true;
                         matchingResponseIndex = i;
                         break;
@@ -225,6 +237,7 @@ export default class PollController {
             errorMsg = {"Error": "Response: " + clientAnswer + " is NOT a valid option, options are " + arrValidAnswers.toString() }
         }
 
+
         //******* MAKE RESPONSE BASED ON PAST 3 CHECKS ******** //
 
         let controllerResp;
@@ -235,9 +248,11 @@ export default class PollController {
         }
         //all checks pass
         else {
+
             //TODO @Lauryn Responder_to_user DAO should add entry to collection here
             targetPoll.incrementVote(matchingResponseIndex);
             // updates the vote
+
             controllerResp = await PollDao.getInstance().updateVote(targetPoll)
         }
 
@@ -282,10 +297,11 @@ export default class PollController {
 
         let targetPoll;
 
+
         // if format is correct check if poll id exists in database
         if (errorMsg == null) {
             // poll DOES exist in database
-            if (pollObjInstance == null) {
+            if (pollObjInstance != null) {
                 targetPoll = pollObjInstance;
                 doesPollExist = true
             }
@@ -293,6 +309,7 @@ export default class PollController {
             else {
                 errorMsg = {"Error" : "Poll with id " + targetPollId + " does NOT exist in database"}
             }
+
         }
 
         //****** CHECK USER ID FORMAT CORRECT AND USER EXISTS *******//
@@ -323,13 +340,14 @@ export default class PollController {
         let isResponseValid = false;
         let matchingResponseIndex;
         let arrValidAnswers;
+
         if (doesPollExist == true && doesUserExist == true) {
             // if response is not null or empty string check it's a response option
             if (clientAnswer != null && clientAnswer != "") {
                 arrValidAnswers = targetPoll.getAllOptions()
 
                 for (let i = 0; i < arrValidAnswers.length; i++) {
-                    if (arrValidAnswers[i].equals(clientAnswer)) {
+                    if (arrValidAnswers[i] == (clientAnswer)) {
                         isResponseValid = true;
                         matchingResponseIndex = i;
                         break;
@@ -342,6 +360,7 @@ export default class PollController {
             errorMsg = {"Error": "Response: " + clientAnswer + " is NOT a valid option, options are " + arrValidAnswers.toString() }
         }
 
+
         //******* MAKE RESPONSE BASED ON PAST 3 CHECKS ******** //
 
         let controllerResp;
@@ -352,9 +371,11 @@ export default class PollController {
         }
         //all checks pass
         else {
-            //TODO @Lauryn Responder_to_user DAO should remove entry to collection here
+
+            //TODO @Lauryn Responder_to_user DAO should add entry to collection here
             targetPoll.decrementVote(matchingResponseIndex);
             // updates the vote
+
             controllerResp = await PollDao.getInstance().updateVote(targetPoll)
         }
 
