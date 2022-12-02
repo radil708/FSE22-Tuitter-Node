@@ -138,23 +138,6 @@ export class MongoToClassConverter {
         return mResp
     }
 
-    async convertToPoll(mongoRes): Promise<Poll> {
-        const uDao = UserDao.getInstance();
-        const pId = mongoRes._id.toString();
-        // get the id of the user who posted the poll
-        const userId = mongoRes.author._id.toString()
-
-        // use the user ID to get a User object
-        const posterUserObj: User = await uDao.findUserById(userId);
-
-        const pollQuestion = mongoRes.question.toString();
-        const pollAnswerOptionsArrStr = mongoRes.options
-        const pollAnswerCountArrNum = mongoRes.optionCount
-
-        const converted = new Poll(pId, posterUserObj, pollQuestion, pollAnswerOptionsArrStr);
-        return converted;
-    }
-
 
     async convertToResponse(mongoRes): Promise<ResponseToPoll> {
         // throw error is object passed in is null or empty
@@ -176,5 +159,27 @@ export class MongoToClassConverter {
         )
 
         return ResponseToPoll
+    }
+    
+    async convertToPoll(mongoRes): Promise<Poll> {
+        const uDao = UserDao.getInstance();
+        const pId = mongoRes._id.toString();
+        // get the id of the user who posted the poll
+        const userId = mongoRes.author._id.toString()
+
+        // use the user ID to get a User object
+        const posterUserObj: User = await uDao.findUserById(userId);
+
+        const pollQuestion = mongoRes.question.toString();
+        const pollAnswerOptionsArrStr = mongoRes.options
+        const pollAnswerCountArrNum = mongoRes.optionCount
+
+        const converted = new Poll(pId, posterUserObj, pollQuestion, pollAnswerOptionsArrStr);
+
+        if (pId != '') {
+            converted.setOptionsCount(pollAnswerCountArrNum)
+        }
+
+        return converted;
     }
 }
