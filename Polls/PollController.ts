@@ -399,9 +399,4 @@ export default class PollController {
     async findPollsByAuthor(req: Request, res: Response) {
 
     }
-
-
-
-
-
 }
