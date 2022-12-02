@@ -8,6 +8,7 @@ import Follow from "./Follows/Follow";
 import FollowDao from "./Follows/FollowDao";
 import Bookmark from "./Bookmarks/Bookmark";
 import Message from "./Messages/Message";
+import PollDao from "./Polls/PollDao";
 import Poll from "./Polls/Poll";
 
 /**
@@ -137,6 +138,29 @@ export class MongoToClassConverter {
         return mResp
     }
 
+
+    async convertToResponse(mongoRes): Promise<ResponseToPoll> {
+        // throw error is object passed in is null or empty
+        if (mongoRes == null) {
+            throw new TypeError("user passed in is null or undefined, cannot convert to User objet")
+        }
+        const tUserDao = UserDao.getInstance();
+        const pDao = PollDao.getInstance();
+        const content = mongoRes.content
+        const pollid = mongoRes["_id"].toString()
+        const responderId = mongoRes["responderId"]._id.toString()
+
+        const userResponded = await tUserDao.findUserById(responderId)
+        const pollCreater = await pDao.findPollById(pollid)
+
+
+        const retResponse =  new ResponseToPoll(
+            content,pollid,responderId
+        )
+
+        return ResponseToPoll
+    }
+    
     async convertToPoll(mongoRes): Promise<Poll> {
         const uDao = UserDao.getInstance();
         const pId = mongoRes._id.toString();
@@ -158,9 +182,4 @@ export class MongoToClassConverter {
 
         return converted;
     }
-
-
-
-
-
 }
