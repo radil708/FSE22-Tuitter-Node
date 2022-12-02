@@ -8,6 +8,7 @@ import LikeController from "./Likes/LikeController";
 import FollowController from "./Follows/FollowController";
 import BookmarkController from "./Bookmarks/BookmarkController";
 import MessagesController from "./Messages/MessagesController";
+import PollController from "./Polls/PollController";
 
 //iter 1
 
@@ -61,6 +62,8 @@ const followController = new FollowController(app);
 const bookmarkController = new BookmarkController(app);
 const messageController = new MessagesController(app);
 
+/*************    Final Project Server code    *****************/
+const pollController = new PollController(app)
 
 const PORT = 4000;
 app.listen(process.env.PORT || PORT);
