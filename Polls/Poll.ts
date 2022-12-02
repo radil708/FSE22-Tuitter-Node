@@ -36,6 +36,13 @@ export default class Poll {
   }
 
 
+  getOptionsCount(): number[] {
+    return this.answerOptionsCount;
+  }
+
+  setOptionsCount(o : number[]): void {
+    this.answerOptionsCount = o;
+  }
 
   /**
    * @return {string} the pollID

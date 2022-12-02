@@ -121,6 +121,9 @@ class MongoToClassConverter {
             const pollAnswerOptionsArrStr = mongoRes.options;
             const pollAnswerCountArrNum = mongoRes.optionCount;
             const converted = new Poll_1.default(pId, posterUserObj, pollQuestion, pollAnswerOptionsArrStr);
+            if (pId != '') {
+                converted.setOptionsCount(pollAnswerCountArrNum);
+            }
             return converted;
         });
     }
