@@ -220,14 +220,9 @@ class PollController {
             }
             //all checks pass
             else {
-                //TODO delete
-                //TODO delete
-                console.log("current options count: ", targetPoll.getAnswerOptionsCount());
                 //TODO @Lauryn Responder_to_user DAO should add entry to collection here
                 targetPoll.incrementVote(matchingResponseIndex);
                 // updates the vote
-                //todo delete
-                //console.log("after incrementation", targetPoll)
                 controllerResp = yield PollDao_1.default.getInstance().updateVote(targetPoll);
             }
             res.json(controllerResp);
@@ -269,7 +264,7 @@ class PollController {
             // if format is correct check if poll id exists in database
             if (errorMsg == null) {
                 // poll DOES exist in database
-                if (pollObjInstance == null) {
+                if (pollObjInstance != null) {
                     targetPoll = pollObjInstance;
                     doesPollExist = true;
                 }
@@ -308,7 +303,7 @@ class PollController {
                 if (clientAnswer != null && clientAnswer != "") {
                     arrValidAnswers = targetPoll.getAllOptions();
                     for (let i = 0; i < arrValidAnswers.length; i++) {
-                        if (arrValidAnswers[i].equals(clientAnswer)) {
+                        if (arrValidAnswers[i] == (clientAnswer)) {
                             isResponseValid = true;
                             matchingResponseIndex = i;
                             break;
@@ -327,7 +322,7 @@ class PollController {
             }
             //all checks pass
             else {
-                //TODO @Lauryn Responder_to_user DAO should remove entry to collection here
+                //TODO @Lauryn Responder_to_user DAO should add entry to collection here
                 targetPoll.decrementVote(matchingResponseIndex);
                 // updates the vote
                 controllerResp = yield PollDao_1.default.getInstance().updateVote(targetPoll);

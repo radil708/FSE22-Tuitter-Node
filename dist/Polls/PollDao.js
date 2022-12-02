@@ -74,14 +74,9 @@ class PollDao {
         return __awaiter(this, void 0, void 0, function* () {
             const targetPollID = pollIn.getPollID();
             const updatedVoteCountArr = pollIn.getAnswerOptionsCount();
-            //TODO delete
-            //console.log("updatedArr = ", updatedVoteCountArr)
-            //console.log("targetPollId ", targetPollID)
             //update poll on database side by replace optionCount with updated Arr
             yield PollModel_1.default.findByIdAndUpdate(targetPollID, { optionCount: updatedVoteCountArr }, { new: true });
             const updated = yield PollModel_1.default.findById(targetPollID);
-            //TODO delete
-            console.log("entry after update: ", updated);
             return updated;
         });
     }

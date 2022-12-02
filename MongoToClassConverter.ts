@@ -10,6 +10,7 @@ import Bookmark from "./Bookmarks/Bookmark";
 import Message from "./Messages/Message";
 import PollDao from "./Polls/PollDao";
 import Poll from "./Polls/Poll";
+import ResponderToPoll from "./Responder/ResponderToPoll";
 
 /**
  * In the newer version of MongoDB you need to map the MongoQueries to the object itself, so I made
@@ -139,7 +140,7 @@ export class MongoToClassConverter {
     }
 
 
-    async convertToResponse(mongoRes): Promise<ResponseToPoll> {
+    async convertToResponse(mongoRes): Promise<ResponderToPoll> {
         // throw error is object passed in is null or empty
         if (mongoRes == null) {
             throw new TypeError("user passed in is null or undefined, cannot convert to User objet")
@@ -154,11 +155,11 @@ export class MongoToClassConverter {
         const pollCreater = await pDao.findPollById(pollid)
 
 
-        const retResponse =  new ResponseToPoll(
+        const retResponse =  new ResponderToPoll(
             content,pollid,responderId
         )
 
-        return ResponseToPoll
+        return retResponse
     }
     
     async convertToPoll(mongoRes): Promise<Poll> {
