@@ -16,7 +16,7 @@ export default class PollController {
         this.app.get('/api/polls/:pid', this.findPollById) // find a poll by id
         this.app.delete('/api/polls/:pid', this.deletePollById) // delete a poll by id
         this.app.put('/api/polls/vote/:pid/users/:uid', this.vote) // vote on a poll
-        //this.app.put('/api/polls/unvote/:pid/users/:uid', this.unvote)
+        this.app.put('/api/polls/unvote/:pid/users/:uid', this.unvote)
 
 
     }
