@@ -254,8 +254,7 @@ export default class PollController {
             //TODO @Lauryn Responder_to_user DAO should add entry to collection here
 
             // create ResponderToPoll entry in database
-            await ResponderToPollDao.getInstance().createResponseToPoll(targetUser,
-                targetPoll, clientAnswer)
+            await ResponderToPollDao.getInstance().createResponseToPoll(targetUser, targetPoll, clientAnswer)
 
             // updates the vote
             controllerResp = await PollDao.getInstance().updateVote(targetPoll)
@@ -384,7 +383,7 @@ export default class PollController {
             controllerResp = await PollDao.getInstance().updateVote(targetPoll)
 
             // removing ResponderToPoll entry
-            await ResponderToPollDao.getInstance().deleteResponseToPoll(targetPoll)
+            await ResponderToPollDao.getInstance().deleteResponseToPoll(targetPollId)
         }
 
         res.json(controllerResp)
