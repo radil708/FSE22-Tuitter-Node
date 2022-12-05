@@ -26,7 +26,7 @@ on local ubuntu use cmd:
  */
 // const DB_USERNAME = process.env.DB_CLUSTER_USERNAME;
 // const DB_PASSWORD = process.env.DB_CLUSTER_PASSWORD;
-// Since we are no longer using aws online due to aws charges this will be hardcoded
+// Since we are no longer using aws online due to aws no longer being free this will be hardcoded
 const DB_USERNAME = "adilr";
 const DB_PASSWORD = "F22SoftEng";
 const DB_PROTOCOL = "mongodb+srv";

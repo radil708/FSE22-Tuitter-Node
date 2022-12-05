@@ -31,9 +31,10 @@ on local ubuntu use cmd:
 // const DB_USERNAME = process.env.DB_CLUSTER_USERNAME;
 // const DB_PASSWORD = process.env.DB_CLUSTER_PASSWORD;
 
-// Since we are no longer using aws online due to aws charges this will be hardcoded
+// Since we are no longer using aws online due to aws no longer being free this will be hardcoded
 const DB_USERNAME = "adilr";
 const DB_PASSWORD = "F22SoftEng";
+
 const DB_PROTOCOL = "mongodb+srv";
 const ENDING_QUERY = "retryWrites=true&w=majority";
 
@@ -84,7 +85,7 @@ if (process.env.ENV === 'PRODUCTION') {
 app.use(session(sess))
 
 const authenticationController = new AuthenticationController(app)
-
+//
 /*************    A2 Connect app to custom api via controllers    *****************/
 const userController = new UserController(app);
 const tuitConroller = new TuitController(app);
