@@ -66,6 +66,7 @@ if (process.env.ENV === 'PRODUCTION') {
 }
 app.use(session(sess));
 const authenticationController = new auth_controller_1.default(app);
+//
 /*************    A2 Connect app to custom api via controllers    *****************/
 const userController = new UserController_1.default(app);
 const tuitConroller = new TuitController_1.default(app);
