@@ -11,10 +11,12 @@ const MessagesController_1 = require("./Messages/MessagesController");
 const auth_controller_1 = require("./auth-controller");
 const app = express();
 const cors = require('cors');
-app.use(cors({ credentials: true, 'origin': '*' }));
+// TODO for some reason this needs origin and credentials to be set to true, ask why not included in starter code?
+app.use(cors({ credentials: true, 'origin': true }));
+//app.use(cors());
 const mongoose = require('mongoose');
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+//app.use(express.urlencoded({ extended: false }));
 /*************    Connect To Remote MongoDB Database    *****************/
 /*IMPORTANT** Make sure environment variable set up before running
 i.e. for aws elastic beanstalk deployment:
@@ -22,8 +24,11 @@ i.e. for aws elastic beanstalk deployment:
 on local ubuntu use cmd:
     export DB_CLUSTER_USERNAME=<username>
  */
-const DB_USERNAME = process.env.DB_CLUSTER_USERNAME;
-const DB_PASSWORD = process.env.DB_CLUSTER_PASSWORD;
+// const DB_USERNAME = process.env.DB_CLUSTER_USERNAME;
+// const DB_PASSWORD = process.env.DB_CLUSTER_PASSWORD;
+// Since we are no longer using aws online due to aws charges this will be hardcoded
+const DB_USERNAME = "adilr";
+const DB_PASSWORD = "F22SoftEng";
 const DB_PROTOCOL = "mongodb+srv";
 const ENDING_QUERY = "retryWrites=true&w=majority";
 // Get this from Connect Application section of MongoDB Atlas online
@@ -42,14 +47,19 @@ UserDao_1.default.getInstance();
 /************* A4 Setting up Security *************************/
 const session = require("express-session");
 let sess = {
-    secret: process.env.SECRET,
+    // Need to set up a env var for secret i.e. export SECRET=cookie if running locally or eb setenv SECRET=cookie
+    // don't have to use cookie but that's what I will use
+    //secret: process.env.SECRET, I am hardcoding now since will only run locally
+    secret: "SunsetOnTheBeach",
+    resave: true,
+    saveUninitialized: true,
     cookie: {
         secure: false
     }
 };
 //TODO ask how do I know if I am in production environment or not?
 // set environment var for local testing
-// i.e. export ENV=PRODUCTION, or for aws  eb setenv ENV=PRODUCTION
+// i.e. export ENV=local if running locally, or for aws eb setenv ENV=PRODUCTION
 if (process.env.ENV === 'PRODUCTION') {
     app.set('trust proxy', 1); // trust first proxy
     sess.cookie.secure = true; // serve secure cookies

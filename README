@@ -1,0 +1,3 @@
+Set up for running locally
+
+1.) Set the SECRET env var. So if using ubuntu use cmd: export SECRET=<your secret string>

@@ -25,8 +25,6 @@ class AuthenticationController {
     }
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            //set to true to see debug statements
-            let printDebug;
             //printDebug = true;
             let sendError = false;
             let error;
@@ -43,6 +41,7 @@ class AuthenticationController {
             let doesUserAlreadyExist;
             let existingUser;
             let match;
+            //
             // no error so fat
             if (sendError == false) {
                 //see if username already taken
@@ -58,7 +57,7 @@ class AuthenticationController {
                     existingUser = yield uDao.findUserbyUserName(username);
                     // compare encrypted passwords
                     match = yield bcrypt.compare(password, existingUser.getPassword());
-                    //found profile with matching password
+                    //found profile with matching password/profile
                     if (match == true) {
                         existingUser.setPassword("*******");
                         req.session['profile'] = existingUser;
@@ -74,6 +73,8 @@ class AuthenticationController {
             else {
                 throw EvalError("Something went wrong line 80 auth-controller");
             }
+            //set to true to see debug statements
+            let printDebug;
             if (printDebug == true) {
                 console.log("Request Body -> ", req.body);
                 console.log("Send status of response = ", res.statusCode);
@@ -118,8 +119,6 @@ class AuthenticationController {
     }
     signUp(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let printDebug;
-            //printDebug = true; // uncomment this line to see debug statements
             const uDao = UserDao_1.default.getInstance();
             // username and password must be in request body
             let wholeRequest = req.body;
@@ -156,6 +155,8 @@ class AuthenticationController {
             else {
                 res.json(insertedUser);
             }
+            //set to true to see debug statements
+            let printDebug = true;
             if (printDebug == true) {
                 console.log("Request body -> ", req.body);
                 console.log("Request after encryption -> ", wholeRequest);
