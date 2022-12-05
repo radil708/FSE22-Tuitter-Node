@@ -28,6 +28,14 @@ export default class ResponderToPollDao implements ResponderToPollDaoInterface {
     }
 
     /**
+     * Get all responderTopoll entries
+     */
+    async findAll() {
+        const dbResp = await ResponderToPollModel.find()
+        return dbResp;
+    }
+
+    /**
      * Creates a new entry in the Tuits Collection
      * @param userID
      * @param pollID
