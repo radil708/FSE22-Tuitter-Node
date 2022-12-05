@@ -40,7 +40,7 @@ export default class AuthenticationController {
         let doesUserAlreadyExist
         let existingUser
         let match
-
+        //
         // no error so fat
         if (sendError == false) {
 
