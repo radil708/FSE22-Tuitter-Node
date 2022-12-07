@@ -27,6 +27,12 @@ class LikeController {
         this.app.get('/users/:uid/likes', this.getAllTuitsLikedBy);
         this.app.get('/tuits/:tid/likes', this.getAllUsersThatLikedThisTuit);
         this.app.delete('/likes/:lid', this.unlike);
+        this.app.post('/api/likes/tuits/:tid/user/:uid', this.createLike);
+        this.app.get('/api/likes', this.getAllLikes);
+        this.app.get('/api/likes/:lid', this.getLikeById);
+        this.app.get('/api/likes/users/:uid', this.getAllTuitsLikedBy);
+        this.app.get('/api/likes/tuits/:tid', this.getAllUsersThatLikedThisTuit);
+        this.app.delete('/api/likes/:lid', this.unlike);
     }
     /**
      * Creates a new Like entry based on the client provided
