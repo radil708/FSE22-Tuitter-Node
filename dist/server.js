@@ -16,6 +16,7 @@ const mongoose = require('mongoose');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 /*************    Connect To Remote MongoDB Database    *****************/
+//
 /*IMPORTANT** Make sure environment variable set up before running
 i.e. for aws elastic beanstalk deployment:
     eb setenv DB_CLUSTER_USERNAME=<username>

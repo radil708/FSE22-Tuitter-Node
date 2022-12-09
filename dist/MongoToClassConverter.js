@@ -18,6 +18,7 @@ const Like_1 = require("./Likes/Like");
 const Follow_1 = require("./Follows/Follow");
 const Bookmark_1 = require("./Bookmarks/Bookmark");
 const Message_1 = require("./Messages/Message");
+const Poll_1 = require("./Polls/Poll");
 /**
  * In the newer version of MongoDB you need to map the MongoQueries to the object itself, so I made
  * this helper class to take care of that for me. It converts mongoResponses to actual class objects
@@ -106,6 +107,21 @@ class MongoToClassConverter {
             const recipientUser = yield uDao.findUserById(recipientId);
             const mResp = new Message_1.default(mId, content, senderUser, recipientUser, false);
             return mResp;
+        });
+    }
+    convertToPoll(mongoRes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const uDao = UserDao_1.default.getInstance();
+            const pId = mongoRes._id.toString();
+            // get the id of the user who posted the poll
+            const userId = mongoRes.author._id.toString();
+            // use the user ID to get a User object
+            const posterUserObj = yield uDao.findUserById(userId);
+            const pollQuestion = mongoRes.question.toString();
+            const pollAnswerOptionsArrStr = mongoRes.options;
+            const pollAnswerCountArrNum = mongoRes.optionCount;
+            const converted = new Poll_1.default(pId, posterUserObj, pollQuestion, pollAnswerOptionsArrStr);
+            return converted;
         });
     }
 }
