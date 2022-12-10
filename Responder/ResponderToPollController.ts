@@ -7,7 +7,7 @@ import {MongoToClassConverter} from "../MongoToClassConverter";
 import PollDao from "../Polls/PollDao";
 
 
-export default class PollController {
+export default class ResponderToPollController {
     app: Express;
 
     public constructor(appIn: Express) {
