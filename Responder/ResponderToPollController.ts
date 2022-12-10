@@ -16,7 +16,8 @@ export default class PollController {
         this.app.get("/api/respondertopolls", this.findAllResponderToPolls) // get all ResponderToPoll entries
         this.app.post('/api/respondertopolls/polls/:pid/users/:uid', this.createResponderToPoll) // make a new ResponderToPoll
         this.app.delete('/api/respondertopolls/polls/:pid/users/:uid', this.deleteResponderToPollById) // delete a ResponderToPoll by id
-
+        // this.app.get('/api/respondertopolls/polls/:pid/', this.findResponsesToPoll) // find all responses to poll
+        this.app.get('/api/respondertopolls/users/:uid', this.findAllPollsVotedOn) // search R2P by user IS THIS RIGHT??
     }
 
     async findAllResponderToPolls(req: Request, res: Response) {
@@ -62,6 +63,21 @@ export default class PollController {
         const targetPollId = req.params.pid
         const deletedCount = ResponderToPollDao.getInstance().deleteResponseToPoll(targetPollId)
         res.json({"ResponderToPollsDeleted" : deletedCount})
+    }
+
+    async findResponsesToPoll(req: Request, res: Response) {
+        const pDao = ResponderToPollDao.getInstance()
+        const all_rtpolls = await pDao.findAll();
+        res.send(all_rtpolls)
+    }
+
+    async findAllPollsVotedOn(req: Request, res: Response) {
+        const targetUserID = req.params.uid
+        const pDao = ResponderToPollDao.getInstance()
+        const all_votes = await pDao.findResponseToPollByUser(targetUserID);
+        res.send(all_votes)
+
+
     }
 
 }
