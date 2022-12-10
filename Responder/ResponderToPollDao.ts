@@ -42,12 +42,16 @@ export default class ResponderToPollDao implements ResponderToPollDaoInterface {
      * @param answer
      */
     async createResponseToPoll(userID: User, pollID: Poll, answer: string): Promise<ResponderToPoll> {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
         const daoJSON = await ResponderToPollModel.create({
             answer: answer,
             responderId: userID.getUserId(),
             pollId: pollID.getPollID()
         });
+        const newRTPid = daoJSON._id.toString()
+
+        // get user after being made, this returns a rtp type obj
+        return await this.findResponseToPollById(newRTPid)
     }
 
     /**
