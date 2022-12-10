@@ -29,6 +29,30 @@ export default class LikeController{
         this.app.get('/api/likes/users/:uid', this.getAllTuitsLikedBy)
         this.app.get('/api/likes/tuits/:tid', this.getAllUsersThatLikedThisTuit)
         this.app.delete('/api/likes/:lid', this.unlike)
+        this.app.get('/api/likes/users/:uid/tuits/:tid', this.getLikeByUserAndTuit)
+        this.app.put('/api/likes/users/:uid/tuits/:tid', this.toggleLikes)
+    }
+
+    async toggleLikes(req: Request, res: Response) {
+        const tLikeDao= LikeDao.getInstance();
+        const tuitId = req.params.tid;
+        const userId = req.params.uid;
+        const toggleRes = tLikeDao.toggleLikes(tuitId, userId)
+        res.send({"result":toggleRes})
+
+    }
+
+    async getLikeByUserAndTuit(req: Request, res: Response) {
+        const tLikeDao= LikeDao.getInstance();
+        const tuitId = req.params.tid;
+        const userId = req.params.uid;
+        const likeFound = tLikeDao.getLikeByUserAndTuit(tuitId, userId)
+        if (likeFound == null) {
+            res.send({"Error" : "no matching like"})
+        }
+        else {
+            res.send(likeFound)
+        }
     }
 
     /**

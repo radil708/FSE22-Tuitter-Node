@@ -13,6 +13,11 @@ const TuitSchema = new mongoose_1.default.Schema({
     postedBy: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'UserModel'
+    },
+    stats: {
+        replies: { type: Number, default: 0 },
+        retuits: { type: Number, default: 0 },
+        likes: { type: Number, default: 0 }
     }
 }, { collection: "Tuits" });
 exports.default = TuitSchema;

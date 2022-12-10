@@ -7,6 +7,7 @@ import Tuit from "../Tuits/Tuit";
 import User from "../Users/User";
 import UserDao from "../Users/UserDao";
 import LikeDaoInterface from "./LikeDaoInterface";
+import TuitModel from "../Tuits/TuitModel";
 
 
 export default class LikeDao implements LikeDaoInterface{
@@ -39,6 +40,17 @@ export default class LikeDao implements LikeDaoInterface{
             likedBy: likedByUserId
         })
 
+        const tDao = TuitDao.getInstance()
+        //
+        const tFromDb = await TuitModel.findById(likedTuitId)
+        let currentLikeCount = tFromDb.stats.likes
+        currentLikeCount += 1
+        tFromDb.stats.likes = currentLikeCount
+        const newStats = tFromDb.stats
+
+        //modify stats
+        await TuitModel.updateOne({_id: likedTuitId }, {$set:{stats: newStats}})
+
         const newLikeId = newLike._id.toString()
 
         return this.getLikeById(newLikeId);
@@ -61,6 +73,42 @@ export default class LikeDao implements LikeDaoInterface{
             return true
         }
         return false
+    }
+
+    async toggleLikes(likedTuitId: string, likedByUserId: string): Promise<number> {
+        const alreadyExist = await this.doesLikeEntryAlreadyExist(likedTuitId, likedByUserId)
+        let likeFromDb
+        let result
+        // if the user has already liked this tuit, toggle to unlike
+        if (alreadyExist) {
+            const arrResults = await LikeModel.find({
+                likedTuit:likedTuitId,
+                likedBy:likedByUserId})
+            //TODO delete
+            console.log(arrResults[0])
+            likeFromDb = arrResults[0]
+            await this.deleteLike(likeFromDb._id.toString())
+            result = 0
+        }
+        else {
+            await this.createLike(likedTuitId, likedByUserId)
+            result = 1
+        }
+        return result;
+    }
+
+    async getLikeByUserAndTuit(likedTuitId: string, likedByUserId: string): Promise<Like> {
+        // this is an array
+        const check = await LikeModel.find({
+            likedTuit:likedTuitId,
+            likedBy:likedByUserId})
+
+        if (check["likedTuit"] == null) {
+            return null
+        }
+        else {
+            return await this.converter.convertToLike(check)
+        }
     }
 
     /**
@@ -149,6 +197,19 @@ export default class LikeDao implements LikeDaoInterface{
      * @param likeId
      */
     async deleteLike(likeId: string): Promise<any> {
+        //
+        const likeFromDb = await LikeModel.findById(likeId)
+        const tuitFromDb = await TuitModel.findById(likeFromDb.likedTuit.toString())
+        //TODO delete print
+        console.log(tuitFromDb)
+
+        let currentLikeCount = tuitFromDb.stats.likes
+        currentLikeCount -= 1
+        tuitFromDb.stats.likes = currentLikeCount
+        const newStats = tuitFromDb.stats
+
+        //modify stats
+        await TuitModel.updateOne({_id: tuitFromDb._id.toString() }, {$set:{stats: newStats}})
         const dbResp = await LikeModel.deleteOne({_id: likeId})
         return dbResp.deletedCount;
     }

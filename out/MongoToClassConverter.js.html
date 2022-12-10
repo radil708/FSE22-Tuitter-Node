@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: MongoToClassConverter.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: MongoToClassConverter.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+var __awaiter = (this &amp;&amp; this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MongoToClassConverter = void 0;
+const User_1 = require("./Users/User");
+const UserDao_1 = require("./Users/UserDao");
+const TuitDao_1 = require("./Tuits/TuitDao");
+const Tuit_1 = require("./Tuits/Tuit");
+const Like_1 = require("./Likes/Like");
+const Follow_1 = require("./Follows/Follow");
+const Bookmark_1 = require("./Bookmarks/Bookmark");
+const Message_1 = require("./Messages/Message");
+/**
+ * In the newer version of MongoDB you need to map the MongoQueries to the object itself, so I made
+ * this helper class to take care of that for me. It converts mongoResponses to actual class objects
+ */
+class MongoToClassConverter {
+    // TODO ask, why can't I set more than one wihtout TypeError: MongoToClassConverter_1.MongoToClassConverter is not a constructor
+    //  attr??
+    //Pass in instance of DAO in getinstance
+    constructor() { }
+    convertToUser(mongoRes, showPassword = false, showNames = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const jScriptObj = mongoRes;
+            // throw error is object passed in is null or empty
+            if (jScriptObj == null || jScriptObj == undefined) {
+                throw new TypeError("user passed in is null or undefined, cannot convert to User objet");
+            }
+            let pwd = '';
+            let firstName = '';
+            let lastName = '';
+            if (showPassword == true) {
+                pwd = jScriptObj["password"];
+            }
+            if (showNames == true) {
+                firstName = jScriptObj["firstName"];
+                lastName = jScriptObj["lastName"];
+            }
+            return new User_1.default(jScriptObj["_id"], jScriptObj["username"], firstName, lastName, pwd, jScriptObj["email"]);
+        });
+    }
+    convertToTuit(mongoRes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // throw error is object passed in is null or empty
+            if (mongoRes == null || mongoRes == undefined) {
+                throw new TypeError("user passed in is null or undefined, cannot convert to User objet");
+            }
+            const tUserDao = UserDao_1.default.getInstance();
+            const tid = mongoRes["_id"].toString();
+            const uid = mongoRes["postedBy"]._id.toString();
+            const tuitedBy = yield tUserDao.findUserById(uid);
+            const retTuit = new Tuit_1.default(tid, mongoRes["tuit"], mongoRes["postedOn"], tuitedBy);
+            return retTuit;
+        });
+    }
+    convertToLike(mongoRes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const likeId = mongoRes["_id"].toString();
+            const likedTuitid = mongoRes["likedTuit"]._id.toString();
+            const likedById = mongoRes["likedBy"]._id.toString();
+            const tuitedBy = yield UserDao_1.default.getInstance().findUserById(likedById);
+            const likedTuit = yield TuitDao_1.default.getInstance().findTuitById(likedTuitid);
+            const retLike = new Like_1.default(likeId, likedTuit, tuitedBy);
+            return retLike;
+        });
+    }
+    convertToFollow(mongoRes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const followId = mongoRes["_id"].toString();
+            const userFollowedId = mongoRes.userFollowed._id.toString();
+            const userFollowingId = mongoRes.userFollowing._id.toString();
+            const uDao = UserDao_1.default.getInstance();
+            const userFollowed = yield uDao.findUserById(userFollowedId);
+            const userFollowing = yield uDao.findUserById(userFollowingId);
+            return new Follow_1.default(followId, userFollowed, userFollowing);
+        });
+    }
+    convertToBookmark(mongoRes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bId = mongoRes["_id"].toString();
+            const bookmarkedTuitId = mongoRes.bookmarkedTuit._id.toString();
+            const bookedBy = mongoRes.bookmarkedBy._id.toString();
+            const uDao = UserDao_1.default.getInstance();
+            const tDao = TuitDao_1.default.getInstance();
+            const userIn = yield uDao.findUserById(bookedBy);
+            const tuitIn = yield tDao.findTuitById(bookmarkedTuitId);
+            return new Bookmark_1.default(bId, tuitIn, userIn);
+        });
+    }
+    convertToMessage(mongoRes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mId = mongoRes._id.toString();
+            const senderId = mongoRes.sender._id.toString();
+            const recipientId = mongoRes.recipient._id.toString();
+            const content = mongoRes.content;
+            const uDao = UserDao_1.default.getInstance();
+            const senderUser = yield uDao.findUserById(senderId);
+            const recipientUser = yield uDao.findUserById(recipientId);
+            const mResp = new Message_1.default(mId, content, senderUser, recipientUser, false);
+            return mResp;
+        });
+    }
+}
+exports.MongoToClassConverter = MongoToClassConverter;
+//# sourceMappingURL=MongoToClassConverter.js.map</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Bookmark.html">Bookmark</a></li><li><a href="BookmarkController.html">BookmarkController</a></li><li><a href="BookmarkDao.html">BookmarkDao</a></li><li><a href="debugHelper.html">debugHelper</a></li><li><a href="Follow.html">Follow</a></li><li><a href="FollowController.html">FollowController</a></li><li><a href="Like.html">Like</a></li><li><a href="LikeController.html">LikeController</a></li><li><a href="LikeDao.html">LikeDao</a></li><li><a href="Location.html">Location</a></li><li><a href="Message.html">Message</a></li><li><a href="MessageDao.html">MessageDao</a></li><li><a href="MongoToClassConverter.html">MongoToClassConverter</a></li><li><a href="Tuit.html">Tuit</a></li><li><a href="User.html">User</a></li><li><a href="UserController.html">UserController</a></li><li><a href="UserDao.html">UserDao</a></li><li><a href="ValidationError.html">ValidationError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AccountType">AccountType</a></li><li><a href="global.html#BookmarkModel">BookmarkModel</a></li><li><a href="global.html#BookmarkSchema">BookmarkSchema</a></li><li><a href="global.html#FollowModel">FollowModel</a></li><li><a href="global.html#FollowSchema">FollowSchema</a></li><li><a href="global.html#LikeModel">LikeModel</a></li><li><a href="global.html#LikeSchema">LikeSchema</a></li><li><a href="global.html#MaritalStatus">MaritalStatus</a></li><li><a href="global.html#MessageModel">MessageModel</a></li><li><a href="global.html#MessageSchema">MessageSchema</a></li><li><a href="global.html#TuitModel">TuitModel</a></li><li><a href="global.html#TuitSchema">TuitSchema</a></li><li><a href="global.html#UserModel">UserModel</a></li><li><a href="global.html#UserSchema">UserSchema</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Sat Dec 10 2022 02:29:56 GMT-0500 (Eastern Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
