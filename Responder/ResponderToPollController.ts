@@ -1,5 +1,3 @@
-
-
 import {Express, Request, Response} from "express";
 import UserDao from "../Users/UserDao";
 import ResponderToPoll from "./ResponderToPoll";
