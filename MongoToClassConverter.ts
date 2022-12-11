@@ -148,15 +148,18 @@ export class MongoToClassConverter {
         const tUserDao = UserDao.getInstance();
         const pDao = PollDao.getInstance();
         const content = mongoRes.content
-        const pollid = mongoRes["_id"].toString()
+        const pollid = mongoRes.pollId._id.toString() // this is poll id
         const responderId = mongoRes["responderId"]._id.toString()
 
         const userResponded = await tUserDao.findUserById(responderId)
+
+        //TODO delete
+        console.log("convert to response poll id ->", pollid)
         const pollCreater = await pDao.findPollById(pollid)
 
 
         const retResponse =  new ResponderToPoll(
-            content,pollid,responderId
+            pollCreater,userResponded,mongoRes.answer
         )
 
         return retResponse
