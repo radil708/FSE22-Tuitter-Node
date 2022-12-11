@@ -52,6 +52,8 @@ class PollDao {
         return __awaiter(this, void 0, void 0, function* () {
             const dbResp = yield PollModel_1.default.findById(pollId);
             const conv = new MongoToClassConverter_1.MongoToClassConverter();
+            //todo delete
+            console.log("find poll by id ->", dbResp);
             return yield conv.convertToPoll(dbResp);
         });
     }
