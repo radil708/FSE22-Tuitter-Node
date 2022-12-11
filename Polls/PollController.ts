@@ -4,6 +4,7 @@ import Poll from "./Poll";
 import PollDao from "./PollDao";
 import debugHelper from "../debugHelper";
 import {MongoToClassConverter} from "../MongoToClassConverter";
+import ResponderToPollDao from "../Responder/ResponderToPollDao";
 
 export default class PollController {
     app: Express;
@@ -172,7 +173,7 @@ export default class PollController {
             errorMsg = {"Error": msg}
         }
 
-        let targetPoll;
+        let targetPoll; //Poll class object
 
 
         // if format is correct check if poll id exists in database
@@ -190,7 +191,7 @@ export default class PollController {
         }
 
         //****** CHECK USER ID FORMAT CORRECT AND USER EXISTS *******//
-        let targetUser;
+        let targetUser; // This is a User class object
 
         // if poll does exist check user exists
         if (doesPollExist == true) {
@@ -248,11 +249,19 @@ export default class PollController {
         }
         //all checks pass
         else {
+            targetPoll.incrementVote(matchingResponseIndex);
 
             //TODO @Lauryn Responder_to_user DAO should add entry to collection here
-            targetPoll.incrementVote(matchingResponseIndex);
-            // updates the vote
 
+
+            //targetUser is User class
+            //targetPoll is Poll class
+            //client answer is a string
+
+            // create ResponderToPoll entry in database
+            await ResponderToPollDao.getInstance().createResponseToPoll(targetUser, targetPoll, clientAnswer)
+
+            // updates the vote
             controllerResp = await PollDao.getInstance().updateVote(targetPoll)
         }
 
@@ -377,6 +386,9 @@ export default class PollController {
             // updates the vote
 
             controllerResp = await PollDao.getInstance().updateVote(targetPoll)
+
+            // removing ResponderToPoll entry
+            await ResponderToPollDao.getInstance().deleteResponseToPoll(targetPollId)
         }
 
         res.json(controllerResp)
