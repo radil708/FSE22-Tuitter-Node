@@ -54,6 +54,18 @@ class Tuit {
     getDate() {
         return this.postedOn;
     }
+    /**
+     * For A4 need to have a stats property
+     * @param likeCount
+     */
+    setStats(likeCount) {
+        if (likeCount == 0) {
+            this.stats = { replies: 0, retuits: 0, likes: 0 };
+        }
+        else {
+            this.stats = { replies: 0, retuits: 0, likes: likeCount };
+        }
+    }
 }
 exports.default = Tuit;
 //# sourceMappingURL=Tuit.js.map

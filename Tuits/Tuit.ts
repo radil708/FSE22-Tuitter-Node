@@ -9,6 +9,7 @@ export default class Tuit {
     private tuitContent: string = '';
     private postedOn: Date = new Date();
     private postedBy: User | null;
+    private stats: {}
 
 
     /**
@@ -62,6 +63,19 @@ export default class Tuit {
      */
     getDate(): Date {
         return this.postedOn;
+    }
+
+    /**
+     * For A4 need to have a stats property
+     * @param likeCount
+     */
+    setStats(likeCount: number): void {
+        if (likeCount == 0) {
+            this.stats = {replies:  0, retuits:  0, likes: 0}
+        }
+        else {
+            this.stats = {replies:  0, retuits:  0, likes: likeCount}
+        }
     }
 
 

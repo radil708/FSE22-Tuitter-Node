@@ -73,6 +73,13 @@ export class MongoToClassConverter {
             mongoRes["postedOn"],
             tuitedBy)
 
+        if (mongoRes.stats == null || mongoRes.stats.likes == null) {
+            retTuit.setStats(0)
+        }
+        else {
+            retTuit.setStats(mongoRes.stats.likes)
+        }
+
         return retTuit
 
     }

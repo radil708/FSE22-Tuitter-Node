@@ -58,6 +58,12 @@ class MongoToClassConverter {
             const uid = mongoRes["postedBy"]._id.toString();
             const tuitedBy = yield tUserDao.findUserById(uid);
             const retTuit = new Tuit_1.default(tid, mongoRes["tuit"], mongoRes["postedOn"], tuitedBy);
+            if (mongoRes.stats == null || mongoRes.stats.likes == null) {
+                retTuit.setStats(0);
+            }
+            else {
+                retTuit.setStats(mongoRes.stats.likes);
+            }
             return retTuit;
         });
     }
