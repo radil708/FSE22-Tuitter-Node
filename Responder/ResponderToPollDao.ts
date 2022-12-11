@@ -28,18 +28,33 @@ export default class ResponderToPollDao implements ResponderToPollDaoInterface {
     }
 
     /**
+     * Get all responderTopoll entries
+     */
+    async findAll() {
+        const dbResp = await ResponderToPollModel.find()
+        return dbResp;
+    }
+
+    /**
      * Creates a new entry in the Tuits Collection
      * @param userID
      * @param pollID
      * @param answer
      */
     async createResponseToPoll(userID: User, pollID: Poll, answer: string): Promise<ResponderToPoll> {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
         const daoJSON = await ResponderToPollModel.create({
             answer: answer,
             responderId: userID.getUserId(),
             pollId: pollID.getPollID()
         });
+
+        //todo delete
+        console.log("DAO JSON form createRespnse to Poll -> ", daoJSON)
+        const newRTPid = daoJSON._id.toString()
+
+        // get user after being made, this returns a rtp type obj
+        return await this.findResponseToPollById(newRTPid)
     }
 
     /**
@@ -88,9 +103,10 @@ export default class ResponderToPollDao implements ResponderToPollDaoInterface {
             retResponse = conv.convertToResponse(tartgetT)
         }
 
-        const printDebug = false;
+        const printDebug = true;
         if (printDebug) {
             console.log("Does pollId: " + pollID+ " exist?  ", pollIdExist)
+            console.log("Target t-> ", tartgetT)
             console.log("Response returned by model:\n", retResponse)
             debugHelper.printEnd("findResponseToPollById", "ResponseToPollDao")
         }
