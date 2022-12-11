@@ -48,6 +48,9 @@ export default class ResponderToPollDao implements ResponderToPollDaoInterface {
             responderId: userID.getUserId(),
             pollId: pollID.getPollID()
         });
+
+        //todo delete
+        console.log("DAO JSON form createRespnse to Poll -> ", daoJSON)
         const newRTPid = daoJSON._id.toString()
 
         // get user after being made, this returns a rtp type obj
@@ -100,9 +103,10 @@ export default class ResponderToPollDao implements ResponderToPollDaoInterface {
             retResponse = conv.convertToResponse(tartgetT)
         }
 
-        const printDebug = false;
+        const printDebug = true;
         if (printDebug) {
             console.log("Does pollId: " + pollID+ " exist?  ", pollIdExist)
+            console.log("Target t-> ", tartgetT)
             console.log("Response returned by model:\n", retResponse)
             debugHelper.printEnd("findResponseToPollById", "ResponseToPollDao")
         }

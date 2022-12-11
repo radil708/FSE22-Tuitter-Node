@@ -120,11 +120,13 @@ class MongoToClassConverter {
             const tUserDao = UserDao_1.default.getInstance();
             const pDao = PollDao_1.default.getInstance();
             const content = mongoRes.content;
-            const pollid = mongoRes["_id"].toString();
+            const pollid = mongoRes.pollId._id.toString(); // this is poll id
             const responderId = mongoRes["responderId"]._id.toString();
             const userResponded = yield tUserDao.findUserById(responderId);
+            //TODO delete
+            console.log("convert to response poll id ->", pollid);
             const pollCreater = yield pDao.findPollById(pollid);
-            const retResponse = new ResponderToPoll_1.default(content, pollid, responderId);
+            const retResponse = new ResponderToPoll_1.default(pollCreater, userResponded, mongoRes.answer);
             return retResponse;
         });
     }

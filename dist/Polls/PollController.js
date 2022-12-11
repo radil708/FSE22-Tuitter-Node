@@ -14,6 +14,7 @@ const Poll_1 = require("./Poll");
 const PollDao_1 = require("./PollDao");
 const debugHelper_1 = require("../debugHelper");
 const MongoToClassConverter_1 = require("../MongoToClassConverter");
+const ResponderToPollDao_1 = require("../Responder/ResponderToPollDao");
 class PollController {
     constructor(appIn) {
         this.app = appIn;
@@ -158,7 +159,7 @@ class PollController {
                 let msg = "Format is incorrect for uid\n" + "uid must be a string of 12 bytes or a string of 24 hex characters or an integer";
                 errorMsg = { "Error": msg };
             }
-            let targetPoll;
+            let targetPoll; //Poll class object
             // if format is correct check if poll id exists in database
             if (errorMsg == null) {
                 // poll DOES exist in database
@@ -172,7 +173,7 @@ class PollController {
                 }
             }
             //****** CHECK USER ID FORMAT CORRECT AND USER EXISTS *******//
-            let targetUser;
+            let targetUser; // This is a User class object
             // if poll does exist check user exists
             if (doesPollExist == true) {
                 // check if userid format is correct
@@ -220,8 +221,13 @@ class PollController {
             }
             //all checks pass
             else {
-                //TODO @Lauryn Responder_to_user DAO should add entry to collection here
                 targetPoll.incrementVote(matchingResponseIndex);
+                //TODO @Lauryn Responder_to_user DAO should add entry to collection here
+                //targetUser is User class
+                //targetPoll is Poll class
+                //client answer is a string
+                // create ResponderToPoll entry in database
+                yield ResponderToPollDao_1.default.getInstance().createResponseToPoll(targetUser, targetPoll, clientAnswer);
                 // updates the vote
                 controllerResp = yield PollDao_1.default.getInstance().updateVote(targetPoll);
             }
@@ -326,6 +332,8 @@ class PollController {
                 targetPoll.decrementVote(matchingResponseIndex);
                 // updates the vote
                 controllerResp = yield PollDao_1.default.getInstance().updateVote(targetPoll);
+                // removing ResponderToPoll entry
+                yield ResponderToPollDao_1.default.getInstance().deleteResponseToPoll(targetPollId);
             }
             res.json(controllerResp);
             let printDebug = false;

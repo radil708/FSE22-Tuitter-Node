@@ -28,8 +28,8 @@ i.e. for aws elastic beanstalk deployment:
 on local ubuntu use cmd:
     export DB_CLUSTER_USERNAME=<username>
  */
-const DB_USERNAME = process.env.DB_CLUSTER_USERNAME;
-const DB_PASSWORD = process.env.DB_CLUSTER_PASSWORD;
+const DB_USERNAME = "cribbsr";
+const DB_PASSWORD = "fse22";
 const DB_PROTOCOL = "mongodb+srv";
 const ENDING_QUERY = "retryWrites=true&w=majority";
 

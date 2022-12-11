@@ -49,6 +49,8 @@ export default class PollDao {
     async findPollById(pollId: string): Promise<Poll> {
         const dbResp = await PollModel.findById(pollId);
         const conv = new MongoToClassConverter();
+        //todo delete
+        console.log("find poll by id ->", dbResp)
         return await conv.convertToPoll(dbResp);
     }
     //
