@@ -44,8 +44,10 @@ export default class ResponderToPollController {
 
         /**
         let errorMsg = null;
+
         // Check is userid format correct and that it exists, catch BSONTypeError
         let userIdExists = false;
+
         try {
             userIdExists = await UserDao.getInstance().doesUserIdExist(userId)
         }
