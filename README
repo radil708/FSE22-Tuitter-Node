@@ -4,8 +4,8 @@ LANGUAGE: javascript
 
 This is the backend I built for a social media "twitter" like website called "Tuitter". 
 The backend interacts with a MongoDB server to create, store, and manage data.
-You can sign up for an account, post a tweet, and send messages
-to other users.
+Backend features implemented include sending messages, posting "tuits",
+storing likes, and bookmarks.
 
 ############## REQUIREMENTS ##################
 1.) nodejs 
@@ -13,9 +13,17 @@ to other users.
 3.) mongoose module for nodejs (npm install mongoose)
 4.) express module for nodejs (npm install express)
 5.) elastic beanstalk (eb) for aws
+6.) Connection to the internet (needed to connect to MongoDB)
 
 ################# HOW TO RUN LOCALLY ####################
-This server code was meant to run in conjuntion with 
+Note: I use intelliJ as my IDE and I use ubuntu
+to execute commands, so I will provide instructions
+on how to run the code using ubuntu and IntelliJ
+but you can use your own environment and command
+shell as long as you install the proper requirements
+for them.
+
+This server code was meant to run in conjuncion with 
 my react (front end) code, which you can find here 
 https://github.com/radil708/FSE22-A3-React.
 
@@ -25,11 +33,19 @@ https://github.com/radil708/FSE22-A3-React.
      am using security features via express module.
      -> Ex. if you are using ubuntu, run the cmd:
            "export SECRET=SunsetOnTheBeach" (without quotes)
-2.) Run the command: npm run build
+2.) Open ubuntu and navigate to this repo.
+    Run the command: npm run build
   -> This will run the back end server on port 4000
   -> Make sure there are no conflicts with port use
-  -> This will open a new page on your browser
-3.) Run the react repo. 
+  -> You know it is working if you search for  
+     localhost:4000 on the addressbar of any browser
+     and you are greeted to a white page with the words
+     "Welcome to Ramzi's Fall2022 SoftEng Home Page".
+3.) Open a different ubuntu terminal window. Navigate
+    to the react repo. Run the react repo with the command
+    npm start.
 4.) Tuitter will be opened in a new page 
     on your browser
+    
+
     
