@@ -1,3 +1,35 @@
-Set up for running locally
 
-1.) Set the SECRET env var. So if using ubuntu use cmd: export SECRET=<your secret string>
+################## DESCRIPTION ##################
+LANGUAGE: javascript
+
+This is the backend I built for a social media "twitter" like website called "Tuitter". 
+The backend interacts with a MongoDB server to create, store, and manage data.
+You can sign up for an account, post a tweet, and send messages
+to other users.
+
+############## REQUIREMENTS ##################
+1.) nodejs 
+2.) typescript
+3.) mongoose module for nodejs (npm install mongoose)
+4.) express module for nodejs (npm install express)
+5.) elastic beanstalk (eb) for aws
+
+################# HOW TO RUN LOCALLY ####################
+This server code was meant to run in conjuntion with 
+my react (front end) code, which you can find here 
+https://github.com/radil708/FSE22-A3-React.
+
+0.) Install all requirements.
+1.) Download this repo & my react repo
+2.) You will NEED to set an environment variable, because I 
+     am using security features via express module.
+     -> Ex. if you are using ubuntu, run the cmd:
+           "export SECRET=SunsetOnTheBeach" (without quotes)
+2.) Run the command: npm run build
+  -> This will run the back end server on port 4000
+  -> Make sure there are no conflicts with port use
+  -> This will open a new page on your browser
+3.) Run the react repo. 
+4.) Tuitter will be opened in a new page 
+    on your browser
+    
